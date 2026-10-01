@@ -1,0 +1,1809 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2a44a8">
+<title>Sổ Kiểm Tra Kachiboshi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+JP:wght@400;600&display=swap">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+<style>
+/* Layout: sổ tay kiểm tra ca — thanh tab dính trên cùng, một cột trên điện thoại; dashboard lưới 2 cột trên màn rộng. Mực xanh bút bi như phiếu giấy. */
+:root{
+  --bg:#eef1f0; --paper:#ffffff; --ink:#1b2430; --muted:#5d6a72; --line:#d3dad8;
+  --pen:#2a44a8; --pen-soft:#e4e9f8; --on-pen:#ffffff;
+  --ok:#1f7a4d; --ok-soft:#e1f2e8; --ng:#c0322b; --ng-soft:#fbe3e1; --warn:#a86400; --warn-soft:#fbefd9; --idle:#8a969c; --idle-soft:#eceff0;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Be Vietnam Pro","Noto Sans JP",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12171c; --paper:#1a2128; --ink:#e6ebee; --muted:#9aa7ae; --line:#2e3942;
+  --pen:#8fa6ff; --pen-soft:#232d4d; --on-pen:#10152a;
+  --ok:#5fcf93; --ok-soft:#173326; --ng:#ff7f77; --ng-soft:#3a1c1b; --warn:#f0b04a; --warn-soft:#3a2c13; --idle:#7d8a91; --idle-soft:#222a31;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171c; --paper:#1a2128; --ink:#e6ebee; --muted:#9aa7ae; --line:#2e3942;
+  --pen:#8fa6ff; --pen-soft:#232d4d; --on-pen:#10152a;
+  --ok:#5fcf93; --ok-soft:#173326; --ng:#ff7f77; --ng-soft:#3a1c1b; --warn:#f0b04a; --warn-soft:#3a2c13; --idle:#7d8a91; --idle-soft:#222a31;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+:lang(ja) body, body.ja{line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:0 64px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:12px 6px}
+.brand h1{font-family:var(--f-display);font-size:26px;letter-spacing:.02em;margin:0;line-height:1.1;text-transform:uppercase}
+body.ja .brand h1{font-family:var(--f-body);font-size:20px;font-weight:700}
+.brand .jp{color:var(--muted);font-size:12px}
+.brand .tools{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.langsw{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.langsw button{border:0;background:none;color:var(--muted);font:600 12px var(--f-body);padding:5px 10px;cursor:pointer}
+.langsw button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.mebtn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:5px 12px;font:600 13px var(--f-body);cursor:pointer}
+.role{font-size:11px;color:var(--muted);font-weight:500}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px}
+nav.tabs button{flex:0 0 auto;border:1px solid transparent;background:none;color:var(--muted);font:600 14px var(--f-body);padding:8px 14px;border-radius:999px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,label.cam:focus-within{outline:2px solid var(--pen);outline-offset:2px}
+.banner{margin-top:14px;padding:10px 14px;border-radius:var(--r);background:var(--warn-soft);color:var(--warn);font-size:14px}
+.banner.info{background:var(--pen-soft);color:var(--pen)}
+section.view{padding-top:18px;display:flex;flex-direction:column;gap:18px}
+h2{font-family:var(--f-display);font-size:24px;text-transform:uppercase;letter-spacing:.03em;margin:0;line-height:1.2;text-wrap:balance}
+body.ja h2{font-family:var(--f-body);font-size:20px;font-weight:700}
+h3{font-size:15px;margin:0}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.sub{color:var(--muted);font-size:13px}
+.jp-s{color:var(--muted);font-size:12px;display:block}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.forms{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.formcard{text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r);padding:14px;cursor:pointer;color:var(--ink);font:inherit;display:flex;flex-direction:column;gap:2px}
+.formcard b{font-size:16px}
+.formcard[aria-pressed="true"]{border-color:var(--pen);background:var(--pen-soft)}
+.row{display:flex;flex-wrap:wrap;gap:14px}
+.row>.field{flex:1 1 180px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:500 14px var(--f-body);padding:8px 14px;border-radius:999px;cursor:pointer;min-height:40px}
+.chip[aria-pressed="true"]{border-color:var(--pen);background:var(--pen);color:var(--on-pen)}
+.chip.sm{min-height:32px;padding:4px 10px;font-size:13px}
+input[type=date],input[type=time],input[type=month],input[type=text],input[type=password],input[type=number],select,textarea{width:100%;font:16px var(--f-body);color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;min-height:42px}
+textarea{min-height:84px;resize:vertical}
+.items{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.item{display:flex;align-items:center;gap:12px;padding-block:12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.item .txt{flex:1 1 200px;min-width:0}
+.seg{display:flex;gap:6px}
+.seg button,.pt{min-width:64px;min-height:44px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:700 15px var(--f-data);border-radius:8px;cursor:pointer}
+.seg button.on-OK,.pt.on-OK{background:var(--ok);border-color:var(--ok);color:#fff}
+.seg button.on-NG,.pt.on-NG{background:var(--ng);border-color:var(--ng);color:#fff}
+.pts{display:grid;grid-template-columns:repeat(3,minmax(58px,1fr));gap:6px}
+.pts .h{font-size:11px;text-align:center;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.btn{border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);font:600 14px var(--f-body);padding:9px 16px;border-radius:8px;cursor:pointer;min-height:42px;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn.primary{background:var(--pen);border-color:var(--pen);color:var(--on-pen);font-size:16px;padding:12px 22px}
+.btn.ghost{border-color:var(--line)}
+.btn.danger{border-color:var(--ng);color:var(--ng)}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.stepper{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:4px 6px 4px 12px}
+.stepper span{flex:1;font-size:14px}
+.stepper button{width:36px;height:36px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;font:700 18px var(--f-data);cursor:pointer}
+.stepper output{min-width:28px;text-align:center;font:600 16px var(--f-data)}
+.defects{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px}
+.stepper span{min-width:0;overflow-wrap:anywhere}
+.measure{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.measure .big{font:600 28px var(--f-data);padding:10px 12px;min-height:56px}
+.range{font-size:13px;margin-top:6px;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font:600 12px var(--f-body);white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.p-ok{background:var(--ok-soft);color:var(--ok)} .p-ng{background:var(--ng-soft);color:var(--ng)} .p-warn{background:var(--warn-soft);color:var(--warn)} .p-idle{background:var(--idle-soft);color:var(--idle)} .p-pen{background:var(--pen-soft);color:var(--pen)}
+.ngbox{border:1.5px solid var(--ng);background:var(--ng-soft);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.ngbox strong{color:var(--ng)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.check input{width:22px;height:22px;flex:0 0 auto;margin-top:1px}
+.savebar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.result{font:700 20px var(--f-display);letter-spacing:.04em;text-transform:uppercase}
+.msg{font-size:14px}
+.msg.err{color:var(--ng)} .msg.warn{color:var(--warn)} .msg.ok{color:var(--ok)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;z-index:30;box-shadow:0 6px 20px rgb(0 0 0 / .2);max-width:calc(100% - 32px);text-align:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
+.stat b{display:block;font:600 26px var(--f-data);font-variant-numeric:tabular-nums;line-height:1.2}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat.ng b{color:var(--ng)} .stat.warn b{color:var(--warn)} .stat.ok b{color:var(--ok)}
+.board{display:flex;flex-direction:column;gap:14px}
+.bgroup h3{font-size:15px;margin-bottom:6px}
+.brow{display:grid;grid-template-columns:minmax(90px,1.1fr) 1fr 1fr;gap:8px;align-items:stretch;margin-bottom:8px}
+.brow .name{font-weight:600;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.brow .name small{font-weight:400;color:var(--muted);font-size:12px}
+.slot{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--ink);font:inherit;display:flex;flex-direction:column;gap:4px;min-width:0}
+.slot small{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.ng{border-color:var(--ng)} .slot.late{border-color:var(--warn)}
+.slot:disabled{cursor:default;opacity:.8}
+.bhead{display:grid;grid-template-columns:minmax(90px,1.1fr) 1fr 1fr;gap:8px;font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
+td.wrapc{white-space:normal;min-width:180px}
+td.num,th.num{text-align:right}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--bg)}
+td.mono{font-family:var(--f-data)}
+tr.ngrow td{background:var(--ng-soft)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:14px}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:14px}
+.hbars{display:flex;flex-direction:column;gap:8px}
+.hbar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;gap:10px;align-items:center;font-size:13px}
+.hbar .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .lab small{color:var(--muted)}
+.hbar .track{height:14px;background:var(--idle-soft);border-radius:4px;overflow:hidden}
+.hbar .fill{height:100%;border-radius:0 4px 4px 0;background:var(--pen)}
+.hbar .fill.ng{background:var(--ng)}
+.hbar .val{font:600 13px var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chart svg{display:block;width:100%;height:auto}
+.chartwrap{overflow-x:auto}
+.chartwrap svg{min-width:460px}
+.heat{border-collapse:separate;border-spacing:2px;font-size:11px}
+.heat th,.heat td{padding:0;border:0;background:none;white-space:nowrap}
+.heat th{font-weight:600;color:var(--muted);text-align:center;padding:2px;text-transform:none;letter-spacing:0}
+.heat th.rowh{text-align:left;padding-right:8px;font-size:12px;color:var(--ink);position:sticky;left:0;background:var(--paper)}
+.hc{display:flex;flex-direction:column;gap:1px;width:18px}
+.hc i{display:block;height:9px;border-radius:2px;background:var(--idle-soft)}
+.hc i.ok{background:var(--ok)} .hc i.ng{background:var(--ng)} .hc i.miss{background:var(--warn)} .hc i.late{background:var(--ok);outline:2px solid var(--warn);outline-offset:-2px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:10px;border-radius:2px;display:inline-block}
+.approve{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px;border:1.5px dashed var(--line);border-radius:var(--r)}
+.src{font-size:11px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:var(--r)}
+.inline-confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;background:var(--warn-soft);border-radius:8px;color:var(--warn);font-size:14px}
+/* Ảnh */
+.photos{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label.cam{display:inline-flex;align-items:center;gap:6px;border:1.5px dashed var(--pen);color:var(--pen);border-radius:8px;padding:8px 12px;cursor:pointer;font:600 13px var(--f-body);min-height:44px;background:var(--paper)}
+label.cam.req{border-style:solid;background:var(--pen-soft)}
+label.cam svg{width:18px;height:18px}
+.thumb{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--idle-soft);padding:0;cursor:pointer}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .x{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;border:0;background:rgb(0 0 0 / .6);color:#fff;font:700 13px var(--f-body);cursor:pointer;line-height:22px;padding:0}
+.thumb small{position:absolute;left:0;right:0;bottom:0;background:rgb(0 0 0 / .55);color:#fff;font:10px var(--f-data);text-align:center}
+.minithumbs{display:flex;gap:4px}
+.minithumbs button{width:36px;height:36px;padding:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--idle-soft);cursor:pointer}
+.minithumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-need{font-size:12px;color:var(--pen);font-weight:600}
+/* Modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgb(10 14 20 / .72);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .box{background:var(--paper);color:var(--ink);border-radius:var(--r);max-width:min(900px,100%);max-height:100%;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;width:100%}
+.modal .box.narrow{max-width:420px}
+.modal img.full{width:100%;height:auto;border-radius:6px;background:#000}
+.modal .gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.modal figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.modal figcaption{font-size:12px;color:var(--muted)}
+/* Đăng nhập */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding-inline:16px;padding-block:24px}
+.login .box{width:100%;max-width:400px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.login h1{font-family:var(--f-display);font-size:30px;text-transform:uppercase;margin:0;line-height:1.1}
+body.ja .login h1{font-family:var(--f-body);font-size:24px}
+.linkbtn{background:none;border:0;color:var(--pen);font:600 13px var(--f-body);cursor:pointer;padding:0;text-align:left;text-decoration:underline}
+.code{font:12px/1.5 var(--f-data);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;white-space:pre;max-height:280px;margin:0}
+details summary{cursor:pointer;font-weight:600}
+.ulist .u{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding-block:10px;border-bottom:1px solid var(--line)}
+.ulist .u .who b{display:block}
+.ulist .u .who small{color:var(--muted)}
+.asg{display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,3fr);gap:10px;padding-block:12px;border-bottom:1px solid var(--line);align-items:start}
+@media (max-width:560px){.asg{grid-template-columns:1fr}.ulist .u{grid-template-columns:1fr auto}.ulist .u .rolecell{grid-column:1/-1}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast" hidden role="status"></div>
+<div id="modal"></div>
+<script>
+/* =====================================================================
+   CẤU HÌNH FIREBASE — dán cấu hình dự án của bạn vào đây.
+   Để trống apiKey => app chạy CHẾ ĐỘ DÙNG THỬ (lưu trên máy này).
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  appId: ""
+};
+/* Nơi lưu ảnh: "firestore" (gói miễn phí Spark, ảnh nén ~100 KB lưu trong Firestore)
+   hoặc "storage" (Cloud Storage, cần gói Blaze, phù hợp khi nhiều ảnh). */
+const PHOTO_BACKEND = "firestore";
+/* Tên đăng nhập được đổi thành email nội bộ: phuc -> phuc@kachiboshi.local
+   Phải khớp với địa chỉ admin trong Firestore Rules. */
+const LOGIN_DOMAIN = "kachiboshi.local";
+
+(function(){
+"use strict";
+
+/* ---------- Ngôn ngữ ---------- */
+const L = {
+vi:{
+  app:"Sổ kiểm tra ca", appSub:"Kachiboshi · Quản lý chất lượng",
+  tab_entry:"Nhập phiếu", tab_today:"Hôm nay", tab_dash:"Dashboard", tab_report:"Báo cáo", tab_assign:"Phân công", tab_users:"Tài khoản", tab_settings:"Cài đặt",
+  role_admin:"Quản lý", role_leader:"Tổ trưởng", role_staff:"Nhân viên kiểm tra", role_viewer:"Người xem báo cáo",
+  username:"Mã nhân viên", password:"Mật khẩu", pw_show:"Hiện", pw_hide:"Ẩn", pw_none:"Chưa lưu", set_pw:"Đổi mật khẩu", pw_forgot:"Quên mật khẩu? Liên hệ tổ trưởng hoặc quản lý để được cung cấp lại.", pw_view_note:"Mật khẩu hiển thị cho quản lý và tổ trưởng phụ trách để hỗ trợ khi nhân viên quên.", pw_nosecret:"Không đổi được: tài khoản này chưa lưu mật khẩu trong app. Đặt lại trong Firebase Console › Authentication.", ap_l1:"Tổ trưởng đã duyệt", ap_l2:"Quản lý đã xác nhận", approve_l1:"Tổ trưởng duyệt", approve_l2:"Quản lý xác nhận", ap_wait_l1:"Chờ tổ trưởng duyệt", ap_wait_l2:"Chờ quản lý xác nhận", ap_short:"{a} TT · {b} QL / {n}", viewer_all:"Xem tất cả khu vực (chỉ đọc)", password2:"Nhập lại mật khẩu", login:"Đăng nhập", logout:"Đăng xuất",
+  login_err:"Sai mã nhân viên hoặc mật khẩu.", login_inactive:"Tài khoản đã bị khoá. Liên hệ quản lý.", login_noprofile:"Tài khoản chưa được cấp quyền. Liên hệ quản lý.",
+  login_net:"Không kết nối được máy chủ. Kiểm tra mạng.", demo_hint:"Chế độ dùng thử — dữ liệu lưu trên máy này. Đăng nhập lần đầu: admin / admin123, sau đó đổi mật khẩu.",
+  demo_banner:"Chế độ dùng thử: dữ liệu lưu trên máy này. Gắn Firebase để nhiều máy dùng chung.",
+  first_setup:"Thiết lập lần đầu: tạo tài khoản admin", first_setup_desc:"Chỉ làm một lần sau khi gắn Firebase. Tên đăng nhập admin cố định là “admin”.",
+  create_admin:"Tạo tài khoản admin", back:"Quay lại", pw_mismatch:"Hai mật khẩu không khớp.", pw_short:"Mật khẩu tối thiểu 6 ký tự.",
+  admin_exists:"Tài khoản admin đã tồn tại. Hãy đăng nhập.", created_admin:"Đã tạo admin. Đang đăng nhập…",
+  change_pw:"Đổi mật khẩu", old_pw:"Mật khẩu hiện tại", new_pw:"Mật khẩu mới", save:"Lưu", cancel:"Huỷ", close:"Đóng", pw_changed:"Đã đổi mật khẩu.",
+  step_form:"1 · Chọn phiếu", step_line:"2 · Line / máy", step_machine:"2 · Máy", step_items:"4 · Nội dung kiểm tra", step_code:"3 · Mã hàng", code_first:"Nhập mã hàng trước khi kiểm tra.", req_code:"mã hàng", recent_codes:"Mã gần đây", c_codes:"Mã hàng có nhiều bất thường nhất", c_codes_s:"Số lần NG + hàng lỗi theo mã hàng",
+  date:"Ngày", check_round:"Lần kiểm", time:"Giờ kiểm", inspector:"Người thực hiện",
+  ca_sang:"Sáng", ca_chieu:"Chiều", ca_sang_l:"Sáng · trước giờ làm", ca_chieu_l:"Chiều · sau nghỉ trưa",
+  no_lines:"Chưa có line nào. Quản lý thêm ở tab Cài đặt.", no_assigned:"Bạn chưa được phân công line nào cho phiếu này. Liên hệ quản lý.",
+  all_ok:"Tất cả OK", all_pass:"Cả 3 mục Đạt", kim_hint:"Thả mẫu kim thử tại 3 điểm băng chuyền. Chạm ô để đổi OK ↔ NG.",
+  pass:"Đạt", product_code:"Mã hàng / chủng loại", defects_title:"Hàng lỗi loại ra (số chiếc) — tổng {n}",
+  temp:"Nhiệt độ (°C)", speed:"Tốc độ băng chuyền", std:"Chuẩn {a}–{b}{u}", in_std:"Trong chuẩn {a}–{b}{u}", out_std:"Ngoài chuẩn {a}–{b}{u}",
+  note:"Ghi chú", note_req:"Ghi chú (bắt buộc)", note_ph_ng:"Mô tả bất thường và cách xử lý", note_ph:"Không bắt buộc",
+  ng_found:"Phát hiện bất thường: {x}", ng_stop:"Ngưng kiểm hàng và báo ngay cho {who}.", ng_confirm:"Tôi đã dừng máy / ngưng kiểm hàng và đã báo cho {who}",
+  save_sheet:"Lưu phiếu", saving:"Đang lưu…", result:"Kết quả", reset:"Làm lại",
+  exists_warn:"Ca này đã có phiếu ({who}, {time}). Lưu sẽ thay phiếu cũ.", open_old:"Mở phiếu cũ để sửa", editing:"Đang sửa phiếu đã lưu.",
+  not_owner:"Ca này đã có phiếu của {who}. Chỉ tổ trưởng hoặc quản lý được sửa.",
+  missing:"Còn thiếu: {x}.", need_note:"Phiếu NG cần ghi chú mô tả bất thường.", need_confirm:"Hãy xác nhận đã dừng máy và báo người phụ trách.",
+  need_photo:"Thiếu ảnh chứng minh: {x}.", saved_at:"Đã lưu lúc {t}. Có thể nhập tiếp line khác.", saved_toast:"Đã lưu phiếu {f} · {l}", saved_ng:"Đã lưu phiếu NG. Nhớ báo người phụ trách.",
+  save_fail:"Chưa lưu được ({c}). Kiểm tra mạng rồi bấm Lưu lại.", photo_fail:"Không tải được ảnh ({c}). Ảnh cần có mạng; kiểm tra wifi rồi lưu lại.",
+  uploading:"Đang gửi ảnh {i}/{n}…",
+  photo:"Ảnh chứng minh", take_photo:"Chụp ảnh", photo_sheet:"Ảnh tổng thể phiếu", photo_req:"bắt buộc", remove_def:"Xoá lỗi này", processing:"Đang nén ảnh…", photo_err:"Không đọc được ảnh này.",
+  photo_mode_hint_item:"Mỗi hạng mục cần 1 ảnh.", photo_mode_hint_sheet_ng:"Cần 1 ảnh cho phiếu, thêm ảnh cho mỗi mục NG.", photo_mode_hint_ng:"Chỉ cần ảnh cho mục NG.",
+  today_title:"Tình trạng {d}", today_hint:"Chạm vào ô để nhập hoặc sửa phiếu của ca đó.", line_machine:"Line / máy", assigned:"Phụ trách",
+  st_ok:"Đạt", st_ng:"NG", st_over:"Quá giờ, chưa kiểm", st_wait:"Chờ kiểm · hạn {t}", st_late:"Nhập trễ", st_overdue_n:"Quá giờ chưa kiểm", st_off:"Ngày nghỉ", st_pre:"Trước ngày áp dụng", k_open_all:"Tính trên 3 tháng gần nhất, mọi phiếu trong khu vực", col_miss:"Bỏ sót (ca)", st_wait_n:"Chờ kiểm",
+  rep_title:"Báo cáo tháng", rep_sub:"Thay cho phiếu giấy nộp cuối tháng. Tổ trưởng / quản lý duyệt điện tử ở cuối trang.",
+  month:"Tháng", form:"Phiếu", n_checks:"Số lần kiểm", n_days:"Số ngày có kiểm", n_ng:"Lần NG", n_half:"Ngày thiếu 1 ca", n_late:"Nhập trễ hạn",
+  no_recs:"Chưa có phiếu nào của {l} trong tháng {m}.", col_day:"Ngày", col_ca:"Ca", col_time:"Giờ", col_code:"Mã hàng", col_defect:"Hàng lỗi", col_res:"KQ", col_by:"Người TH", col_note:"Ghi chú", col_photo:"Ảnh", col_src:"Nguồn",
+  src_paper:"Phiếu giấy", src_app:"App", src_sample:"Mẫu", reported:"đã báo", not_reported:"chưa xác nhận đã báo",
+  approved:"Đã duyệt", not_approved:"Chưa duyệt", approve:"Duyệt tháng này", unapprove:"Bỏ duyệt", approve_note:"Nhận xét (không bắt buộc)", approve_who:"Tổ trưởng duyệt trước, quản lý xác nhận sau — thay chữ ký cuối tháng.",
+  csv_one:"Tải Excel (CSV) phiếu này", csv_all:"Tải CSV cả tháng, mọi phiếu", downloaded:"Đã tải {f}",
+  dash_title:"Dashboard chất lượng", dash_sub:"Tổng hợp lỗi phát sinh, mức tuân thủ kiểm tra và người phụ trách.", from:"Từ tháng", to:"Đến tháng", all:"Tất cả",
+  k_compliance:"Tuân thủ kiểm tra", k_compliance_s:"{a}/{b} lần đã kiểm đúng lịch", k_ng:"Lần NG", k_ng_s:"trên {n} lần kiểm", k_defects:"Hàng lỗi loại ra", k_defects_s:"chiếc", k_late:"Nhập trễ / bỏ sót", k_late_s:"{a} trễ · {b} bỏ sót", k_photo:"Phiếu có ảnh", k_photo_s:"phiếu nhập qua app",
+  c_pareto:"Loại lỗi phát hiện nhiều nhất", c_pareto_s:"Sắp xếp giảm dần — xử lý các loại đầu danh sách trước (Pareto).", c_items:"Hạng mục kiểm tra bị NG nhiều nhất", c_lines:"Line / máy có nhiều bất thường nhất", c_lines_s:"Số lần NG + hàng lỗi mỗi 100 lần kiểm",
+  c_trend:"Hàng lỗi theo ngày", c_heat:"Lịch tuân thủ kiểm tra", c_heat_s:"Mỗi ô: trên = sáng, dưới = chiều.", c_staff:"Theo nhân viên", c_pvc:"Nhiệt độ máy in sấy PVC", c_recent:"Bất thường gần đây",
+  lg_ok:"Đạt", lg_ng:"NG", lg_miss:"Bỏ sót", lg_late:"Nhập trễ", lg_none:"Không cần / chưa tới",
+  unclassified:"Chưa phân loại", pieces:"chiếc", times:"lần", per100:"/100 lần", no_data:"Chưa có dữ liệu trong khoảng này.", none_ng:"Không có bất thường nào trong khoảng này.",
+  s_checks:"Lần kiểm", s_late:"Trễ", s_miss:"Bỏ sót", s_ng:"NG phát hiện", s_rate:"Đúng hạn",
+  asg_title:"Phân công phụ trách", asg_sub:"Chọn người chính và người dự phòng cho từng line / máy. Nhân viên chỉ thấy các line được phân công. Ô bỏ sót sẽ tính cho người phụ trách chính.",
+  asg_main:"Phụ trách chính", asg_backup:"Dự phòng", asg_saved:"Đã lưu phân công", asg_leader:"Bạn phân công được cho các line thuộc khu vực: {a}.", asg_nochange:"Chưa có thay đổi nào.", asg_none:"Chưa có nhân viên kiểm tra. Tạo tài khoản ở tab Tài khoản.",
+  users_title:"Tài khoản", users_sub_leader:"Bạn tạo và quản lý tài khoản nhân viên kiểm tra thuộc khu vực: {a}.", need_area:"Chọn ít nhất 1 khu vực.", other_areas:"Khu khác", users_sub:"Tên đăng nhập là mã nhân viên (chỉ gồm số). Quản lý tạo tổ trưởng và người xem báo cáo; tổ trưởng tạo nhân viên kiểm tra của khu mình.",
+  add_user:"Thêm tài khoản", full_name:"Họ tên", role:"Vai trò", create:"Tạo", active:"Đang dùng", locked:"Đã khoá", lock:"Khoá", unlock:"Mở khoá", reset_pw:"Đặt lại mật khẩu",
+  user_created:"Đã tạo tài khoản {u}", user_exists:"Mã nhân viên này đã có tài khoản.", bad_username:"Mã nhân viên chỉ gồm chữ số (2–12 số).",
+  reset_note:"Firebase không cho quản lý đặt mật khẩu hộ từ trình duyệt. Cách làm: khoá tài khoản cũ và tạo tài khoản mới (VD: phuc2), hoặc đặt lại trong Firebase Console › Authentication.",
+  you:"bạn", lang:"Ngôn ngữ",
+  set_title:"Cài đặt", set_lines:"Line / máy theo phiếu", set_one_per_line:"Mỗi dòng một mục.", set_contacts:"Người nhận báo bất thường",
+  set_pvc:"Ngưỡng tiêu chuẩn máy in sấy PVC", set_pvc_s:"Phiếu giấy chưa ghi ngưỡng. 130–140°C và 500–540 là giả định tạm, cần kỹ thuật xác nhận.",
+  tmin:"Nhiệt độ min", tmax:"Nhiệt độ max", smin:"Tốc độ min", smax:"Tốc độ max",
+  set_deadline:"Hạn chót mỗi lần kiểm", set_deadline_s:"Quá giờ này chưa có phiếu thì báo “Quá giờ”. Lưu sau giờ này bị đánh dấu “Nhập trễ”.",
+  set_workdays:"Ngày làm việc", set_photo:"Ảnh chứng minh", pm_item:"Mỗi hạng mục 1 ảnh", pm_sheet_ng:"1 ảnh / phiếu + ảnh cho mục NG (khuyên dùng)", pm_ng:"Chỉ khi NG (khuyên dùng)", pm_off:"Không yêu cầu",
+  set_saved:"Đã lưu cài đặt", set_system:"Hệ thống & Firebase", demo_reset:"Xoá toàn bộ dữ liệu dùng thử", demo_reset_q:"Xoá hết dữ liệu dùng thử trên máy này?", confirm:"Xác nhận",
+  sample_note:"Dữ liệu tháng 9/2026 trong chế độ dùng thử là dữ liệu mẫu để xem dashboard; dữ liệu tháng 8 và 5–8/9 lấy từ phiếu giấy.",
+  wd:["CN","T2","T3","T4","T5","T6","T7"],
+  req_line:"line / máy", req_person:"người thực hiện", req_temp:"nhiệt độ", req_speed:"tốc độ băng chuyền",
+  tab_capa:"Xử lý NG", tab_catalog:"Danh mục",
+  capa_title:"Theo dõi xử lý bất thường", capa_sub:"Mỗi lần NG cần tìm nguyên nhân, có biện pháp khắc phục và khép lại. Tổ trưởng cập nhật tại đây.",
+  st_open:"Chưa xử lý", st_doing:"Đang xử lý", st_closed:"Đã khắc phục", f_todo:"Cần xử lý", cause:"Nguyên nhân", action:"Biện pháp khắc phục", capa_save:"Cập nhật",
+  need_action:"Nhập biện pháp khắc phục trước khi khép lại.", capa_saved:"Đã cập nhật xử lý", days_open:"{n} ngày", handled_by:"Cập nhật: {who} · {t}", no_capa:"Không có bất thường nào.",
+  k_open:"NG chưa khép lại", k_open_s:"lâu nhất {n} ngày", capa_hint:"Xem 3 tháng gần nhất.",
+  cat_title:"Danh mục", cat_sub:"Chỉ quản lý và tổ trưởng được thêm, sửa. Nhân viên chỉ chọn từ danh mục khi nhập phiếu.",
+  cat_products:"Mã hàng", cat_defects:"Danh mục lỗi", code:"Mã hàng", prod_name:"Tên hàng", name_vi:"Tên lỗi (Tiếng Việt)", name_ja:"Tên lỗi (Tiếng Nhật)", apply_forms:"Áp dụng cho phiếu",
+  add:"Thêm", in_use:"Đang dùng", retired:"Ngừng dùng", retire:"Ngừng dùng", reuse:"Dùng lại", cat_saved:"Đã lưu danh mục", code_exists:"Mã này đã có trong danh mục.",
+  need_code_name:"Nhập mã hàng và chọn ít nhất 1 phiếu.", need_def_name:"Nhập tên lỗi và chọn ít nhất 1 phiếu.",
+  pick_code:"Tìm mã hàng", no_products:"Chưa có mã hàng nào trong danh mục cho phiếu này. Liên hệ tổ trưởng / quản lý.", change:"Đổi mã", add_defect:"Chạm vào lỗi phát hiện để thêm", no_match:"Không tìm thấy mã phù hợp.",
+  manage_catalog:"Mở danh mục",
+  offline:"Đang mất mạng: phiếu vẫn lưu và tự gửi khi có mạng (ảnh cần có mạng).", perm_err:"Không đủ quyền thực hiện thao tác này.",
+  del_user:"Xoá", del_user_q:"Xoá tài khoản {n}? Người này sẽ không đăng nhập được nữa. Các phiếu đã nhập vẫn giữ tên người nhập.", user_deleted:"Đã xoá {n}", cant_del_last_admin:"Không thể xoá quản lý cuối cùng.",
+  area:"Khu vực", areas:"Khu vực phụ trách", all_areas:"Tất cả khu vực", set_areas:"Khu vực & line", set_areas_s:"Mỗi line thuộc 1 khu vực. Tổ trưởng và nhân viên chỉ xem và thao tác được các line trong khu vực của mình.",
+  add_area:"Thêm khu vực", area_name:"Tên khu vực", no_area:"Tài khoản chưa được gán khu vực nào. Liên hệ quản lý.", area_none:"(chưa gán)", line_area:"Line thuộc khu vực",
+  reason:"Lý do không đạt", reason_ph:"VD: cổ tay ngắn 5 mm", need_reason:"Nhập lý do không đạt cho: {x}.",
+  period:"Kỳ báo cáo", p_month:"Tháng", p_quarter:"Quý", p_year:"Năm", quarter:"Quý", year:"Năm", q_title:"Báo cáo quý {q}/{y}", y_title:"Báo cáo năm {y}",
+  r_by_month:"Theo tháng", r_by_line:"Theo line / máy", r_trend:"NG và hàng lỗi theo tháng", col_compliance:"Tuân thủ", col_checks:"Lần kiểm", col_def:"Hàng lỗi", col_approval:"Duyệt tháng",
+  csv_period:"Tải CSV tổng hợp", r_top_def:"Loại lỗi phát hiện", r_top_items:"Hạng mục NG nhiều nhất", r_period_sub:"Tổng hợp từ các phiếu tháng. Duyệt từng tháng ở kỳ “Tháng”.", r_months_done:"{a}/{b} tháng đã duyệt",
+  start_date:"Ngày bắt đầu dùng app", start_date_s:"Báo cáo chỉ tính bỏ sót từ ngày này. Để trống = từ phiếu đầu tiên có trong hệ thống.", idx_err:"Firestore cần tạo chỉ mục cho truy vấn theo khu vực. Mở đường dẫn trong thông báo lỗi (Console) để tạo, chờ 2–3 phút rồi tải lại."
+},
+ja:{
+  app:"チェック記録帳", appSub:"Kachiboshi・品質管理",
+  tab_entry:"記録入力", tab_today:"本日", tab_dash:"ダッシュボード", tab_report:"報告", tab_assign:"担当割当", tab_users:"アカウント", tab_settings:"設定",
+  role_admin:"管理者", role_leader:"リーダー", role_staff:"検査員", role_viewer:"閲覧者",
+  username:"社員番号", password:"パスワード", pw_show:"表示", pw_hide:"隠す", pw_none:"未保存", set_pw:"パスワード変更", pw_forgot:"パスワードを忘れた場合は、リーダーまたは管理者に確認してください。", pw_view_note:"社員がパスワードを忘れた時のため、管理者と担当リーダーに表示されます。", pw_nosecret:"変更できません：このアカウントのパスワードはアプリに保存されていません。Firebaseコンソール › Authentication で再設定してください。", ap_l1:"リーダー承認済", ap_l2:"管理者確認済", approve_l1:"リーダー承認", approve_l2:"管理者確認", ap_wait_l1:"リーダー承認待ち", ap_wait_l2:"管理者確認待ち", ap_short:"リーダー{a} · 管理者{b} / {n}", viewer_all:"全エリア閲覧（読み取りのみ）", password2:"パスワード（確認）", login:"ログイン", logout:"ログアウト",
+  login_err:"社員番号またはパスワードが違います。", login_inactive:"このアカウントは無効です。管理者に連絡してください。", login_noprofile:"権限が付与されていません。管理者に連絡してください。",
+  login_net:"サーバーに接続できません。ネットワークを確認してください。", demo_hint:"試用モード — データはこの端末に保存されます。初回ログイン：admin / admin123（ログイン後にパスワードを変更してください）。",
+  demo_banner:"試用モード：データはこの端末に保存されます。複数端末で共有するにはFirebaseを接続してください。",
+  first_setup:"初期設定：管理者アカウント作成", first_setup_desc:"Firebase接続後に一度だけ実行します。管理者のユーザー名は「admin」固定です。",
+  create_admin:"管理者を作成", back:"戻る", pw_mismatch:"パスワードが一致しません。", pw_short:"パスワードは6文字以上です。",
+  admin_exists:"管理者アカウントは既に存在します。ログインしてください。", created_admin:"管理者を作成しました。ログイン中…",
+  change_pw:"パスワード変更", old_pw:"現在のパスワード", new_pw:"新しいパスワード", save:"保存", cancel:"キャンセル", close:"閉じる", pw_changed:"パスワードを変更しました。",
+  step_form:"1 · チェック表を選択", step_line:"2 · ライン／機械", step_machine:"2 · 機械", step_items:"4 · チェック内容", step_code:"3 · 品番", code_first:"チェック前に品番を入力してください。", req_code:"品番", recent_codes:"最近の品番", c_codes:"異常が多い品番", c_codes_s:"品番別のNG回数＋不良数",
+  date:"日付", check_round:"回", time:"時間", inspector:"実施者",
+  ca_sang:"朝", ca_chieu:"午後", ca_sang_l:"朝 · 作業開始前", ca_chieu_l:"午後 · 昼休み明け",
+  no_lines:"ラインが未登録です。設定で追加してください。", no_assigned:"このチェック表の担当ラインがありません。管理者に連絡してください。",
+  all_ok:"全てOK", all_pass:"3項目とも合格", kim_hint:"テストピースをコンベアの3か所で通してください。タップでOK↔NG。",
+  pass:"合格", product_code:"品番／種類", defects_title:"不良品（個数）— 合計 {n}",
+  temp:"温度（°C）", speed:"コンベアのスピード", std:"基準 {a}–{b}{u}", in_std:"基準内 {a}–{b}{u}", out_std:"基準外 {a}–{b}{u}",
+  note:"備考", note_req:"備考（必須）", note_ph_ng:"異常内容と処置を記入", note_ph:"任意",
+  ng_found:"異常あり：{x}", ng_stop:"作業を中止し、すぐに{who}へ報告してください。", ng_confirm:"作業を中止し、{who}へ報告しました",
+  save_sheet:"保存", saving:"保存中…", result:"結果", reset:"やり直し",
+  exists_warn:"この回は記録済みです（{who}、{time}）。保存すると上書きします。", open_old:"既存の記録を開く", editing:"保存済みの記録を編集中。",
+  not_owner:"この回は{who}の記録があります。修正はリーダー／管理者のみ可能です。",
+  missing:"未入力：{x}。", need_note:"NGの場合は備考に異常内容を記入してください。", need_confirm:"作業中止と報告の確認にチェックしてください。",
+  need_photo:"証拠写真が不足：{x}。", saved_at:"{t}に保存しました。続けて他のラインを入力できます。", saved_toast:"保存しました：{f} · {l}", saved_ng:"NGを保存しました。担当者へ報告してください。",
+  save_fail:"保存できませんでした（{c}）。ネットワークを確認して再度保存してください。", photo_fail:"写真をアップロードできません（{c}）。写真にはネット接続が必要です。",
+  uploading:"写真を送信中 {i}/{n}…",
+  photo:"証拠写真", take_photo:"撮影", photo_sheet:"全体写真", photo_req:"必須", remove_def:"この不良を削除", processing:"写真を圧縮中…", photo_err:"この写真を読み込めません。",
+  photo_mode_hint_item:"各項目に写真1枚が必要です。", photo_mode_hint_sheet_ng:"記録ごとに1枚＋NG項目ごとに写真が必要です。", photo_mode_hint_ng:"NG項目のみ写真が必要です。",
+  today_title:"{d} の状況", today_hint:"枠をタップして入力・修正します。", line_machine:"ライン／機械", assigned:"担当",
+  st_ok:"合格", st_ng:"NG", st_over:"時間超過・未チェック", st_wait:"未チェック · 期限 {t}", st_late:"遅れ入力", st_overdue_n:"時間超過・未チェック", st_off:"休日", st_pre:"運用開始前", k_open_all:"直近3か月・担当エリアの全チェック表", col_miss:"漏れ（回）", st_wait_n:"未チェック",
+  rep_title:"月次報告", rep_sub:"月末の紙提出の代わりです。リーダー／管理者がページ下部で電子承認します。",
+  month:"月", form:"チェック表", n_checks:"チェック回数", n_days:"実施日数", n_ng:"NG回数", n_half:"1回欠けの日", n_late:"期限後入力",
+  no_recs:"{m}の{l}の記録はありません。", col_day:"日付", col_ca:"回", col_time:"時間", col_code:"品番", col_defect:"不良", col_res:"結果", col_by:"実施者", col_note:"備考", col_photo:"写真", col_src:"入力元",
+  src_paper:"紙", src_app:"アプリ", src_sample:"サンプル", reported:"報告済", not_reported:"報告未確認",
+  approved:"承認済", not_approved:"未承認", approve:"今月を承認", unapprove:"承認取消", approve_note:"コメント（任意）", approve_who:"リーダーが承認し、管理者が確認します（月末のサインの代わり）。",
+  csv_one:"このチェック表をExcel(CSV)で出力", csv_all:"今月の全チェック表をCSV出力", downloaded:"{f} を出力しました",
+  dash_title:"品質ダッシュボード", dash_sub:"不良の発生状況、チェック遵守率、担当者を集計します。", from:"開始月", to:"終了月", all:"すべて",
+  k_compliance:"チェック遵守率", k_compliance_s:"{b}回中 {a}回 期限内実施", k_ng:"NG回数", k_ng_s:"{n}回のチェック中", k_defects:"不良品", k_defects_s:"個", k_late:"遅れ／漏れ", k_late_s:"遅れ{a} · 漏れ{b}", k_photo:"写真付き記録", k_photo_s:"アプリ入力分",
+  c_pareto:"不良内容（多い順）", c_pareto_s:"降順（パレート）— 上位から対策してください。", c_items:"NGが多いチェック項目", c_lines:"異常が多いライン／機械", c_lines_s:"チェック100回あたりのNG＋不良数",
+  c_trend:"日別不良数", c_heat:"チェック実施カレンダー", c_heat_s:"各枠：上＝朝、下＝午後。", c_staff:"担当者別", c_pvc:"PVC加工機の温度", c_recent:"最近の異常",
+  lg_ok:"合格", lg_ng:"NG", lg_miss:"漏れ", lg_late:"遅れ入力", lg_none:"対象外／未到来",
+  unclassified:"未分類", pieces:"個", times:"回", per100:"/100回", no_data:"この期間のデータはありません。", none_ng:"この期間の異常はありません。",
+  s_checks:"チェック", s_late:"遅れ", s_miss:"漏れ", s_ng:"NG発見", s_rate:"期限内率",
+  asg_title:"担当割当", asg_sub:"ライン／機械ごとに主担当と予備担当を選びます。検査員は担当ラインのみ表示されます。漏れは主担当に計上されます。",
+  asg_main:"主担当", asg_backup:"予備", asg_saved:"担当割当を保存しました", asg_leader:"担当エリアのラインを割り当てられます：{a}。", asg_nochange:"変更はありません。", asg_none:"検査員がいません。アカウントで作成してください。",
+  users_title:"アカウント", users_sub_leader:"担当エリアの検査員アカウントを作成・管理できます：{a}。", need_area:"エリアを1つ以上選んでください。", other_areas:"他エリア", users_sub:"ログインIDは社員番号（数字のみ）です。管理者がリーダーと閲覧者を、リーダーが自エリアの検査員を作成します。",
+  add_user:"アカウント追加", full_name:"氏名", role:"役割", create:"作成", active:"有効", locked:"無効", lock:"無効化", unlock:"有効化", reset_pw:"パスワード再設定",
+  user_created:"{u} を作成しました", user_exists:"この社員番号のアカウントは既に存在します。", bad_username:"社員番号は数字のみ（2〜12桁）です。",
+  reset_note:"Firebaseではブラウザから他人のパスワードを設定できません。旧アカウントを無効化して新規作成（例：phuc2）するか、Firebaseコンソール › Authenticationで再設定してください。",
+  you:"あなた", lang:"言語",
+  set_title:"設定", set_lines:"チェック表ごとのライン／機械", set_one_per_line:"1行に1項目。", set_contacts:"異常時の報告先",
+  set_pvc:"PVC加工機の基準値", set_pvc_s:"紙の記録表に基準値の記載がありません。130–140°C、500–540は仮の値です。技術担当に確認してください。",
+  tmin:"温度 下限", tmax:"温度 上限", smin:"スピード 下限", smax:"スピード 上限",
+  set_deadline:"各回の期限", set_deadline_s:"期限を過ぎて未記録なら「時間超過」、期限後の保存は「遅れ入力」になります。",
+  set_workdays:"稼働日", set_photo:"証拠写真", pm_item:"各項目に1枚", pm_sheet_ng:"記録ごと1枚＋NG項目（推奨）", pm_ng:"NGのみ（推奨）", pm_off:"不要",
+  set_saved:"設定を保存しました", set_system:"システム・Firebase", demo_reset:"試用データを全て削除", demo_reset_q:"この端末の試用データを全て削除しますか？", confirm:"確認",
+  sample_note:"試用モードの2026年9月のデータはダッシュボード確認用のサンプルです。8月と9/5–9/8は紙の記録から入力しました。",
+  wd:["日","月","火","水","木","金","土"],
+  req_line:"ライン／機械", req_person:"実施者", req_temp:"温度", req_speed:"コンベアのスピード",
+  tab_capa:"NG処置", tab_catalog:"マスタ",
+  capa_title:"異常処置の管理", capa_sub:"NGごとに原因と対策を記録し、完了まで管理します。リーダーがここで更新します。",
+  st_open:"未対応", st_doing:"対応中", st_closed:"対策完了", f_todo:"要対応", cause:"原因", action:"対策", capa_save:"更新",
+  need_action:"完了にする前に対策を入力してください。", capa_saved:"処置を更新しました", days_open:"{n}日経過", handled_by:"更新：{who} · {t}", no_capa:"異常はありません。",
+  k_open:"未完了のNG", k_open_s:"最長 {n}日", capa_hint:"直近3か月を表示します。",
+  cat_title:"マスタ管理", cat_sub:"管理者とリーダーのみ追加・編集できます。検査員は入力時にリストから選択します。",
+  cat_products:"品番", cat_defects:"不良項目", code:"品番", prod_name:"品名", name_vi:"不良名（ベトナム語）", name_ja:"不良名（日本語）", apply_forms:"対象チェック表",
+  add:"追加", in_use:"使用中", retired:"使用停止", retire:"停止", reuse:"再開", cat_saved:"マスタを保存しました", code_exists:"この品番は登録済みです。",
+  need_code_name:"品番を入力し、対象チェック表を1つ以上選んでください。", need_def_name:"不良名を入力し、対象チェック表を1つ以上選んでください。",
+  pick_code:"品番を検索", no_products:"このチェック表の品番が未登録です。リーダー／管理者に連絡してください。", change:"品番を変更", add_defect:"発見した不良をタップして追加", no_match:"該当する品番がありません。",
+  manage_catalog:"マスタを開く",
+  offline:"オフライン：記録は保存され、接続時に自動送信されます（写真は接続が必要）。", perm_err:"この操作の権限がありません。",
+  del_user:"削除", del_user_q:"{n} のアカウントを削除しますか？ログインできなくなります。入力済みの記録は実施者名とともに残ります。", user_deleted:"{n} を削除しました", cant_del_last_admin:"最後の管理者は削除できません。",
+  area:"エリア", areas:"担当エリア", all_areas:"全エリア", set_areas:"エリアとライン", set_areas_s:"各ラインは1つのエリアに属します。リーダーと検査員は自分のエリアのラインのみ閲覧・操作できます。",
+  add_area:"エリア追加", area_name:"エリア名", no_area:"エリアが割り当てられていません。管理者に連絡してください。", area_none:"（未割当）", line_area:"ラインの所属エリア",
+  reason:"不合格の理由", reason_ph:"例：手首が5mm短い", need_reason:"不合格の理由を入力してください：{x}。",
+  period:"報告期間", p_month:"月次", p_quarter:"四半期", p_year:"年次", quarter:"四半期", year:"年", q_title:"{y}年 第{q}四半期 報告", y_title:"{y}年 年次報告",
+  r_by_month:"月別", r_by_line:"ライン／機械別", r_trend:"月別 NG・不良", col_compliance:"遵守率", col_checks:"チェック", col_def:"不良", col_approval:"月次承認",
+  csv_period:"集計CSVを出力", r_top_def:"不良内容", r_top_items:"NGが多い項目", r_period_sub:"月次記録から集計します。各月の承認は「月次」で行います。", r_months_done:"{b}か月中 {a}か月 承認済",
+  start_date:"アプリ運用開始日", start_date_s:"この日以降のみ漏れとして集計します。空欄＝システム内の最初の記録から。", idx_err:"エリア別の検索にはFirestoreのインデックスが必要です。エラー（コンソール）内のリンクから作成し、2〜3分後に再読み込みしてください。"
+}};
+let LANG = (()=>{ try{ return localStorage.getItem("kcb.lang")||"vi"; }catch(e){ return "vi"; } })();
+function t(k, v){ let s=(L[LANG]&&L[LANG][k]!=null)?L[LANG][k]:(L.vi[k]!=null?L.vi[k]:k); if(v && typeof s==="string") for(const x in v) s=s.split("{"+x+"}").join(v[x]); return s; }
+const tx = o => (LANG==="ja" && o.ja) ? o.ja : o.vi;
+
+/* ---------- Định nghĩa phiếu ---------- */
+const FORMS = {
+  kim:{vi:"Máy kiểm kim", ja:"検針機", sheetJa:"検針機のチェック項目",
+    items:[
+      {k:"camBien", vi:"Độ nhạy cảm biến", ja:"感度チェック"},
+      {k:"tocDo", vi:"Tốc độ máy", ja:"スピードチェック"},
+      {k:"amBao", vi:"Âm báo + thời gian báo khi bất thường", ja:"異常時に警告音・鳴り時間チェック"}
+    ]},
+  caosu:{vi:"Chất lượng cao su", ja:"ゴム商品の品質", sheetJa:"ゴム商品の品質管理項目",
+    items:[
+      {k:"kichThuoc", vi:"Kích thước găng (dài · ngón · cổ tay)", ja:"寸法（全長・指・手首）"},
+      {k:"deoThu", vi:"Đeo găng tay để kiểm tra", ja:"手袋を嵌めて、チェックする"},
+      {k:"lopCaoSu", vi:"Chất lượng lớp cao su", ja:"ゴムの品質チェック"}
+    ]},
+  pvc:{vi:"Máy in sấy PVC", ja:"PVC加工機", sheetJa:"PVC加工機のチェック項目",
+    items:[
+      {k:"nhietDo", vi:"Nhiệt độ", ja:"温度"},
+      {k:"tocDo", vi:"Tốc độ băng chuyền", ja:"コンベアのスピード"}
+    ]}
+};
+const FORM_KEYS = ["kim","caosu","pvc"];
+const POINTS = [["trai",{vi:"Trái",ja:"左"}],["giua",{vi:"Giữa",ja:"真ん中"}],["phai",{vi:"Phải",ja:"右"}]];
+const DEFECTS = [["do",{vi:"Dơ",ja:"汚れ"}],["rach",{vi:"Rách",ja:"破れ"}],["thung",{vi:"Thủng",ja:"穴あき"}],["dinh",{vi:"Dính / bọt",ja:"付着・気泡"}],["khac",{vi:"Khác",ja:"その他"}]];
+const CAS = ["sang","chieu"];
+const DEFAULT_CATALOG = { products:[], defects:[] };
+const ROLES = ["admin","leader","staff","viewer"];
+const DEFAULT_CFG = {
+  lines:{kim:["Máy kiểm kim 1"], caosu:["Cao su 1","Cao su 2"], pvc:["PVC 1","PVC 2"]},
+  contacts:{kim:"Tổ trưởng – anh Quốc", caosu:"Tổ trưởng – anh Chính", pvc:"Cơ điện – anh Vinh, anh Thi"},
+  pvc:{tMin:130, tMax:140, sMin:500, sMax:540},
+  deadlines:{sang:"09:00", chieu:"14:00"},
+  workdays:[1,2,3,4,5,6],
+  photoMode:"ng",
+  areas:[{id:"kim",name:"Khu kiểm kim"},{id:"caosu",name:"Khu cao su"},{id:"pvc",name:"Khu in sấy PVC"}],
+  lineArea:{},
+  startDate:""
+};
+const CAMERA_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>';
+
+/* ---------- Tiện ích ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const dstr = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const todayStr = () => dstr(new Date());
+const hhmm = () => { const d=new Date(); return pad(d.getHours())+":"+pad(d.getMinutes()); };
+const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-+|-+$/g,"").toLowerCase() || "x";
+const docId = (form,line,date,ca) => form+"_"+slug(line)+"_"+date+"_"+ca;
+const lineKey = (form,line) => form+"_"+slug(line);
+const parseD = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+const fmtDate = d => { if(!d) return ""; const x=parseD(d); return t("wd")[x.getDay()]+" "+pad(x.getDate())+"/"+pad(x.getMonth()+1); };
+const fmtMonth = m => m ? m.slice(5)+"/"+m.slice(0,4) : "";
+const caName = c => t(c==="sang"?"ca_sang":"ca_chieu");
+const sk = r => r.date+(r.ca==="sang"?"1":"2")+(r.gio||"");
+const ls = { get(k,def){ try{ const v=localStorage.getItem(k); return v==null?def:JSON.parse(v);}catch(e){return def;} }, set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }, del(k){ try{localStorage.removeItem(k);}catch(e){} } };
+function toast(s){ const el=$("#toast"); el.textContent=s; el.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>el.hidden=true,2800); }
+const monthAdd = (m,n) => { const [y,mm]=m.split("-").map(Number); const d=new Date(y,mm-1+n,1); return d.getFullYear()+"-"+pad(d.getMonth()+1); };
+const lastDay = m => { const [y,mm]=m.split("-").map(Number); return dstr(new Date(y,mm,0)); };
+function uid8(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); }
+async function sha(s){
+  try{ const b=await crypto.subtle.digest("SHA-256", new TextEncoder().encode("kcb:"+s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+  catch(e){ let h=5381; for(const c of "kcb:"+s) h=((h<<5)+h+c.charCodeAt(0))|0; return "d"+(h>>>0).toString(16); }
+}
+function blobToDataURL(b){ return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(b); }); }
+function dataURLToBlob(u){ const [h,d]=u.split(","); const bin=atob(d); const a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return new Blob([a],{type:(h.match(/:(.*?);/)||[])[1]||"image/jpeg"}); }
+
+/* Nén + đóng dấu ảnh: cạnh dài tối đa 1280px (Storage) / 1024px (Firestore), JPEG ~0.7 → thường 80–250 KB */
+async function compressPhoto(file, stamp){
+  const maxSide = PHOTO_BACKEND==="storage" ? 1280 : 1024;
+  let src;
+  try{ src = await createImageBitmap(file, {imageOrientation:"from-image"}); }
+  catch(e){ src = await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=URL.createObjectURL(file); }); }
+  const w0=src.width, h0=src.height, k=Math.min(1, maxSide/Math.max(w0,h0));
+  const w=Math.round(w0*k), h=Math.round(h0*k);
+  const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+  const g=cv.getContext("2d"); g.drawImage(src,0,0,w,h);
+  const fs=Math.max(14, Math.round(w/42)), pad2=Math.round(fs*0.6);
+  g.fillStyle="rgba(0,0,0,.58)"; g.fillRect(0,h-fs-pad2*2,w,fs+pad2*2);
+  g.fillStyle="#fff"; g.font="600 "+fs+"px system-ui, sans-serif"; g.textBaseline="middle";
+  g.fillText(stamp, pad2, h-(fs+pad2*2)/2, w-pad2*2);
+  let q=0.72, blob;
+  for(let i=0;i<5;i++){
+    blob = await new Promise(r=>cv.toBlob(r,"image/jpeg",q));
+    if(blob.size < (PHOTO_BACKEND==="storage"?400000:260000)) break;
+    q -= 0.12;
+  }
+  return {blob, w, h, size:blob.size};
+}
+
+/* =====================================================================
+   LỚP DỮ LIỆU — 2 chế độ: Firebase (thật) và Demo (trên máy)
+   ===================================================================== */
+
+function makeBus(){ const m={}; return { on(k,f){ (m[k]=m[k]||new Set()).add(f); return ()=>m[k].delete(f); }, emit(k){ (m[k]||[]).forEach(f=>{ try{f();}catch(e){ console.error(e);} }); } }; }
+
+/* ---------- Demo ---------- */
+function DemoBackend(){
+  const K={users:"kcbd.users", cfg:"kcbd.cfg", asg:"kcbd.assign", cat:"kcbd.catalog", sec:"kcbd.secrets", rec:"kcbd.records", ap:"kcbd.approvals", sess:"kcbd.session", ver:"kcbd.ver"};
+  const bus=makeBus();
+  let db=null;
+  const idb = { open(){ return new Promise((res,rej)=>{ const r=indexedDB.open("kcb-demo-photos",1); r.onupgradeneeded=()=>r.result.createObjectStore("p"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); },
+    async put(k,v){ const d=await this.open(); return new Promise((res,rej)=>{ const tx=d.transaction("p","readwrite"); tx.objectStore("p").put(v,k); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); },
+    async get(k){ const d=await this.open(); return new Promise((res,rej)=>{ const q=d.transaction("p").objectStore("p").get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); },
+    async clear(){ try{ const d=await this.open(); d.transaction("p","readwrite").objectStore("p").clear(); }catch(e){} } };
+  const urlCache={};
+  async function seed(){
+    // Bắt đầu sạch: chỉ có tài khoản admin, không có phiếu, danh mục trống.
+    const users=[{uid:"u_admin", username:"admin", name:"Quản lý QC", role:"admin", active:true, pw:await sha("admin123")}];
+    Object.values(K).forEach(k=>ls.del(k)); await idb.clear();
+    ls.set(K.users,users); ls.set(K.cfg,Object.assign({},DEFAULT_CFG)); ls.set(K.asg,{map:{}}); ls.set(K.rec,{});
+    ls.set(K.cat,{products:[], defects:[]}); ls.set(K.ap,{}); ls.set(K.ver,7);
+  }
+  const strip = u => { const {pw, ...rest}=u; return rest; };
+  const api = {
+    mode:"demo",
+    async init(onAuth){
+      if(ls.get(K.ver,0)!==7) await seed();
+      db={ users:ls.get(K.users,[]), cfg:ls.get(K.cfg,DEFAULT_CFG), asg:ls.get(K.asg,{map:{}}), cat:ls.get(K.cat,DEFAULT_CATALOG), rec:ls.get(K.rec,{}), ap:ls.get(K.ap,{}) };
+      const sid=ls.get(K.sess,null); const u=db.users.find(x=>x.uid===sid && x.active);
+      onAuth(u?strip(u):null);
+      window.addEventListener("storage", e=>{ if(e.key && e.key.startsWith("kcbd.")){ db={ users:ls.get(K.users,[]), cfg:ls.get(K.cfg,DEFAULT_CFG), asg:ls.get(K.asg,{map:{}}), cat:ls.get(K.cat,DEFAULT_CATALOG), rec:ls.get(K.rec,{}), ap:ls.get(K.ap,{}) }; ["users","config","assign","catalog","rec","ap"].forEach(bus.emit); } });
+    },
+    async login(username,pw){
+      const u=db.users.find(x=>x.username===username.trim().toLowerCase());
+      if(!u || u.pw!==await sha(pw)) throw {code:"bad"};
+      if(!u.active) throw {code:"inactive"};
+      ls.set(K.sess,u.uid); return strip(u);
+    },
+    async logout(){ ls.del(K.sess); },
+    async firstSetup(){ throw {code:"exists"}; },
+    async changePassword(uid,oldPw,newPw){ const u=db.users.find(x=>x.uid===uid); if(!u || u.pw!==await sha(oldPw)) throw {code:"bad"}; u.pw=await sha(newPw); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); if(sc[uid]!=null){ sc[uid]=newPw; ls.set(K.sec,sc); } },
+    async createUser(o){ if(db.users.some(x=>x.username===o.username)) throw {code:"exists"}; const u={uid:"u_"+uid8(), username:o.username, name:o.name, role:o.role, areas:o.areas||[], active:true, pw:await sha(o.password)}; db.users.push(u); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); sc[u.uid]=o.password; ls.set(K.sec,sc); bus.emit("users"); return u.uid; },
+    async deleteUser(uid){ db.users=db.users.filter(x=>x.uid!==uid); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); delete sc[uid]; ls.set(K.sec,sc); bus.emit("users"); },
+    async getPassword(uid){ const sc=ls.get(K.sec,{}); return sc[uid]!=null?sc[uid]:null; },
+    async setPassword(uid,newPw){ const u=db.users.find(x=>x.uid===uid); if(!u) throw {code:"err"}; u.pw=await sha(newPw); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); sc[uid]=newPw; ls.set(K.sec,sc); },
+    async updateUser(uid,patch){ const u=db.users.find(x=>x.uid===uid); if(!u) return; if(patch.password){ u.pw=await sha(patch.password); delete patch.password; } Object.assign(u,patch); ls.set(K.users,db.users); bus.emit("users"); },
+    canResetPw:true,
+    listenUsers(cb){ const f=()=>cb(db.users.map(strip)); f(); return bus.on("users",f); },
+    listenDoc(name,cb){ const f=()=>cb(name==="config"?db.cfg:name==="catalog"?db.cat:db.asg); f(); return bus.on(name,f); },
+    listenApprovals(cb){ const f=()=>cb(Object.entries(db.ap).map(([id,v])=>Object.assign({},v,{id}))); f(); return bus.on("ap",f); },
+    listenRecords(from,to,areas,cb){ const f=()=>cb(Object.values(db.rec).filter(r=>r.month>=from && r.month<=to && (!areas || areas.includes(r.area)))); f(); return bus.on("rec",f); },
+    async getRecord(id){ return db.rec[id]||null; },
+    async saveRecord(r){ db.rec[r.id]=r; ls.set(K.rec,db.rec); bus.emit("rec"); },
+    async setConfig(c){ db.cfg=c; ls.set(K.cfg,c); bus.emit("config"); },
+    async setAssign(a){ db.asg={map:Object.assign({}, (db.asg||{}).map||{}, a.map||{})}; ls.set(K.asg,db.asg); bus.emit("assign"); },
+    async setCatalog(c){ db.cat=c; ls.set(K.cat,c); bus.emit("catalog"); },
+    async updateRecord(id,patch){ if(db.rec[id]){ Object.assign(db.rec[id],patch); ls.set(K.rec,db.rec); bus.emit("rec"); } },
+    async setApproval(id,a){ if(a) db.ap[id]=a; else delete db.ap[id]; ls.set(K.ap,db.ap); bus.emit("ap"); },
+    async putPhoto(blob,meta){ const id="ph_"+uid8(); await idb.put(id,blob); return {b:"l", id}; },
+    async photoURL(ref){ if(urlCache[ref.id]) return urlCache[ref.id]; const b=await idb.get(ref.id); if(!b) return ""; return urlCache[ref.id]=URL.createObjectURL(b); },
+    async resetAll(){ Object.values(K).forEach(k=>ls.del(k)); await idb.clear(); }
+  };
+  return api;
+}
+
+/* ---------- Firebase ---------- */
+function FirebaseBackend(){
+  const app=firebase.initializeApp(FIREBASE_CONFIG);
+  const auth=firebase.auth(), fs=firebase.firestore();
+  try{ fs.settings({ignoreUndefinedProperties:true, merge:true}); }catch(e){}
+  try{ fs.enablePersistence({synchronizeTabs:true}).catch(()=>{}); }catch(e){}
+  const st = (PHOTO_BACKEND==="storage" && FIREBASE_CONFIG.storageBucket) ? firebase.storage() : null;
+  const email = u => u.trim().toLowerCase()+"@"+LOGIN_DOMAIN;
+  const urlCache={};
+  let profUnsub=null;
+  async function loadProfile(user){
+    const snap=await fs.collection("users").doc(user.uid).get();
+    if(!snap.exists){
+      if(user.email===email("admin")){
+        const p={username:"admin", name:"Admin", role:"admin", active:true, createdAt:new Date().toISOString()};
+        await fs.collection("users").doc(user.uid).set(p); return Object.assign({uid:user.uid},p);
+      }
+      return null;
+    }
+    return Object.assign({uid:user.uid}, snap.data());
+  }
+  const api = {
+    mode:"firebase",
+    async init(onAuth){
+      auth.onAuthStateChanged(async user=>{
+        if(!user){ onAuth(null); return; }
+        try{ const p=await loadProfile(user); if(!p || !p.active){ await auth.signOut(); onAuth(null, p?"inactive":"noprofile"); return; } onAuth(p); }
+        catch(e){ onAuth(null, e.code==="permission-denied"?"noprofile":"net"); }
+      });
+    },
+    async login(username,pw){
+      try{ await auth.signInWithEmailAndPassword(email(username), pw); }
+      catch(e){ throw {code: /network/.test(e.code||"")?"net":"bad"}; }
+    },
+    async logout(){ await auth.signOut(); },
+    async firstSetup(pw){
+      try{ await auth.createUserWithEmailAndPassword(email("admin"), pw); }
+      catch(e){ throw {code: e.code==="auth/email-already-in-use"?"exists":(e.code||"err")}; }
+    },
+    async changePassword(uid,oldPw,newPw){
+      const u=auth.currentUser; const cred=firebase.auth.EmailAuthProvider.credential(u.email, oldPw);
+      try{ await u.reauthenticateWithCredential(cred); await u.updatePassword(newPw); }
+      catch(e){ throw {code: /wrong-password|invalid-credential/.test(e.code||"")?"bad":(e.code||"err")}; }
+      try{ const s=await fs.collection("secrets").doc(uid).get(); if(s.exists) await fs.collection("secrets").doc(uid).set({pw:newPw, at:new Date().toISOString(), byUid:uid}); }catch(e){}
+    },
+    /* Mật khẩu xem được: lưu ở secrets/{uid}; chỉ quản lý và tổ trưởng phụ trách đọc được (Rules). */
+    async getPassword(uid){ const s=await fs.collection("secrets").doc(uid).get(); return s.exists?(s.data().pw||null):null; },
+    async setPassword(uid,newPw){
+      const target=(await fs.collection("users").doc(uid).get()).data(); const old=await this.getPassword(uid);
+      if(!target || old==null) throw {code:"nosecret"};
+      const sec = firebase.apps.find(a=>a.name==="secondary") || firebase.initializeApp(FIREBASE_CONFIG,"secondary");
+      try{ const c=await sec.auth().signInWithEmailAndPassword(email(target.username), old); await c.user.updatePassword(newPw); await sec.auth().signOut(); }
+      catch(e){ try{ await sec.auth().signOut(); }catch(x){} throw {code:"nosecret"}; }
+      await fs.collection("secrets").doc(uid).set({pw:newPw, at:new Date().toISOString(), byUid:auth.currentUser.uid});
+    },
+    async createUser(o){
+      const sec = firebase.apps.find(a=>a.name==="secondary") || firebase.initializeApp(FIREBASE_CONFIG,"secondary");
+      let cred;
+      try{ cred=await sec.auth().createUserWithEmailAndPassword(email(o.username), o.password); }
+      catch(e){ throw {code: e.code==="auth/email-already-in-use"?"exists":(e.code||"err")}; }
+      await fs.collection("users").doc(cred.user.uid).set({username:o.username, name:o.name, role:o.role, areas:o.areas||[], active:true, createdAt:new Date().toISOString()});
+      await fs.collection("secrets").doc(cred.user.uid).set({pw:o.password, at:new Date().toISOString(), byUid:auth.currentUser.uid});
+      await sec.auth().signOut();
+      return cred.user.uid;
+    },
+    async updateUser(uid,patch){ delete patch.password; await fs.collection("users").doc(uid).update(patch); },
+    async deleteUser(uid){ try{ await fs.collection("secrets").doc(uid).delete(); }catch(e){} await fs.collection("users").doc(uid).delete(); },
+    canResetPw:false,
+    listenUsers(cb){ return fs.collection("users").onSnapshot(s=>cb(s.docs.map(d=>Object.assign({uid:d.id},d.data()))), e=>console.warn(e)); },
+    listenDoc(name,cb){ if(name==="assign") return fs.collection("assign").onSnapshot(s=>{ const map={}; s.docs.forEach(d=>{ const v=d.data(); map[d.id]={main:v.main||[], backup:v.backup||[]}; }); cb({map}); }, e=>console.warn(e));
+      return fs.collection("config").doc(name==="config"?"main":"catalog").onSnapshot(s=>cb(s.exists?s.data():null), e=>console.warn(e)); },
+    listenApprovals(cb){ return fs.collection("approvals").onSnapshot(s=>cb(s.docs.map(d=>Object.assign({id:d.id},d.data()))), e=>console.warn(e)); },
+    listenRecords(from,to,areas,cb,onErr){
+      let q=fs.collection("records");
+      if(areas){ if(!areas.length){ cb([]); return ()=>{}; } q=q.where("area","in",areas.slice(0,30)); }
+      return q.where("month",">=",from).where("month","<=",to).onSnapshot(s=>cb(s.docs.map(d=>Object.assign({id:d.id},d.data()))), e=>{ console.warn(e); onErr&&onErr(e); }); },
+    async getRecord(id){ const s=await fs.collection("records").doc(id).get(); return s.exists?Object.assign({id:s.id},s.data()):null; },
+    async saveRecord(r){ const {id,...rest}=r; await fs.collection("records").doc(id).set(rest); },
+    async setConfig(c){ await fs.collection("config").doc("main").set(c); },
+    async setAssign(a){ const b=fs.batch(); Object.entries(a.map||{}).forEach(([k,v])=>b.set(fs.collection("assign").doc(k), {main:v.main||[], backup:v.backup||[], area:v.area||null, form:v.form||null, line:v.line||null, byUid:a.byUid||null, at:a.at||new Date().toISOString()})); await b.commit(); },
+    async setCatalog(c){ await fs.collection("config").doc("catalog").set(c); },
+    async updateRecord(id,patch){ await fs.collection("records").doc(id).update(patch); },
+    async setApproval(id,a){ const ref=fs.collection("approvals").doc(id); if(a) await ref.set(a); else await ref.delete(); },
+    async putPhoto(blob,meta){
+      if(st){
+        const path="photos/"+meta.month+"/"+meta.recId+"/"+meta.key+"_"+Date.now()+".jpg";
+        const ref=st.ref(path); await ref.put(blob,{contentType:"image/jpeg"}); const url=await ref.getDownloadURL();
+        return {b:"s", path, url};
+      }
+      const data=await blobToDataURL(blob);
+      const ref=fs.collection("photos").doc();
+      await ref.set({data, recordId:meta.recId, month:meta.month, key:meta.key, area:meta.area||null, at:new Date().toISOString()});
+      return {b:"f", id:ref.id};
+    },
+    async photoURL(ref){
+      if(ref.url) return ref.url;
+      if(urlCache[ref.id]) return urlCache[ref.id];
+      const s=await fs.collection("photos").doc(ref.id).get(); if(!s.exists) return "";
+      return urlCache[ref.id]=URL.createObjectURL(dataURLToBlob(s.data().data));
+    }
+  };
+  return api;
+}
+
+/* =====================================================================
+   TRẠNG THÁI & NGHIỆP VỤ
+   ===================================================================== */
+const S = {
+  B:null, me:null, ready:false,
+  users:[], cfg:JSON.parse(JSON.stringify(DEFAULT_CFG)), asg:{map:{}}, asgDraft:null,
+  records:new Map(), approvals:new Map(), sub:null,
+  tab:"entry", draft:null, overwrite:false, saveMsg:null, saving:false, prog:"",
+  todayDate:todayStr(),
+  rep:{period:"month", month:todayStr().slice(0,7), q:Math.floor(new Date().getMonth()/3)+1, y:new Date().getFullYear(), form:"kim", line:null},
+  dash:{from:todayStr().slice(0,7), to:todayStr().slice(0,7), form:"all", pvcLine:null},
+  login:{mode:"login", msg:null, busy:false},
+  userMsg:null, cfgMsg:null, unsubs:[]
+};
+const refReg = new Map(); let refSeq=0;
+const regRef = ref => { const k="r"+(++refSeq); refReg.set(k,ref); return k; };
+const userName = uid => { const u=S.users.find(x=>x.uid===uid); return u?u.name:""; };
+const cfg = () => S.cfg;
+const isLeader = () => S.me && (S.me.role==="admin"||S.me.role==="leader");
+const isAdmin = () => S.me && S.me.role==="admin";
+const isViewer = () => S.me && S.me.role==="viewer";
+function tabsFor(){
+  if(!S.me) return [];
+  if(S.me.role==="admin") return ["entry","today","capa","dash","report","catalog","assign","users","settings"];
+  if(S.me.role==="leader") return ["entry","today","capa","dash","report","assign","users","catalog"];
+  if(S.me.role==="viewer") return ["today","capa","dash","report"];
+  return ["entry","today"];
+}
+const catalog = () => S.catalog || DEFAULT_CATALOG;
+function defName(id){ const d=(catalog().defects||[]).find(x=>x.id===id); if(d) return tx(d); const o=DEFECTS.find(x=>x[0]===id); return o?tx(o[1]):id; }
+const activeProducts = f => (catalog().products||[]).filter(p=>p.active!==false && (p.forms||[]).includes(f));
+const activeDefects = f => (catalog().defects||[]).filter(p=>p.active!==false && (p.forms||[]).includes(f));
+const capaStatus = r => r.ketqua!=="NG" ? null : ((r.capa&&r.capa.status==="closed")?"closed":"doing");
+const capaPill = r => { const s=capaStatus(r); if(!s) return ""; return `<span class="pill ${s==="closed"?"p-ok":"p-warn"}">${esc(t("st_"+s))}</span>`; };
+function areaOfLine(form,line){ const c=cfg(), k=lineKey(form,line); if(c.lineArea && c.lineArea[k]) return c.lineArea[k]; const ids=(c.areas||[]).map(a=>a.id); return ids.includes(form)?form:(ids[0]||form); }
+const recArea = r => r.area || areaOfLine(r.form,r.line);
+function myAreas(){ if(!S.me || S.me.role==="admin" || S.me.role==="viewer") return null; return S.me.areas||[]; }
+function canSeeArea(a){ const m=myAreas(); return !m || m.includes(a); }
+function visibleLines(form){ return (cfg().lines[form]||[]).filter(l=>canSeeArea(areaOfLine(form,l))); }
+const recVisible = r => canSeeArea(recArea(r));
+const areaName = id => ((cfg().areas||[]).find(a=>a.id===id)||{name:t("area_none")}).name;
+function repRange(){ const R=S.rep; if(R.period==="year") return {from:R.y+"-01", to:R.y+"-12"}; if(R.period==="quarter"){ const m0=(R.q-1)*3+1; return {from:R.y+"-"+pad(m0), to:R.y+"-"+pad(m0+2)}; } return {from:R.month, to:R.month}; }
+function asgOf(form,line){ return (S.asg.map||{})[lineKey(form,line)]||{main:[],backup:[]}; }
+function myLines(form){
+  const all=visibleLines(form);
+  if(!S.me || S.me.role!=="staff") return all;
+  const anyAsg = all.some(l=>{ const a=asgOf(form,l); return (a.main||[]).length||(a.backup||[]).length; });
+  if(!anyAsg) return all;
+  return all.filter(l=>{ const a=asgOf(form,l); return (a.main||[]).includes(S.me.uid)||(a.backup||[]).includes(S.me.uid); });
+}
+function myForms(){ return FORM_KEYS.filter(f=>myLines(f).length); }
+
+function newDraft(form,line,date,ca){
+  const forms=myForms(); let f=form||ls.get("kcb.lastForm",forms[0]||"kim"); if(!forms.includes(f)) f=forms[0]||"kim";
+  const lines=myLines(f); const last=ls.get("kcb.lastLine_"+f,"");
+  const h=new Date().getHours();
+  const d={form:f, line: line || (lines.includes(last)?last:lines[0]||""), date:date||todayStr(), ca:ca||(h<11?"sang":"chieu"), gio:hhmm(),
+    nguoiUid:S.me?S.me.uid:null, items:{}, lyDo:{}, maHang:"", loi:{}, nhietDo:"", tocDo:"", ghiChu:"", daBao:false, photos:{}, oldPhotos:{}, processing:0};
+  if(f==="kim") FORMS.kim.items.forEach(it=>d.items[it.k]={trai:null,giua:null,phai:null});
+  if(f==="caosu") FORMS.caosu.items.forEach(it=>d.items[it.k]=null);
+  return d;
+}
+function draftFromRecord(r){
+  const d=newDraft(r.form,r.line,r.date,r.ca);
+  d.gio=r.gio||d.gio; d.maHang=r.maHang||""; d.lyDo=Object.assign({},r.lyDo||{}); d.ghiChu=r.ghiChu||""; d.daBao=!!r.daBao; d.nguoiUid=r.byUid||null; d.nguoiName=r.nguoi||"";
+  if(r.form==="kim" && r.items) FORMS.kim.items.forEach(it=>{ const v=r.items[it.k]||{}; d.items[it.k]={trai:v.trai||null,giua:v.giua||null,phai:v.phai||null}; });
+  if(r.form==="caosu"){ if(r.items) FORMS.caosu.items.forEach(it=>d.items[it.k]=r.items[it.k]||null); }
+  d.loi=Object.assign({},(r.loi&&r.loi.chiTiet)||{});
+  if(r.form==="pvc"){ d.nhietDo=r.nhietDo??""; d.tocDo=r.tocDo??""; }
+  (r.photos||[]).forEach(p=>{ d.oldPhotos[p.key]=p; });
+  return d;
+}
+function ngKeysOf(form, items, nhiet, toc){
+  const out=[], c=cfg().pvc;
+  if(form==="kim") FORMS.kim.items.forEach(it=>{ const v=(items||{})[it.k]||{}; if(POINTS.some(([p])=>v[p]==="NG")) out.push(it.k); });
+  if(form==="caosu") FORMS.caosu.items.forEach(it=>{ if((items||{})[it.k]==="NG") out.push(it.k); });
+  if(form==="pvc"){ const tt=parseFloat(nhiet), ss=parseFloat(toc); if(!isNaN(tt)&&(tt<c.tMin||tt>c.tMax)) out.push("nhietDo"); if(!isNaN(ss)&&(ss<c.sMin||ss>c.sMax)) out.push("tocDo"); }
+  return out;
+}
+const recNgKeys = r => r.ngItems || ngKeysOf(r.form, r.items, r.nhietDo, r.tocDo);
+function requiredPhotos(d, ng){
+  let m=cfg().photoMode||"ng"; if(m==="sheet_ng") m="ng";
+  if(m==="off") return [];
+  if(m==="item") return FORMS[d.form].items.map(i=>i.k);
+  if(m==="ng") return ng;
+  return ng;
+}
+function evalDraft(d){
+  const out={ketqua:"OK", missing:[], flags:[], ng:[]};
+  if(!d.line) out.missing.push(t("req_line"));
+  if(d.form==="kim") FORMS.kim.items.forEach(it=>POINTS.forEach(([p,pn])=>{ const v=d.items[it.k][p]; if(!v) out.missing.push(tx(it)+" – "+tx(pn)); else if(v==="NG") out.flags.push(tx(it)+" ("+tx(pn)+")"); }));
+  else if(d.form==="caosu") FORMS.caosu.items.forEach(it=>{ const v=d.items[it.k]; if(!v) out.missing.push(tx(it)); else if(v==="NG") out.flags.push(tx(it)); });
+  else {
+    const c=cfg().pvc, tt=parseFloat(d.nhietDo), ss=parseFloat(d.tocDo);
+    if(isNaN(tt)) out.missing.push(t("req_temp")); else if(tt<c.tMin||tt>c.tMax) out.flags.push(tx(FORMS.pvc.items[0])+" "+tt+"°C");
+    if(isNaN(ss)) out.missing.push(t("req_speed")); else if(ss<c.sMin||ss>c.sMax) out.flags.push(tx(FORMS.pvc.items[1])+" "+ss);
+  }
+  out.ng=ngKeysOf(d.form,d.items,d.nhietDo,d.tocDo);
+  if(!String(d.maHang||"").trim()) out.missing.unshift(t("req_code"));
+  out.noReason=out.ng.filter(k=>!String((d.lyDo||{})[k]||"").trim()).map(k=>tx(FORMS[d.form].items.find(i=>i.k===k)||{vi:k}));
+  if(out.flags.length) out.ketqua="NG";
+  out.needPhotos=requiredPhotos(d,out.ng);
+  out.missingPhotos=out.needPhotos.filter(k=>!d.photos[k] && !d.oldPhotos[k]);
+  return out;
+}
+const photoLabel = (form,k) => k==="sheet" ? t("photo_sheet") : tx((FORMS[form].items.find(i=>i.k===k))||{vi:k});
+
+/* ---------- Đăng ký nghe dữ liệu ---------- */
+function neededRange(){
+  const rr=repRange(); const ms=[S.todayDate.slice(0,7), rr.from, rr.to, S.dash.from, S.dash.to, monthAdd(todayStr().slice(0,7),-2)];
+  if(S.draft) ms.push(S.draft.date.slice(0,7));
+  ms.sort(); return {from:ms[0], to:ms[ms.length-1]};
+}
+function syncSubs(){
+  if(!S.B || !S.me) return;
+  const r=neededRange(), areas=myAreas(), ak=areas?areas.slice().sort().join("|"):"*";
+  if(S.sub && S.sub.ak===ak && S.sub.from<=r.from && S.sub.to>=r.to) return;
+  const same = S.sub && S.sub.ak===ak;
+  const from = same? (r.from<S.sub.from?r.from:S.sub.from) : r.from;
+  const to = same? (r.to>S.sub.to?r.to:S.sub.to) : r.to;
+  if(S.sub) S.sub.unsub();
+  const unsub=S.B.listenRecords(from,to,areas,list=>{ S.records=new Map(list.filter(recVisible).map(x=>[x.id,x])); S.dbErr=null; renderBg(); }, e=>{ S.dbErr = (e && e.code==="failed-precondition") ? t("idx_err") : t("perm_err")+" ("+(e&&e.code)+")"; renderBg(); });
+  S.sub={from,to,ak,unsub};
+}
+function startListeners(){
+  stopListeners();
+  S.unsubs.push(S.B.listenUsers(list=>{ S.users=list; const me=list.find(u=>u.uid===S.me.uid); if(me){ if(!me.active){ doLogout(); return; } S.me=Object.assign({},S.me,me); syncSubs(); } else if(S.me){ doLogout(); return; } renderBg(); }));
+  S.unsubs.push(S.B.listenDoc("config",c=>{ if(isAdmin() && (!c || !c.startDate) && !S._autoStart){ S._autoStart=true; S.B.setConfig(Object.assign({}, c||DEFAULT_CFG, {startDate:todayStr()})).catch(()=>{}); } if(c) S.cfg={ lines:Object.assign({},DEFAULT_CFG.lines,c.lines||{}), contacts:Object.assign({},DEFAULT_CFG.contacts,c.contacts||{}), pvc:Object.assign({},DEFAULT_CFG.pvc,c.pvc||{}), deadlines:Object.assign({},DEFAULT_CFG.deadlines,c.deadlines||{}), workdays:c.workdays||DEFAULT_CFG.workdays, photoMode:c.photoMode||DEFAULT_CFG.photoMode, areas:(c.areas&&c.areas.length)?c.areas:DEFAULT_CFG.areas, lineArea:c.lineArea||{}, startDate:c.startDate||"" }; S.records=new Map([...S.records].filter(([k,r])=>recVisible(r))); const d=S.draft; if(d && !myLines(d.form).includes(d.line)) d.line=myLines(d.form)[0]||""; renderBg(); }));
+  S.unsubs.push(S.B.listenDoc("catalog",c=>{ S.catalog=c?{products:c.products||[], defects:c.defects||[]}:null; renderBg(); }));
+  S.unsubs.push(S.B.listenDoc("assign",a=>{ S.asg=a||{map:{}}; const d=S.draft; if(d && !S.saving){ if(!myForms().includes(d.form)) S.draft=newDraft(); else if(!myLines(d.form).includes(d.line)) d.line=myLines(d.form)[0]||""; } renderBg(); }));
+  S.unsubs.push(S.B.listenApprovals(list=>{ S.approvals=new Map(list.map(x=>[x.id,x])); renderBg(); }));
+  syncSubs();
+}
+function stopListeners(){ S.unsubs.forEach(u=>{ try{u();}catch(e){} }); S.unsubs=[]; if(S.sub){ S.sub.unsub(); S.sub=null; } S.records=new Map(); }
+
+/* ---------- Trạng thái ca ---------- */
+function recFor(form,line,date,ca){ return S.records.get(docId(form,line,date,ca)); }
+function isLate(r){
+  if(!r || r.nguon==="giay" || !r.ghiLuc) return false;
+  const dl=cfg().deadlines[r.ca]||"23:59"; const g=new Date(r.ghiLuc);
+  const gs=dstr(g), gt=pad(g.getHours())+":"+pad(g.getMinutes());
+  return gs>r.date || (gs===r.date && gt>dl);
+}
+function slotDue(date,ca){ const td=todayStr(); return date<td || (date===td && hhmm()>(cfg().deadlines[ca]||"23:59")); }
+function slotState(form,line,date,ca){
+  const r=recFor(form,line,date,ca);
+  if(r) return {r, kind:r.ketqua==="NG"?"ng":"ok", late:isLate(r)};
+  return {kind: slotDue(date,ca)?"overdue":"waiting"};
+}
+function recsFor(month,form,line){ return [...S.records.values()].filter(r=>r.month===month && r.form===form && (!line||r.line===line)).sort((a,b)=>sk(a).localeCompare(sk(b))); }
+function trackStart(){ return cfg().startDate || todayStr(); }
+/* Một bộ tính lịch kiểm duy nhất cho mọi màn hình (Hôm nay, Dashboard, Báo cáo tháng/quý/năm).
+   Trạng thái ô: none = không tính (trước ngày bắt đầu, ngày nghỉ, chưa tới hạn); ok / ng / late = đã kiểm; miss = bỏ sót. */
+function slotInfo(form,line,date,ca){
+  const r=recFor(form,line,date,ca);
+  if(date<trackStart()) return {state:"none", r, pre:true};
+  if(!r){ if(!isWorkday(date)) return {state:"none", off:true}; if(!slotDue(date,ca)) return {state:"none", wait:true}; return {state:"miss"}; }
+  return {state: r.ketqua==="NG"?"ng":(isLate(r)?"late":"ok"), r, late:isLate(r)};
+}
+function slotSummary(slots){
+  const due=slots.filter(s=>s.state!=="none");
+  const done=due.filter(s=>s.r).length, onTime=due.filter(s=>s.r && !s.late).length, miss=due.filter(s=>s.state==="miss").length, late=due.filter(s=>s.late).length;
+  return {due:due.length, done, onTime, miss, late};
+}
+const visForms = () => FORM_KEYS.filter(f=>visibleLines(f).length);
+function isWorkday(date){ return (cfg().workdays||[1,2,3,4,5,6]).includes(parseD(date).getDay()); }
+
+/* =====================================================================
+   GIAO DIỆN
+   ===================================================================== */
+function langSwitch(){ return `<span class="langsw" role="group" aria-label="${esc(t("lang"))}"><button data-act="lang" data-v="vi" aria-pressed="${LANG==="vi"}">VI</button><button data-act="lang" data-v="ja" aria-pressed="${LANG==="ja"}">日本語</button></span>`; }
+function shell(){
+  const tabs=tabsFor();
+  if(!tabs.includes(S.tab)) S.tab=tabs[0];
+  return `<div class="wrap"><header class="top"><div class="brand"><h1>${esc(t("app"))}</h1><span class="jp">${esc(t("appSub"))}</span>
+    <span class="tools">${langSwitch()}<button class="mebtn" data-act="mymenu">${esc(S.me.name)} <span class="role">· ${esc(t("role_"+S.me.role))}</span></button></span></div>
+    <nav class="tabs" role="tablist">${tabs.map(k=>`<button role="tab" data-tab="${k}" id="t-${k}" aria-selected="${S.tab===k}">${esc(t("tab_"+k))}</button>`).join("")}</nav></header>
+    ${S.B.mode==="demo"?`<div class="banner info">${esc(t("demo_banner"))}</div>`:""}
+    ${navigator.onLine===false?`<div class="banner">${esc(t("offline"))}</div>`:""}
+    <section class="view" id="view"></section></div>`;
+}
+
+/* ---------- Đăng nhập ---------- */
+function renderLogin(){
+  const L2=S.login;
+  let body;
+  if(L2.mode==="setup"){
+    body=`<div><h2 style="font-size:18px">${esc(t("first_setup"))}</h2><p class="sub">${esc(t("first_setup_desc"))}</p></div>
+      <div class="field"><label class="lbl" for="l-p1">${esc(t("password"))}</label><input type="password" id="l-p1" autocomplete="new-password"></div>
+      <div class="field"><label class="lbl" for="l-p2">${esc(t("password2"))}</label><input type="password" id="l-p2" autocomplete="new-password"></div>
+      <button class="btn primary" data-act="dosetup" ${L2.busy?"disabled":""}>${esc(t("create_admin"))}</button>
+      <button class="linkbtn" data-act="loginmode" data-v="login">${esc(t("back"))}</button>`;
+  } else {
+    body=`<form id="loginform" style="display:flex;flex-direction:column;gap:14px">
+      <div class="field"><label class="lbl" for="l-u">${esc(t("username"))}</label><input type="text" id="l-u" autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(ls.get("kcb.lastUser",""))}"></div>
+      <div class="field"><label class="lbl" for="l-p">${esc(t("password"))}</label><input type="password" id="l-p" autocomplete="current-password"></div>
+      <button class="btn primary" type="submit" ${L2.busy?"disabled":""}>${esc(t("login"))}</button></form>
+      ${S.B.mode==="demo"?`<p class="sub" style="margin:0">${esc(t("demo_hint"))}</p>`:`<button class="linkbtn" data-act="loginmode" data-v="setup">${esc(t("first_setup"))}</button>`}`;
+  }
+  $("#app").innerHTML=`<div class="login"><div class="box"><div style="display:flex;justify-content:space-between;align-items:start;gap:10px"><div><h1>${esc(t("app"))}</h1><div class="sub">${esc(t("appSub"))}</div></div>${langSwitch()}</div>
+    ${body}${L2.msg?`<div class="msg ${L2.msg.cls||"err"}">${esc(L2.msg.t)}</div>`:""}</div></div>`;
+}
+
+/* ---------- Nhập phiếu ---------- */
+function rangeBadge(v,a,b,u){ return isNaN(v)?`<span class="sub">${esc(t("std",{a,b,u}))}</span>` : (v<a||v>b?`<span class="pill p-ng">${esc(t("out_std",{a,b,u}))}</span>`:`<span class="pill p-ok">${esc(t("in_std",{a,b,u}))}</span>`); }
+function photoSlot(d,k,req){
+  const nw=d.photos[k], old=d.oldPhotos[k];
+  let h=`<div class="photos">`;
+  if(nw) h+=`<div class="thumb"><button class="thumb" style="border:0;width:100%;height:100%" data-act="viewnew" data-k="${k}" aria-label="${esc(t("photo"))}"><img src="${nw.url}" alt=""></button><button class="x" data-act="rmphoto" data-k="${k}" aria-label="×">×</button><small>${Math.round(nw.size/1024)} KB</small></div>`;
+  else if(old) h+=`<button class="thumb" data-act="viewref" data-ref="${regRef(old)}"><img data-pref="${regRef(old)}" alt=""></button>`;
+  h+=`<label class="cam ${req&&!nw&&!old?"req":""}">${CAMERA_SVG}<span>${esc(nw||old?t("take_photo")+" ↻":t("take_photo"))}${req&&!nw&&!old?" · "+esc(t("photo_req")):""}</span><input type="file" accept="image/*" capture="environment" data-photo="${k}" hidden></label>`;
+  return h+`</div>`;
+}
+function renderEntry(){
+  const d=S.draft, c=cfg(), ev=evalDraft(d);
+  const lines=myLines(d.form), forms=myForms();
+  if(!forms.length) return `<div class="empty">${esc(t(myAreas()&&!myAreas().length?"no_area":"no_assigned"))}</div>`;
+  const existing=recFor(d.form,d.line,d.date,d.ca);
+  const need=new Set(ev.needPhotos), pm=(c.photoMode==="sheet_ng"?"ng":c.photoMode);
+  const itemPhoto = k => (pm==="item" || need.has(k)) ? photoSlot(d,k,need.has(k)) : "";
+  let h=`<div><span class="lbl">${esc(t("step_form"))}</span><div class="forms">`+forms.map(k=>`<button class="formcard" data-act="form" data-v="${k}" aria-pressed="${d.form===k}"><b>${esc(tx(FORMS[k]))}</b><span class="jp-s">${esc(LANG==="ja"?FORMS[k].vi:FORMS[k].sheetJa)}</span></button>`).join("")+`</div></div>`;
+  h+=`<div class="sheet"><div><span class="lbl">${esc(t(d.form==="pvc"?"step_machine":"step_line"))}</span><div class="chips">`+(lines.length?lines.map(l=>`<button class="chip" data-act="line" data-v="${esc(l)}" aria-pressed="${d.line===l}">${esc(l)}</button>`).join(""):`<span class="sub">${esc(t(S.me.role==="staff"?"no_assigned":"no_lines"))}</span>`)+`</div></div>
+    <div class="row"><div class="field"><label class="lbl" for="f-date">${esc(t("date"))}</label><input type="date" id="f-date" value="${esc(d.date)}"></div>
+      <div class="field"><span class="lbl">${esc(t("check_round"))}</span><div class="chips">${CAS.map(k=>`<button class="chip" data-act="ca" data-v="${k}" aria-pressed="${d.ca===k}">${esc(t("ca_"+k+"_l"))}</button>`).join("")}</div></div>
+      <div class="field" style="flex:0 1 140px"><label class="lbl" for="f-gio">${esc(t("time"))}</label><input type="time" id="f-gio" value="${esc(d.gio)}"></div></div>
+    <div class="sub">${esc(t("inspector"))}: <b style="color:var(--ink)">${esc(d.nguoiName||S.me.name)}</b></div></div>`;
+  const hasCode=!!String(d.maHang||"").trim();
+  const prods=activeProducts(d.form);
+  h+=`<div class="sheet"><span class="lbl">${esc(t("step_code"))} *</span>`;
+  if(hasCode){ const pr=(catalog().products||[]).find(x=>x.code===d.maHang);
+    h+=`<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1 1 200px;min-width:0"><div style="font:600 22px var(--f-data)">${esc(d.maHang)}</div>${pr&&pr.name?`<div class="sub">${esc(pr.name)}</div>`:""}</div><button class="btn ghost sm" data-act="codeclear">${esc(t("change"))}</button></div>`; }
+  else if(!prods.length){ h+=`<div class="empty">${esc(t("no_products"))}${isLeader()?`<div style="margin-top:8px"><button class="btn ghost sm" data-tab="catalog">${esc(t("manage_catalog"))}</button></div>`:""}</div>`; }
+  else {
+    const recent=(ls.get("kcb.codes_"+d.form,[])||[]);
+    const q=(S.codeQ||"").trim().toLowerCase();
+    let list=prods.slice().sort((a,b)=>{ const ia=recent.indexOf(a.code), ib=recent.indexOf(b.code); return (ia<0?99:ia)-(ib<0?99:ib) || a.code.localeCompare(b.code); });
+    if(q) list=list.filter(x=>x.code.toLowerCase().includes(q) || String(x.name||"").toLowerCase().includes(q));
+    h+=`${prods.length>8?`<div class="field"><label class="lbl" for="f-codeq">${esc(t("pick_code"))}</label><input type="search" id="f-codeq" value="${esc(S.codeQ||"")}" autocomplete="off"></div>`:""}
+      <div class="chips">${list.slice(0,24).map(x=>`<button class="chip" data-act="code" data-v="${esc(x.code)}"><b style="font-family:var(--f-data)">${esc(x.code)}</b>${x.name?` <span class="sub">${esc(x.name)}</span>`:""}</button>`).join("")||`<span class="sub">${esc(t("no_match"))}</span>`}</div>`; }
+  h+=`</div>`;
+  const ngSet=new Set(ev.ng);
+  const reasonField = k => ngSet.has(k) ? `<div class="field reasonf" style="flex-basis:100%"><label class="lbl" for="f-r-${k}" style="color:var(--ng)">${esc(t("reason"))} *</label><input type="text" id="f-r-${k}" data-reason="${k}" value="${esc((d.lyDo||{})[k]||"")}" autocomplete="off"></div>` : "";
+  h+=`<div class="sheet"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span class="lbl" style="margin:0">${esc(t("step_items"))}</span>`;
+  if(hasCode && d.form==="kim") h+=`<button class="btn ghost sm" data-act="allok">${esc(t("all_ok"))}</button>`;
+  if(hasCode && d.form==="caosu") h+=`<button class="btn ghost sm" data-act="allok">${esc(t("all_pass"))}</button>`;
+  h+=`</div>`;
+  if(!hasCode){ h+=`<div class="empty">${esc(t("code_first"))}</div></div>`; }
+  else {
+  if(pm!=="off") h+=`<div class="photo-need">${esc(t("photo_mode_hint_"+(pm==="sheet_ng"?"ng":pm)))}</div>`;
+  if(d.form==="kim"){
+    h+=`<p class="sub" style="margin:0">${esc(t("kim_hint"))}</p><div class="items">`;
+    FORMS.kim.items.forEach(it=>{
+      h+=`<div class="item"><div class="txt"><b>${esc(tx(it))}</b><span class="jp-s">${esc(LANG==="ja"?it.vi:it.ja)}</span></div><div class="pts">`+POINTS.map(([p,pn])=>`<div class="h">${esc(tx(pn))}</div>`).join("")+POINTS.map(([p,pn])=>{const v=d.items[it.k][p];return `<button class="pt ${v?"on-"+v:""}" data-act="pt" data-k="${it.k}" data-p="${p}" aria-label="${esc(tx(it))} – ${esc(tx(pn))}: ${v||"—"}">${v||"—"}</button>`;}).join("")+`</div>${reasonField(it.k)}${itemPhoto(it.k)?`<div style="flex-basis:100%">${itemPhoto(it.k)}</div>`:""}</div>`;
+    });
+    h+=`</div>`;
+  } else if(d.form==="caosu"){
+    h+=`<div class="items">`;
+    FORMS.caosu.items.forEach(it=>{ const v=d.items[it.k];
+      h+=`<div class="item"><div class="txt"><b>${esc(tx(it))}</b><span class="jp-s">${esc(LANG==="ja"?it.vi:it.ja)}</span></div><div class="seg">`+["OK","NG"].map(o=>`<button class="${v===o?"on-"+o:""}" data-act="it" data-k="${it.k}" data-v="${o}">${o==="OK"?esc(t("pass")):"NG"}</button>`).join("")+`</div>`
+        +reasonField(it.k)+`${itemPhoto(it.k)?`<div style="flex-basis:100%">${itemPhoto(it.k)}</div>`:""}</div>`;
+    });
+    h+=`</div>`;
+  } else {
+    const p=c.pvc, tt=parseFloat(d.nhietDo), ss=parseFloat(d.tocDo);
+    const rng=(v,a,b,u,id)=>`<div class="range" id="${id}">${rangeBadge(v,a,b,u)}</div>`;
+    h+=`<div class="measure">
+      <div class="field"><label class="lbl" for="f-t">${esc(t("temp"))}</label><input class="big" type="number" inputmode="decimal" step="0.1" id="f-t" value="${esc(d.nhietDo)}">${rng(tt,p.tMin,p.tMax,"°C","rg-t")}${reasonField("nhietDo")}${itemPhoto("nhietDo")}</div>
+      <div class="field"><label class="lbl" for="f-s">${esc(t("speed"))}</label><input class="big" type="number" inputmode="decimal" id="f-s" value="${esc(d.tocDo)}">${rng(ss,p.sMin,p.sMax,"","rg-s")}${reasonField("tocDo")}${itemPhoto("tocDo")}</div></div>`;
+  }
+  const defs=activeDefects(d.form);
+  if(defs.length || Object.keys(d.loi||{}).length){
+    const sel=Object.keys(d.loi||{}).filter(k=>d.loi[k]>0), tong=sel.reduce((s,k)=>s+(+d.loi[k]||0),0);
+    h+=`<div><span class="lbl">${esc(t("defects_title",{n:tong}))}</span>
+      ${sel.length?`<div class="defects" style="margin-bottom:10px">${sel.map(k=>`<div class="stepper"><span>${esc(defName(k))}</span><button data-act="dec" data-k="${esc(k)}" aria-label="−">−</button><output>${d.loi[k]}</output><button data-act="inc" data-k="${esc(k)}" aria-label="+">+</button><button data-act="rmdef" data-k="${esc(k)}" aria-label="${esc(t("remove_def"))}" title="${esc(t("remove_def"))}" style="color:var(--ng);border-color:var(--ng)">×</button></div>`).join("")}</div>`:""}
+      <div class="sub" style="margin-bottom:6px">${esc(t("add_defect"))}</div><div class="chips">${defs.filter(x=>!(d.loi[x.id]>0)).map(x=>`<button class="chip sm" data-act="adddef" data-v="${esc(x.id)}">+ ${esc(tx(x))}</button>`).join("")}</div></div>`;
+  }
+  if(d.processing) h+=`<div class="msg">${esc(t("processing"))}</div>`;
+  h+=`</div>`;
+  }
+  if(ev.ketqua==="NG"){
+    const who=c.contacts[d.form]||"";
+    h+=`<div class="ngbox"><strong>${esc(t("ng_found",{x:ev.flags.join("; ")}))}</strong><div>${esc(t("ng_stop",{who}))}</div>
+      <label class="check"><input type="checkbox" id="f-dabao" ${d.daBao?"checked":""}> ${esc(t("ng_confirm",{who}))}</label></div>`;
+  }
+  h+=`<div class="savebar"><button class="btn primary" data-act="save" ${S.saving||d.processing||!lines.length?"disabled":""}>${esc(S.saving?(S.prog||t("saving")):t("save_sheet"))}</button>
+      <span class="result">${esc(t("result"))}: <span id="res-val" style="color:var(--${ev.ketqua==="NG"?"ng":"ok"})">${ev.missing.length?"—":ev.ketqua}</span></span>
+      <button class="btn ghost" data-act="reset">${esc(t("reset"))}</button></div>`;
+  if(existing && !S.overwrite && !(S.saveMsg&&S.saveMsg.cls==="ok")) h+=`<div class="inline-confirm">${esc(t("exists_warn",{who:existing.nguoi||"",time:existing.gio||""}))} <button class="btn ghost sm" data-act="loadexist">${esc(t("open_old"))}</button></div>`;
+  if(S.saveMsg) h+=`<div class="msg ${S.saveMsg.cls||""}">${esc(S.saveMsg.t)}</div>`;
+  return h;
+}
+
+/* ---------- Hôm nay ---------- */
+function renderToday(){
+  const c=cfg(), date=S.todayDate;
+  const n={ok:0,ng:0,over:0,wait:0};
+  let rows="";
+  FORM_KEYS.forEach(f=>{
+    const lines=visibleLines(f); if(!lines.length) return;
+    rows+=`<div class="bgroup"><h3>${esc(tx(FORMS[f]))}</h3>`;
+    lines.forEach(l=>{
+      const a=asgOf(f,l), who=(a.main||[]).map(userName).filter(Boolean).join(", ");
+      const mine = !isViewer() && (S.me.role!=="staff" || myLines(f).includes(l));
+      rows+=`<div class="brow"><div class="name">${esc(l)}${who?`<small>${esc(t("assigned"))}: ${esc(who)}</small>`:""}</div>`;
+      CAS.forEach(ca=>{
+        const si=slotInfo(f,l,date,ca), st=slotState(f,l,date,ca); let pill, meta="";
+        if(!st.r && si.state==="none" && !si.wait){ pill=`<span class="pill p-idle">${esc(t(si.pre?"st_pre":"st_off"))}</span>`; st.kind="none"; }
+        else if(st.kind==="ok"){ n.ok++; pill=`<span class="pill p-ok">${esc(t("st_ok"))}</span>`; }
+        else if(st.kind==="ng"){ n.ng++; pill=`<span class="pill p-ng">NG</span> `+capaPill(st.r); }
+        else if(st.kind==="overdue"){ n.over++; pill=`<span class="pill p-warn">${esc(t("st_over"))}</span>`; }
+        else { n.wait++; pill=`<span class="pill p-idle">${esc(t("st_wait",{t:c.deadlines[ca]}))}</span>`; }
+        if(st.r){ meta=(st.r.gio||"")+" · "+(st.r.nguoi||""); if(st.late) pill+=` <span class="pill p-warn">${esc(t("st_late"))}</span>`; if((st.r.photos||[]).length) meta+=" · "+st.r.photos.length+" "+t("col_photo").toLowerCase(); }
+        rows+=`<button class="slot ${st.kind==="ng"?"ng":""} ${st.kind==="overdue"||st.late?"late":""}" data-act="openslot" data-f="${f}" data-l="${esc(l)}" data-ca="${ca}" ${mine?"":"disabled"}><span>${pill}</span><small>${esc(caName(ca))}${meta?" · "+esc(meta):""}</small></button>`;
+      });
+      rows+=`</div>`;
+    });
+    rows+=`</div>`;
+  });
+  return `<div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;justify-content:space-between"><div><h2>${esc(t("today_title",{d:fmtDate(date)}))}</h2><div class="sub">${esc(t("today_hint"))}</div></div>
+    <div class="field" style="width:180px"><label class="lbl" for="f-today">${esc(t("date"))}</label><input type="date" id="f-today" value="${esc(date)}"></div></div>
+    <div class="stats"><div class="stat ok"><span class="lbl">${esc(t("st_ok"))}</span><b>${n.ok}</b></div><div class="stat ng"><span class="lbl">NG</span><b>${n.ng}</b></div><div class="stat warn"><span class="lbl">${esc(t("st_overdue_n"))}</span><b>${n.over}</b></div><div class="stat"><span class="lbl">${esc(t("st_wait_n"))}</span><b>${n.wait}</b></div></div>
+    <div class="board"><div class="bhead"><span>${esc(t("line_machine"))}</span><span>${esc(t("ca_sang"))}</span><span>${esc(t("ca_chieu"))}</span></div>${rows||`<div class="empty">${esc(t("no_lines"))}</div>`}</div>`;
+}
+
+/* ---------- Báo cáo tháng ---------- */
+function kimCell(v){ if(!v) return "—"; const vals=POINTS.map(([p])=>v[p]); if(vals.every(x=>x==="OK")) return "OK"; if(vals.every(x=>!x)) return "—"; return POINTS.map(([p,pn],i)=>tx(pn)+":"+(vals[i]||"—")).join(" "); }
+function loiText(r){ const l=r.loi||{}; if(!l.tong) return ""; const ct=l.chiTiet||{}; const parts=Object.keys(ct).filter(k=>ct[k]).map(k=>defName(k)+" "+ct[k]); if(!parts.length && l.loai && l.loai.length) return l.tong+" "+t("pieces")+" ("+l.loai.map(defName).join(", ")+")"; return l.tong+" "+t("pieces")+(parts.length?" ("+parts.join(", ")+")":""); }
+function thumbs(r){ const ps=r.photos||[]; if(!ps.length) return ""; return `<div class="minithumbs">`+ps.slice(0,3).map(p=>`<button data-act="viewrec" data-id="${esc(r.id)}" aria-label="${esc(t("photo"))}"><img data-pref="${regRef(p)}" alt=""></button>`).join("")+(ps.length>3?`<span class="sub">+${ps.length-3}</span>`:"")+`</div>`; }
+function periodBar(){
+  const R=S.rep, y0=new Date().getFullYear(), years=[y0-2,y0-1,y0,y0+1];
+  let h=`<div class="sheet"><div class="row"><div class="field"><span class="lbl">${esc(t("period"))}</span><div class="chips">${["month","quarter","year"].map(k=>`<button class="chip" data-act="rperiod" data-v="${k}" aria-pressed="${R.period===k}">${esc(t("p_"+k))}</button>`).join("")}</div></div>`;
+  if(R.period==="month") h+=`<div class="field" style="flex:0 1 190px"><label class="lbl" for="f-month">${esc(t("month"))}</label><input type="month" id="f-month" value="${esc(R.month)}"></div>`;
+  else { h+=`<div class="field" style="flex:0 1 120px"><label class="lbl" for="f-year">${esc(t("year"))}</label><select id="f-year">${years.map(y=>`<option ${y===R.y?"selected":""}>${y}</option>`).join("")}</select></div>`;
+    if(R.period==="quarter") h+=`<div class="field" style="flex:0 1 220px"><span class="lbl">${esc(t("quarter"))}</span><div class="chips">${[1,2,3,4].map(q=>`<button class="chip sm" data-act="rq" data-v="${q}" aria-pressed="${R.q===q}">Q${q}</button>`).join("")}</div></div>`; }
+  return h+`</div></div>`;
+}
+function renderReport(){
+  if(S.rep.period!=="month") return periodBar()+renderPeriodReport();
+  const c=cfg(), R=S.rep; const vf=visForms(); if(vf.length && !vf.includes(R.form)){ R.form=vf[0]; R.line=null; }
+  if(!vf.length) return periodBar()+`<div class="empty">${esc(t("no_area"))}</div>`;
+  const lines=visibleLines(R.form);
+  const used=[...new Set([...lines, ...[...S.records.values()].filter(r=>r.month===R.month&&r.form===R.form).map(r=>r.line)])];
+  if(!R.line || !used.includes(R.line)) R.line=used[0]||null;
+  const recs=recsFor(R.month,R.form,R.line);
+  const days=[...new Set(recs.map(r=>r.date))];
+  const ng=recs.filter(r=>r.ketqua==="NG").length;
+  const mslots=[]; { const td=todayStr(), end=lastDay(R.month)<td?lastDay(R.month):td; for(let dd=parseD(R.month+"-01"); dstr(dd)<=end; dd.setDate(dd.getDate()+1)){ const ds=dstr(dd); CAS.forEach(ca=>mslots.push(slotInfo(R.form,R.line,ds,ca))); } }
+  const SS=slotSummary(mslots);
+  const late=recs.filter(isLate).length;
+  const apId=R.form+"_"+slug(R.line||"")+"_"+R.month, ap=S.approvals.get(apId);
+  if(S.dbErr) return `<div class="banner">${esc(S.dbErr)}</div>`;
+  let h=`<div><h2>${esc(t("rep_title"))}</h2><div class="sub">${esc(t("rep_sub"))}</div></div>${periodBar()}
+  <div class="sheet"><div class="row">
+    <div class="field"><span class="lbl">${esc(t("form"))}</span><div class="chips">${vf.map(k=>`<button class="chip" data-act="repform" data-v="${k}" aria-pressed="${R.form===k}">${esc(tx(FORMS[k]))}</button>`).join("")}</div></div></div>
+    <div><span class="lbl">${esc(t("line_machine"))}</span><div class="chips">${used.map(l=>`<button class="chip" data-act="repline" data-v="${esc(l)}" aria-pressed="${R.line===l}">${esc(l)}</button>`).join("")}</div></div></div>
+  <div class="stats"><div class="stat"><span class="lbl">${esc(t("n_checks"))}</span><b>${recs.length}</b></div><div class="stat"><span class="lbl">${esc(t("n_days"))}</span><b>${days.length}</b></div><div class="stat ng"><span class="lbl">${esc(t("n_ng"))}</span><b>${ng}</b></div><div class="stat ${SS.due&&SS.onTime/SS.due<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${SS.due?Math.round(SS.onTime/SS.due*100)+"%":"—"}</b><small>${esc(t("k_compliance_s",{a:SS.onTime,b:SS.due}))}</small></div><div class="stat warn"><span class="lbl">${esc(t("col_miss"))}</span><b>${SS.miss}</b></div><div class="stat warn"><span class="lbl">${esc(t("n_late"))}</span><b>${late}</b></div></div>`;
+  if(!recs.length) h+=`<div class="empty">${esc(t("no_recs",{l:R.line||"",m:fmtMonth(R.month)}))}</div>`;
+  else {
+    if(R.form==="pvc") h+=`<div class="card"><h3>${esc(t("c_pvc"))} · ${esc(R.line)}</h3>${pvcChart(recs)}</div>`;
+    const showNote=recs.some(r=>r.ketqua==="NG"||r.ghiChu||(r.lyDo&&Object.keys(r.lyDo).length));
+    let th=`<th>${esc(t("col_day"))}</th><th>${esc(t("col_ca"))}</th><th>${esc(t("col_time"))}</th><th>${esc(t("col_code"))}</th>`, body="";
+    if(R.form==="kim") th+=FORMS.kim.items.map(it=>`<th>${esc(tx(it).split(" +")[0])}</th>`).join("");
+    if(R.form==="caosu") th+=FORMS.caosu.items.map(it=>`<th>${esc(tx(it).split(" (")[0].split("（")[0])}</th>`).join("")+`<th>${esc(t("col_defect"))}</th>`;
+    if(R.form==="pvc") th+=`<th class="num">${esc(t("temp"))}</th><th class="num">${esc(t("speed"))}</th>`;
+    const showDef = R.form!=="caosu" && recs.some(r=>r.loi&&r.loi.tong);
+    if(showDef) th+=`<th>${esc(t("col_defect"))}</th>`;
+    th+=`<th>${esc(t("col_res"))}</th><th>${esc(t("col_by"))}</th>${showNote?`<th>${esc(t("col_note"))}</th>`:""}<th>${esc(t("col_photo"))}</th><th>${esc(t("col_src"))}</th>`;
+    recs.forEach(r=>{
+      let tds=`<td>${esc(fmtDate(r.date))}</td><td>${esc(caName(r.ca))}</td><td class="mono">${esc(r.gio||"")}</td><td>${esc(r.maHang||"")}</td>`;
+      if(R.form==="kim") tds+=FORMS.kim.items.map(it=>`<td class="mono">${esc(kimCell((r.items||{})[it.k]))}</td>`).join("");
+      if(R.form==="caosu") tds+=FORMS.caosu.items.map(it=>{ const v=(r.items||{})[it.k]; return `<td class="mono">${v==="OK"?esc(t("pass")):esc(v||"—")}</td>`; }).join("")+`<td>${esc(loiText(r))}</td>`;
+      if(R.form==="pvc") tds+=`<td class="mono num">${esc(r.nhietDo??"")}</td><td class="mono num">${esc(r.tocDo??"")}</td>`;
+      if(showDef) tds+=`<td>${esc(loiText(r))}</td>`;
+      tds+=`<td><span class="pill ${r.ketqua==="NG"?"p-ng":"p-ok"}">${esc(r.ketqua)}</span> ${capaPill(r)}${isLate(r)?` <span class="pill p-warn">${esc(t("st_late"))}</span>`:""}</td><td>${esc(r.nguoi||"")}</td>
+        ${showNote?`<td class="wrapc">${r.lyDo&&Object.keys(r.lyDo).length?`<span style="color:var(--ng)">${esc(Object.entries(r.lyDo).map(([k,v])=>tx(FORMS[r.form].items.find(i=>i.k===k)||{vi:k})+": "+v).join("; "))}</span> `:""}${esc(r.ghiChu||"")}${r.ketqua==="NG"?(r.daBao?" · "+esc(t("reported")):" · <b>"+esc(t("not_reported"))+"</b>"):""}</td>`:""}<td>${thumbs(r)}</td>
+        <td class="src">${r.nguon==="giay"?esc(t("src_paper")):r.mau?esc(t("src_sample")):esc(t("src_app"))+(r.ghiLuc?" · "+esc(new Date(r.ghiLuc).toLocaleString(LANG==="ja"?"ja-JP":"vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})):"")}</td>`;
+      body+=`<tr class="${r.ketqua==="NG"?"ngrow":""}">${tds}</tr>`;
+    });
+    h+=`<div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table></div>`;
+  }
+  { const l1=ap&&(ap.l1||(ap.byUid?{byUid:ap.byUid,name:ap.nguoiDuyet,at:ap.at,note:ap.note}:null)), l2=ap&&ap.l2;
+    const who=x=>esc(userName(x.byUid)||x.name||"")+" · "+esc(new Date(x.at).toLocaleString(LANG==="ja"?"ja-JP":"vi-VN"))+(x.note?` · “${esc(x.note)}”`:"");
+    h+=`<div class="approve" style="flex-direction:column;align-items:stretch">`;
+    h+=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${l1?`<span class="pill p-ok">${esc(t("ap_l1"))}</span><span class="sub">${who(l1)}</span>`:`<span class="pill p-idle">${esc(t("ap_wait_l1"))}</span>`}</div>`;
+    h+=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${l2?`<span class="pill p-ok">${esc(t("ap_l2"))}</span><span class="sub">${who(l2)}</span>`:`<span class="pill p-idle">${esc(t("ap_wait_l2"))}</span>`}</div>`;
+    const canL1 = !l1 && isLeader() && recs.length, canL2 = l1 && !l2 && isAdmin();
+    const canUn = (isAdmin() && (l1||l2)) || (S.me.role==="leader" && l1 && !l2);
+    if(canL1||canL2||canUn) h+=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${canL1||canL2?`<input type="text" id="f-apnote" placeholder="${esc(t("approve_note"))}" style="flex:1 1 200px;width:auto"><button class="btn primary" data-act="${canL1?"approve":"approve2"}">${esc(t(canL1?"approve_l1":"approve_l2"))}</button>`:""}${canUn?`<button class="btn ghost sm" data-act="unapprove">${esc(t("unapprove"))}</button>`:""}</div>`;
+    if(!l1 && !canL1) h+=`<span class="sub">${esc(t("approve_who"))}</span>`;
+    h+=`</div>`; }
+  h+=`<div class="savebar"><button class="btn" data-act="csv" ${recs.length?"":"disabled"}>${esc(t("csv_one"))}</button><button class="btn ghost" data-act="csvall">${esc(t("csv_all"))}</button></div>`;
+  return h;
+}
+function pvcChart(recs){
+  const p=cfg().pvc, W=720, H=230, L=44, Rm=16, T=16, B=30;
+  const pts=recs.map((r,i)=>({i,v:+r.nhietDo,r})).filter(o=>!isNaN(o.v));
+  if(!pts.length) return `<div class="sub">${esc(t("no_data"))}</div>`;
+  const vals=pts.map(o=>o.v);
+  const lo=Math.floor(Math.min(p.tMin-2,...vals)), hi=Math.ceil(Math.max(p.tMax+2,...vals));
+  const n=recs.length, x=i=>L+(n===1?(W-L-Rm)/2:i*(W-L-Rm)/(n-1)), y=v=>T+(hi-v)*(H-T-B)/(hi-lo);
+  const step=(hi-lo)>12?4:2; let grid="";
+  for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step) grid+=`<line x1="${L}" x2="${W-Rm}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  const band=`<rect x="${L}" y="${y(p.tMax)}" width="${W-L-Rm}" height="${y(p.tMin)-y(p.tMax)}" fill="var(--ok-soft)"/><text x="${W-Rm-4}" y="${y(p.tMax)+13}" text-anchor="end" font-size="11" fill="var(--ok)">${esc(t("std",{a:p.tMin,b:p.tMax,u:"°C"}))}</text>`;
+  const path=pts.map((o,k)=>(k?"L":"M")+x(o.i).toFixed(1)+" "+y(o.v).toFixed(1)).join(" ");
+  const dots=pts.map(o=>{const bad=o.v<p.tMin||o.v>p.tMax;return `<circle cx="${x(o.i)}" cy="${y(o.v)}" r="${bad?5.5:4}" fill="${bad?"var(--ng)":"var(--pen)"}" stroke="var(--paper)" stroke-width="2"><title>${esc(fmtDate(o.r.date)+" "+caName(o.r.ca)+": "+o.v+"°C")}</title></circle>`;}).join("");
+  const every=Math.max(1,Math.ceil(n/12));
+  const labels=recs.map((r,i)=> (i%every===0)?`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${esc(r.date.slice(8)+"/"+r.date.slice(5,7))}</text>`:"").join("");
+  return `<div class="chart chartwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("c_pvc"))}">${band}${grid}<path d="${path}" fill="none" stroke="var(--pen)" stroke-width="2"/>${dots}${labels}</svg></div>`;
+}
+
+/* ---------- Dashboard ---------- */
+function hbars(rows, opts){
+  if(!rows.length) return `<div class="sub">${esc(opts&&opts.empty||t("no_data"))}</div>`;
+  const max=Math.max(1,...rows.map(r=>r.v));
+  return `<div class="hbars">`+rows.map(r=>`<div class="hbar" title="${esc(r.tip||"")}"><span class="lab">${esc(r.label)}${r.sub?` <small>${esc(r.sub)}</small>`:""}</span><span class="track"><span class="fill ${r.ng?"ng":""}" style="display:block;width:${Math.max(2,r.v/max*100).toFixed(1)}%"></span></span><span class="val">${esc(r.text!=null?r.text:r.v)}</span></div>`).join("")+`</div>`;
+}
+function dashData(D){
+  D=D||S.dash; const c=cfg(), today=todayStr();
+  const forms = (D.form==="all"?FORM_KEYS:[D.form]).filter(f=>visForms().includes(f)); const st0=trackStart();
+  const recs=[...S.records.values()].filter(r=>r.month>=D.from && r.month<=D.to && forms.includes(r.form));
+  // lịch dự kiến
+  const start=parseD(D.from+"-01"), endS=lastDay(D.to)<today?lastDay(D.to):today, end=parseD(endS);
+  const dates=[]; for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)) dates.push(dstr(d));
+  const slots=[];
+  forms.forEach(f=>visibleLines(f).forEach(l=>dates.forEach(date=>CAS.forEach(ca=>{ slots.push(Object.assign({form:f,line:l,date,ca}, slotInfo(f,l,date,ca))); }))));
+  return {recs, dates, slots, forms};
+}
+function renderDash(){
+  const D=S.dash, c=cfg();
+  const {recs, dates, slots, forms}=dashData();
+  const due=slots.filter(s=>s.state!=="none"), SS=slotSummary(slots);
+  const onTime=SS.onTime, miss=SS.miss, late=recs.filter(isLate).length;
+  const ngRecs=recs.filter(r=>r.ketqua==="NG");
+  const cs=recs; const defTot=cs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0);
+  const appRecs=recs.filter(r=>r.nguon==="app" && !r.mau); const withPh=appRecs.filter(r=>(r.photos||[]).length).length;
+  const pct=(a,b)=>b?Math.round(a/b*100)+"%":"—";
+  const openNg=capaList().filter(r=>capaStatus(r)!=="closed"); const oldest=openNg.reduce((m,r)=>Math.max(m,Math.round((parseD(todayStr())-parseD(r.date))/864e5)),0);
+  let h=`<div><h2>${esc(t("dash_title"))}</h2><div class="sub">${esc(t("dash_sub"))}${myAreas()?" · "+esc(t("area"))+": "+esc(myAreas().map(areaName).join(", ")):""}</div></div>${S.dbErr?`<div class="banner">${esc(S.dbErr)}</div>`:""}
+  <div class="sheet"><div class="row">
+    <div class="field" style="flex:0 1 180px"><label class="lbl" for="d-from">${esc(t("from"))}</label><input type="month" id="d-from" value="${esc(D.from)}"></div>
+    <div class="field" style="flex:0 1 180px"><label class="lbl" for="d-to">${esc(t("to"))}</label><input type="month" id="d-to" value="${esc(D.to)}"></div>
+    <div class="field"><span class="lbl">${esc(t("form"))}</span><div class="chips"><button class="chip" data-act="dform" data-v="all" aria-pressed="${D.form==="all"}">${esc(t("all"))}</button>${visForms().map(k=>`<button class="chip" data-act="dform" data-v="${k}" aria-pressed="${D.form===k}">${esc(tx(FORMS[k]))}</button>`).join("")}</div></div>
+  </div></div>
+  <div class="stats">
+    <div class="stat ${due.length&&onTime/due.length<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${pct(onTime,due.length)}</b><small>${esc(t("k_compliance_s",{a:onTime,b:due.length}))}</small></div>
+    <div class="stat ng"><span class="lbl">${esc(t("k_ng"))}</span><b>${ngRecs.length}</b><small>${esc(t("k_ng_s",{n:recs.length}))}</small></div>
+    <div class="stat"><span class="lbl">${esc(t("k_defects"))}</span><b>${defTot}</b><small>${esc(t("k_defects_s"))}</small></div>
+    <div class="stat warn"><span class="lbl">${esc(t("k_late"))}</span><b>${late+miss}</b><small>${esc(t("k_late_s",{a:late,b:miss}))}</small></div>
+    <button class="stat ${openNg.length?"ng":"ok"}" data-tab="capa" style="text-align:left;font:inherit;color:inherit;cursor:pointer" title="${esc(t("k_open_all"))}"><span class="lbl">${esc(t("k_open"))} ›</span><b>${openNg.length}</b><small>${openNg.length?esc(t("k_open_s",{n:oldest})):esc(t("k_open_all"))}</small></button>
+    <div class="stat"><span class="lbl">${esc(t("k_photo"))}</span><b>${pct(withPh,appRecs.length)}</b><small>${esc(t("k_photo_s"))}</small></div>
+  </div>`;
+  if(!recs.length && !due.length){ return h+`<div class="empty">${esc(t("no_data"))}</div>`; }
+  // Pareto loại lỗi
+  const tot={}; let unk=0;
+  recs.forEach(r=>{ const l=r.loi||{}; if(!l.tong) return; const ct=l.chiTiet||{}; if(Object.keys(ct).length) Object.entries(ct).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); else unk+=l.tong; });
+  const all=Object.values(tot).reduce((a,b)=>a+b,0)+unk;
+  let par=Object.keys(tot).map(k=>({label:defName(k), v:tot[k]})).sort((a,b)=>b.v-a.v);
+  if(unk) par.push({label:t("unclassified"), v:unk});
+  let cum=0; par=par.map(r=>{ cum+=r.v; return Object.assign(r,{text:r.v+" · "+Math.round(r.v/all*100)+"%", sub:"∑ "+Math.round(cum/all*100)+"%", tip:r.label+": "+r.v+" "+t("pieces")}); });
+  // Hạng mục NG
+  const itemCnt={};
+  recs.forEach(r=>recNgKeys(r).forEach(k=>{ const key=r.form+"|"+k; itemCnt[key]=(itemCnt[key]||0)+1; }));
+  const items=Object.entries(itemCnt).map(([key,v])=>{ const [f,k]=key.split("|"); const it=FORMS[f].items.find(i=>i.k===k)||{vi:k}; return {label:tx(it), sub:tx(FORMS[f]), v, ng:true, text:v+" "+t("times")}; }).sort((a,b)=>b.v-a.v).slice(0,8);
+  // Line
+  const byLine={};
+  recs.forEach(r=>{ const k=r.form+"|"+r.line; const o=byLine[k]=byLine[k]||{f:r.form,l:r.line,n:0,ng:0,def:0}; o.n++; if(r.ketqua==="NG") o.ng++; o.def+=(r.loi&&r.loi.tong)||0; });
+  const lines=Object.values(byLine).map(o=>{ const v=Math.round((o.ng+o.def)/o.n*1000)/10; return {label:o.l, sub:o.ng+" NG · "+o.def+" "+t("pieces")+" · "+o.n+" "+t("times"), v, text:v+t("per100"), ng:o.ng>0}; }).sort((a,b)=>b.v-a.v);
+  h+=`<div class="dgrid">
+    <div class="card"><h3>${esc(t("c_pareto"))}</h3><div class="sub">${esc(t("c_pareto_s"))}</div>${hbars(par)}</div>
+    <div class="card"><h3>${esc(t("c_items"))}</h3>${hbars(items,{empty:t("none_ng")})}</div>
+    <div class="card"><h3>${esc(t("c_lines"))}</h3><div class="sub">${esc(t("c_lines_s"))}</div>${hbars(lines)}</div>
+    <div class="card"><h3>${esc(t("c_trend"))}</h3>${trendChart(recs,dates)}</div>
+    <div class="card"><h3>${esc(t("c_codes"))}</h3><div class="sub">${esc(t("c_codes_s"))}</div>${hbars(codeRows(recs),{empty:t("none_ng")})}</div>
+  </div>`;
+  // Lịch tuân thủ
+  const rowsK=[]; forms.forEach(f=>visibleLines(f).forEach(l=>rowsK.push([f,l])));
+  const byKey={}; slots.forEach(s=>{ byKey[s.form+"|"+s.line+"|"+s.date+"|"+s.ca]=s.state; });
+  h+=`<div class="card"><h3>${esc(t("c_heat"))}</h3><div class="legend"><span><i style="background:var(--ok)"></i>${esc(t("lg_ok"))}</span><span><i style="background:var(--ng)"></i>${esc(t("lg_ng"))}</span><span><i style="background:var(--ok);outline:2px solid var(--warn);outline-offset:-2px"></i>${esc(t("lg_late"))}</span><span><i style="background:var(--warn)"></i>${esc(t("lg_miss"))}</span><span><i style="background:var(--idle-soft)"></i>${esc(t("lg_none"))}</span></div><div class="sub">${esc(t("c_heat_s"))}</div>
+    <div class="chartwrap"><table class="heat"><thead><tr><th></th>${dates.map(d=>`<th>${+d.slice(8)}</th>`).join("")}</tr></thead><tbody>${rowsK.map(([f,l])=>`<tr><th class="rowh">${esc(l)}</th>${dates.map(d=>`<td><span class="hc" title="${esc(l+" · "+fmtDate(d))}">${CAS.map(ca=>{ const s=byKey[f+"|"+l+"|"+d+"|"+ca]; return `<i class="${s==="none"?"":s||""}"></i>`; }).join("")}</span></td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  // Theo nhân viên
+  const ma=myAreas(); const staff=S.users.filter(u=>(u.role!=="admin" || recs.some(r=>r.byUid===u.uid)) && (!ma || (u.areas||[]).some(a=>ma.includes(a)) || recs.some(r=>r.byUid===u.uid)));
+  const stRows=staff.map(u=>{
+    const mine=recs.filter(r=>r.byUid===u.uid); const lt=mine.filter(isLate).length;
+    const ms=slots.filter(s=>s.state==="miss" && (asgOf(s.form,s.line).main||[]).includes(u.uid)).length;
+    const ng=mine.filter(r=>r.ketqua==="NG").length;
+    return {u, n:mine.length, lt, ms, ng, rate:mine.length?Math.round((mine.length-lt)/mine.length*100):null};
+  }).filter(x=>x.n||x.ms).sort((a,b)=>(b.ms+b.lt)-(a.ms+a.lt));
+  h+=`<div class="dgrid"><div class="card"><h3>${esc(t("c_staff"))}</h3>${stRows.length?`<div class="tablewrap"><table><thead><tr><th>${esc(t("full_name"))}</th><th class="num">${esc(t("s_checks"))}</th><th class="num">${esc(t("s_rate"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th><th class="num">${esc(t("s_ng"))}</th></tr></thead><tbody>${stRows.map(x=>`<tr><td>${esc(x.u.name)}</td><td class="num mono">${x.n}</td><td class="num mono">${x.rate==null?"—":x.rate+"%"}</td><td class="num mono">${x.lt?`<span style="color:var(--warn)">${x.lt}</span>`:0}</td><td class="num mono">${x.ms?`<span style="color:var(--warn)">${x.ms}</span>`:0}</td><td class="num mono">${x.ng}</td></tr>`).join("")}</tbody></table></div>`:`<div class="sub">${esc(t("no_data"))}</div>`}</div>`;
+  // Bất thường gần đây
+  const recent=ngRecs.slice().sort((a,b)=>sk(b).localeCompare(sk(a))).slice(0,8);
+  h+=`<div class="card"><h3>${esc(t("c_recent"))}</h3>${recent.length?`<div class="items">${recent.map(r=>`<div class="item" style="align-items:flex-start"><div class="txt"><b>${esc(r.line)}</b> ${capaPill(r)} <span class="sub">· ${esc(fmtDate(r.date))} ${esc(caName(r.ca))} · ${esc(r.maHang||"")} · ${esc(r.nguoi||"")}</span><div style="font-size:13px">${esc(recNgKeys(r).map(k=>tx(FORMS[r.form].items.find(i=>i.k===k)||{vi:k})).join(", "))}${r.form==="pvc"?" · "+esc(r.nhietDo)+"°C":""}</div><div class="sub">${esc([...Object.values(r.lyDo||{}), r.ghiChu||""].filter(Boolean).join(" · "))}</div></div>${thumbs(r)}</div>`).join("")}</div>`:`<div class="sub">${esc(t("none_ng"))}</div>`}</div></div>`;
+  // PVC
+  if(forms.includes("pvc")){
+    const pl=visibleLines("pvc"); if(!D.pvcLine || !pl.includes(D.pvcLine)) D.pvcLine=pl[0]||null;
+    if(D.pvcLine){ const pr=recs.filter(r=>r.form==="pvc"&&r.line===D.pvcLine).sort((a,b)=>sk(a).localeCompare(sk(b)));
+      h+=`<div class="card"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h3>${esc(t("c_pvc"))}</h3><div class="chips">${pl.map(l=>`<button class="chip sm" data-act="dpvc" data-v="${esc(l)}" aria-pressed="${D.pvcLine===l}">${esc(l)}</button>`).join("")}</div></div>${pvcChart(pr)}</div>`; }
+  }
+  return h;
+}
+function codeRows(recs){
+  const m={}; recs.forEach(r=>{ const c=String(r.maHang||"").trim(); if(!c) return; const o=m[c]=m[c]||{n:0,ng:0,def:0}; o.n++; if(r.ketqua==="NG") o.ng++; o.def+=(r.loi&&r.loi.tong)||0; });
+  return Object.entries(m).map(([c,o])=>({label:c, sub:o.n+" "+t("times"), v:o.ng+o.def, text:o.ng+" NG · "+o.def+" "+t("pieces"), ng:o.ng>0})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,8);
+}
+function trendChart(recs,dates){
+  if(!dates.length) return `<div class="sub">${esc(t("no_data"))}</div>`;
+  const def={}, ng={};
+  recs.forEach(r=>{ def[r.date]=(def[r.date]||0)+((r.loi&&r.loi.tong)||0); if(r.ketqua==="NG") ng[r.date]=(ng[r.date]||0)+1; });
+  const W=Math.max(460,dates.length*18+60), H=200, L=34, Rm=8, T=12, B=26;
+  const max=Math.max(4,...dates.map(d=>(def[d]||0)+(ng[d]||0)));
+  const top=Math.ceil(max/4)*4, bw=(W-L-Rm)/dates.length, y=v=>T+(top-v)*(H-T-B)/top;
+  let g=""; for(let v=0; v<=top; v+=top/4) g+=`<line x1="${L}" x2="${W-Rm}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  let bars="";
+  dates.forEach((d,i)=>{
+    const x=L+i*bw+bw*0.18, w=Math.max(3,bw*0.64), a=def[d]||0, b=ng[d]||0;
+    if(a) bars+=`<rect x="${x}" y="${y(a)}" width="${w}" height="${y(0)-y(a)}" rx="2" fill="var(--pen)"><title>${esc(fmtDate(d)+": "+a+" "+t("pieces"))}</title></rect>`;
+    if(b) bars+=`<rect x="${x}" y="${y(a+b)}" width="${w}" height="${Math.max(0,y(a)-y(a+b)-2)}" rx="2" fill="var(--ng)"><title>${esc(fmtDate(d)+": "+b+" NG")}</title></rect>`;
+    if(i%Math.max(1,Math.ceil(dates.length/15))===0) bars+=`<text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${+d.slice(8)}</text>`;
+  });
+  return `<div class="legend"><span><i style="background:var(--pen)"></i>${esc(t("k_defects"))} (${esc(t("pieces"))})</span><span><i style="background:var(--ng)"></i>${esc(t("k_ng"))}</span></div><div class="chart chartwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("c_trend"))}">${g}${bars}</svg></div>`;
+}
+
+/* ---------- Báo cáo quý / năm ---------- */
+function monthsBetween(a,b){ const out=[]; for(let m=a; m<=b; m=monthAdd(m,1)) out.push(m); return out; }
+function periodStats(){
+  const rr=repRange(), D={from:rr.from, to:rr.to, form:S.rep.pform||"all"};
+  const {recs, slots, forms}=dashData(D);
+  return {rr, recs, slots, forms, months:monthsBetween(rr.from, rr.to)};
+}
+function renderPeriodReport(){
+  const R=S.rep, {rr, recs, slots, forms, months}=periodStats();
+  const title = R.period==="year" ? t("y_title",{y:R.y}) : t("q_title",{q:R.q,y:R.y});
+  const agg = list => { const x=slotSummary(list); return {due:x.due, on:x.onTime, miss:x.miss}; };
+  const pct=(a,b)=>b?Math.round(a/b*100)+"%":"—";
+  let h=`<div><h2>${esc(title)}</h2><div class="sub">${esc(t("r_period_sub"))}</div></div>
+  <div class="sheet"><span class="lbl">${esc(t("form"))}</span><div class="chips"><button class="chip" data-act="pform" data-v="all" aria-pressed="${(R.pform||"all")==="all"}">${esc(t("all"))}</button>${visForms().map(k=>`<button class="chip" data-act="pform" data-v="${k}" aria-pressed="${R.pform===k}">${esc(tx(FORMS[k]))}</button>`).join("")}</div></div>`;
+  if(S.dbErr) return h+`<div class="banner">${esc(S.dbErr)}</div>`;
+  const A=agg(slots), ng=recs.filter(r=>r.ketqua==="NG").length, def=recs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), late=recs.filter(isLate).length;
+  h+=`<div class="stats"><div class="stat ${A.due&&A.on/A.due<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${pct(A.on,A.due)}</b><small>${esc(t("k_compliance_s",{a:A.on,b:A.due}))}</small></div>
+    <div class="stat"><span class="lbl">${esc(t("n_checks"))}</span><b>${recs.length}</b></div><div class="stat ng"><span class="lbl">${esc(t("n_ng"))}</span><b>${ng}</b></div>
+    <div class="stat"><span class="lbl">${esc(t("k_defects"))}</span><b>${def}</b><small>${esc(t("k_defects_s"))}</small></div><div class="stat warn"><span class="lbl">${esc(t("k_late"))}</span><b>${late+A.miss}</b><small>${esc(t("k_late_s",{a:late,b:A.miss}))}</small></div></div>`;
+  if(!recs.length) return h+`<div class="empty">${esc(t("no_data"))}</div>`;
+  // theo tháng
+  const mRows=months.map(m=>{ const rs=recs.filter(r=>r.month===m), sl=slots.filter(s=>s.date.slice(0,7)===m), a=agg(sl);
+    const lines=new Set(sl.map(s=>s.form+"|"+s.line)); const aps=[...lines].map(k=>{ const [f,l]=k.split("|"); return S.approvals.get(f+"_"+slug(l)+"_"+m); }).filter(Boolean);
+    const apL1=aps.filter(x=>x.l1||x.byUid).length, apL2=aps.filter(x=>x.l2).length;
+    return {m, n:rs.length, comp:pct(a.on,a.due), ng:rs.filter(r=>r.ketqua==="NG").length, def:rs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), late:rs.filter(isLate).length, miss:a.miss, ap:lines.size?t("ap_short",{a:apL1,b:apL2,n:lines.size}):"—", has:a.due>0||rs.length>0}; });
+  h+=`<div class="card"><h3>${esc(t("r_by_month"))}</h3><div class="tablewrap"><table><thead><tr><th>${esc(t("month"))}</th><th class="num">${esc(t("col_checks"))}</th><th class="num">${esc(t("col_compliance"))}</th><th class="num">NG</th><th class="num">${esc(t("col_def"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th><th class="num">${esc(t("col_approval"))}</th></tr></thead>
+    <tbody>${mRows.map(x=>`<tr><td>${esc(fmtMonth(x.m))}</td>${x.has?`<td class="num mono">${x.n}</td><td class="num mono">${x.comp}</td><td class="num mono">${x.ng?`<span style="color:var(--ng)">${x.ng}</span>`:0}</td><td class="num mono">${x.def}</td><td class="num mono">${x.late}</td><td class="num mono">${x.miss}</td><td class="num mono">${x.ap}</td>`:`<td colspan="7" class="sub">—</td>`}</tr>`).join("")}</tbody></table></div></div>`;
+  // xu hướng theo tháng
+  const W=Math.max(460, months.length*52+60), H=190, L=34, Rm=8, T=12, B=26, mx=Math.max(4,...mRows.map(x=>x.ng+x.def)), top=Math.ceil(mx/4)*4, bw=(W-L-Rm)/months.length, y=v=>T+(top-v)*(H-T-B)/top;
+  let g=""; for(let v=0; v<=top; v+=top/4) g+=`<line x1="${L}" x2="${W-Rm}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  mRows.forEach((x,i)=>{ const bx=L+i*bw+bw*0.22, w=bw*0.56;
+    if(x.def) g+=`<rect x="${bx}" y="${y(x.def)}" width="${w}" height="${y(0)-y(x.def)}" rx="3" fill="var(--pen)"><title>${esc(fmtMonth(x.m)+": "+x.def+" "+t("pieces"))}</title></rect>`;
+    if(x.ng) g+=`<rect x="${bx}" y="${y(x.def+x.ng)}" width="${w}" height="${Math.max(0,y(x.def)-y(x.def+x.ng)-2)}" rx="3" fill="var(--ng)"><title>${esc(fmtMonth(x.m)+": "+x.ng+" NG")}</title></rect>`;
+    g+=`<text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${esc(x.m.slice(5))}</text>`; });
+  h+=`<div class="card"><h3>${esc(t("r_trend"))}</h3><div class="legend"><span><i style="background:var(--pen)"></i>${esc(t("k_defects"))}</span><span><i style="background:var(--ng)"></i>NG</span></div><div class="chart chartwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("r_trend"))}">${g}</svg></div></div>`;
+  // theo line
+  const byLine={}; slots.forEach(s=>{ const k=s.form+"|"+s.line; const o=byLine[k]=byLine[k]||{f:s.form,l:s.line,sl:[],rs:[]}; o.sl.push(s); });
+  recs.forEach(r=>{ const k=r.form+"|"+r.line; const o=byLine[k]=byLine[k]||{f:r.form,l:r.line,sl:[],rs:[]}; o.rs.push(r); });
+  const lRows=Object.values(byLine).map(o=>{ const a=agg(o.sl); return {o, n:o.rs.length, comp:pct(a.on,a.due), ng:o.rs.filter(r=>r.ketqua==="NG").length, def:o.rs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), miss:a.miss, late:o.rs.filter(isLate).length}; }).sort((a,b)=>FORM_KEYS.indexOf(a.o.f)-FORM_KEYS.indexOf(b.o.f)||a.o.l.localeCompare(b.o.l));
+  h+=`<div class="card"><h3>${esc(t("r_by_line"))}</h3><div class="tablewrap"><table><thead><tr><th>${esc(t("line_machine"))}</th><th>${esc(t("area"))}</th><th class="num">${esc(t("col_checks"))}</th><th class="num">${esc(t("col_compliance"))}</th><th class="num">NG</th><th class="num">${esc(t("col_def"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th></tr></thead>
+    <tbody>${lRows.map(x=>`<tr><td>${esc(x.o.l)} <span class="sub">${esc(tx(FORMS[x.o.f]))}</span></td><td>${esc(areaName(areaOfLine(x.o.f,x.o.l)))}</td><td class="num mono">${x.n}</td><td class="num mono">${x.comp}</td><td class="num mono">${x.ng?`<span style="color:var(--ng)">${x.ng}</span>`:0}</td><td class="num mono">${x.def}</td><td class="num mono">${x.late}</td><td class="num mono">${x.miss}</td></tr>`).join("")}</tbody></table></div></div>`;
+  // Pareto + hạng mục
+  const tot={}; let unk=0; recs.forEach(r=>{ const l=r.loi||{}; if(!l.tong) return; const ct=l.chiTiet||{}; if(Object.keys(ct).length) Object.entries(ct).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); else unk+=l.tong; });
+  const all=Object.values(tot).reduce((a,b)=>a+b,0)+unk; let cum=0;
+  let par=Object.keys(tot).map(k=>({label:defName(k), v:tot[k]})).sort((a,b)=>b.v-a.v); if(unk) par.push({label:t("unclassified"),v:unk});
+  par=par.map(r=>{ cum+=r.v; return Object.assign(r,{text:r.v+" · "+Math.round(r.v/all*100)+"%", sub:"∑ "+Math.round(cum/all*100)+"%"}); });
+  const itemCnt={}; recs.forEach(r=>recNgKeys(r).forEach(k=>{ const key=r.form+"|"+k; itemCnt[key]=(itemCnt[key]||0)+1; }));
+  const items=Object.entries(itemCnt).map(([key,v])=>{ const [f,k]=key.split("|"); return {label:tx(FORMS[f].items.find(i=>i.k===k)||{vi:k}), sub:tx(FORMS[f]), v, ng:true, text:v+" "+t("times")}; }).sort((a,b)=>b.v-a.v).slice(0,8);
+  h+=`<div class="dgrid"><div class="card"><h3>${esc(t("r_top_def"))}</h3>${hbars(par)}</div><div class="card"><h3>${esc(t("r_top_items"))}</h3>${hbars(items,{empty:t("none_ng")})}</div></div>`;
+  h+=`<div class="savebar"><button class="btn" data-act="csvperiod">${esc(t("csv_period"))}</button><button class="btn ghost" data-act="csvperiodraw">${esc(t("csv_all"))}</button></div>`;
+  S._period={mRows,lRows,recs,title};
+  return h;
+}
+
+/* ---------- Xử lý NG (CAPA) ---------- */
+function capaList(){ const from=monthAdd(todayStr().slice(0,7),-2); return [...S.records.values()].filter(r=>r.ketqua==="NG" && r.month>=from && recVisible(r)); }
+function renderCapa(){
+  const f=S.capaF||"todo";
+  let list=capaList();
+  const cnt={todo:list.filter(r=>capaStatus(r)!=="closed").length, closed:list.filter(r=>capaStatus(r)==="closed").length, all:list.length};
+  if(f==="todo") list=list.filter(r=>capaStatus(r)!=="closed"); else if(f==="closed") list=list.filter(r=>capaStatus(r)==="closed");
+  const rank={doing:0,closed:1};
+  list.sort((a,b)=>rank[capaStatus(a)]-rank[capaStatus(b)] || sk(a).localeCompare(sk(b)));
+  let h=`<div><h2>${esc(t("capa_title"))}</h2><div class="sub">${esc(t("capa_sub"))} ${esc(t("capa_hint"))}</div></div>
+  <div class="chips">${[["todo","f_todo"],["closed","st_closed"],["all","all"]].map(([k,l])=>`<button class="chip" data-act="capaf" data-v="${k}" aria-pressed="${f===k}">${esc(t(l))} · ${cnt[k]}</button>`).join("")}</div>`;
+  if(!list.length) return h+`<div class="empty">${esc(t("no_capa"))}</div>`;
+  const today=parseD(todayStr());
+  h+=list.map(r=>{
+    const st=capaStatus(r), c=r.capa||{}, age=Math.round((today-parseD(r.date))/864e5), id=esc(r.id), dr=(S.capaDraft||{})[r.id]||{};
+    const items=recNgKeys(r).map(k=>{ const it=FORMS[r.form].items.find(i=>i.k===k)||{vi:k}; const why=(r.lyDo||{})[k]; return `<li><b>${esc(tx(it))}</b>${why?` — ${esc(why)}`:""}${r.form==="pvc"&&k==="nhietDo"?` (${esc(r.nhietDo)}°C)`:""}${r.form==="pvc"&&k==="tocDo"?` (${esc(r.tocDo)})`:""}</li>`; }).join("");
+    const ro=!isLeader();
+    return `<div class="sheet" style="gap:12px;${st!=="closed"?"border-left:4px solid var(--warn)":""}">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:start"><div><b>${esc(r.line)}</b> <span class="sub">${esc(tx(FORMS[r.form]))} · ${esc(fmtDate(r.date))} ${esc(caName(r.ca))} ${esc(r.gio||"")} · ${esc(t("code"))}: ${esc(r.maHang||"—")} · ${esc(r.nguoi||"")}</span></div>
+        <div style="display:flex;gap:6px;align-items:center">${capaPill(r)}${st!=="closed"?`<span class="pill ${age>2?"p-ng":"p-idle"}">${esc(t("days_open",{n:age}))}</span>`:""}</div></div>
+      <ul style="margin:0;padding-left:18px;font-size:14px">${items}</ul>${r.loi&&r.loi.tong?`<div class="sub">${esc(t("col_defect"))}: ${esc(loiText(r))}</div>`:""}${thumbs(r)}
+      <div class="grid2"><div class="field"><label class="lbl" for="cc-${id}">${esc(t("cause"))}</label><textarea id="cc-${id}" data-capa="${id}" data-f="cause" ${ro?"readonly":""} style="min-height:64px">${esc(dr.cause!=null?dr.cause:(c.cause||""))}</textarea></div>
+        <div class="field"><label class="lbl" for="ca-${id}">${esc(t("action"))}</label><textarea id="ca-${id}" data-capa="${id}" data-f="action" ${ro?"readonly":""} style="min-height:64px">${esc(dr.action!=null?dr.action:(c.action||""))}</textarea></div></div>
+      ${ro?"":`<div class="savebar">${["doing","closed"].map(s=>`<button class="chip sm" data-act="capast" data-id="${id}" data-v="${s}" aria-pressed="${(dr.status||st)===s}">${esc(t("st_"+s))}</button>`).join("")}<button class="btn primary sm" data-act="capasave" data-id="${id}">${esc(t("capa_save"))}</button></div>`}
+      ${c.updatedAt?`<div class="src">${esc(t("handled_by",{who:userName(c.byUid)||"",t:new Date(c.updatedAt).toLocaleString(LANG==="ja"?"ja-JP":"vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})}))}</div>`:""}
+    </div>`;
+  }).join("");
+  return h;
+}
+
+/* ---------- Danh mục ---------- */
+function renderCatalog(){
+  if(!S.catDraft) S.catDraft=JSON.parse(JSON.stringify(catalog()));
+  const C=S.catDraft, nf=S.catNew||{pf:[],df:["caosu"]};
+  const formChips=(act,sel,extra)=>FORM_KEYS.map(f=>`<button class="chip sm" data-act="${act}" data-v="${f}" ${extra||""} aria-pressed="${(sel||[]).includes(f)}">${esc(tx(FORMS[f]))}</button>`).join("");
+  let h=`<div><h2>${esc(t("cat_title"))}</h2><div class="sub">${esc(t("cat_sub"))}</div></div>`;
+  h+=`<div class="sheet"><h3>${esc(t("cat_products"))}</h3>
+    <div class="row"><div class="field" style="flex:0 1 200px"><label class="lbl" for="n-code">${esc(t("code"))}</label><input type="text" id="n-code" autocomplete="off" value="${esc(nf.code||"")}"></div><div class="field"><label class="lbl" for="n-pname">${esc(t("prod_name"))}</label><input type="text" id="n-pname" autocomplete="off" value="${esc(nf.pname||"")}"></div></div>
+    <div><span class="lbl">${esc(t("apply_forms"))}</span><div class="chips">${formChips("npf",nf.pf)}</div></div>
+    <div><button class="btn sm" data-act="addprod">+ ${esc(t("add"))}</button></div>
+    <div class="tablewrap"><table><thead><tr><th>${esc(t("code"))}</th><th>${esc(t("prod_name"))}</th><th>${esc(t("apply_forms"))}</th><th></th></tr></thead><tbody>
+    ${(C.products||[]).map((x,i)=>`<tr style="${x.active===false?"opacity:.55":""}"><td class="mono"><b>${esc(x.code)}</b></td><td style="min-width:160px"><input type="text" data-cat="products" data-i="${i}" data-f="name" value="${esc(x.name||"")}" aria-label="${esc(t("prod_name"))}"></td><td><div class="chips">${formChips("cpf",x.forms,`data-i="${i}"`)}</div></td><td><button class="btn ghost sm" data-act="cptoggle" data-i="${i}">${esc(t(x.active===false?"reuse":"retire"))}</button></td></tr>`).join("")}
+    </tbody></table></div></div>`;
+  h+=`<div class="sheet"><h3>${esc(t("cat_defects"))}</h3>
+    <div class="row"><div class="field"><label class="lbl" for="n-dvi">${esc(t("name_vi"))}</label><input type="text" id="n-dvi" autocomplete="off" value="${esc(nf.dvi||"")}"></div><div class="field"><label class="lbl" for="n-dja">${esc(t("name_ja"))}</label><input type="text" id="n-dja" autocomplete="off" value="${esc(nf.dja||"")}"></div></div>
+    <div><span class="lbl">${esc(t("apply_forms"))}</span><div class="chips">${formChips("ndf",nf.df)}</div></div>
+    <div><button class="btn sm" data-act="adddefcat">+ ${esc(t("add"))}</button></div>
+    <div class="tablewrap"><table><thead><tr><th>${esc(t("name_vi"))}</th><th>${esc(t("name_ja"))}</th><th>${esc(t("apply_forms"))}</th><th></th></tr></thead><tbody>
+    ${(C.defects||[]).map((x,i)=>`<tr style="${x.active===false?"opacity:.55":""}"><td style="min-width:150px"><input type="text" data-cat="defects" data-i="${i}" data-f="vi" value="${esc(x.vi||"")}" aria-label="${esc(t("name_vi"))}"></td><td style="min-width:150px"><input type="text" data-cat="defects" data-i="${i}" data-f="ja" value="${esc(x.ja||"")}" aria-label="${esc(t("name_ja"))}"></td><td><div class="chips">${formChips("cdf",x.forms,`data-i="${i}"`)}</div></td><td><button class="btn ghost sm" data-act="cdtoggle" data-i="${i}">${esc(t(x.active===false?"reuse":"retire"))}</button></td></tr>`).join("")}
+    </tbody></table></div></div>
+  <div class="savebar"><button class="btn primary" data-act="savecat">${esc(t("save"))}</button>${S.catMsg?`<span class="msg ${S.catMsg.cls||""}">${esc(S.catMsg.t)}</span>`:""}</div>`;
+  return h;
+}
+
+/* ---------- Phân công ---------- */
+function renderAssign(){
+  if(!S.asgDraft) S.asgDraft=JSON.parse(JSON.stringify(S.asg.map||{}));
+  const people=S.users.filter(u=>u.active && u.role!=="admin");
+  let h=`<div><h2>${esc(t("asg_title"))}</h2><div class="sub">${esc(t("asg_sub"))}${myAreas()?" "+esc(t("asg_leader",{a:myAreas().map(areaName).join(", ")})):""}</div></div>`;
+  if(!people.length) return h+`<div class="empty">${esc(t("asg_none"))}</div>`;
+  FORM_KEYS.forEach(f=>{
+    const lines=visibleLines(f); if(!lines.length) return;
+    h+=`<div class="sheet"><h3>${esc(tx(FORMS[f]))}</h3><div>`;
+    lines.forEach(l=>{
+      const k=lineKey(f,l), a=S.asgDraft[k]||{main:[],backup:[]};
+      const ar=areaOfLine(f,l); const grp=(role)=>people.filter(u=>u.role==="admin"||(u.areas||[]).includes(ar)||(a[role]||[]).includes(u.uid)).map(u=>`<button class="chip sm" data-act="asg" data-k="${k}" data-r="${role}" data-u="${u.uid}" aria-pressed="${(a[role]||[]).includes(u.uid)}">${esc(u.name)}</button>`).join("");
+      h+=`<div class="asg"><div><b>${esc(l)}</b><div class="sub">${esc(areaName(areaOfLine(f,l)))}</div></div><div style="display:flex;flex-direction:column;gap:8px"><div><span class="lbl">${esc(t("asg_main"))}</span><div class="chips">${grp("main")}</div></div><div><span class="lbl">${esc(t("asg_backup"))}</span><div class="chips">${grp("backup")}</div></div></div></div>`;
+    });
+    h+=`</div></div>`;
+  });
+  return h+`<div class="savebar"><button class="btn primary" data-act="saveasg">${esc(t("save"))}</button></div>`;
+}
+
+/* ---------- Tài khoản ---------- */
+/* Quản lý: mọi tài khoản. Tổ trưởng: chỉ tạo / quản lý Nhân viên kiểm tra trong khu vực của mình. */
+function canManageUser(u){
+  if(isAdmin()) return true;
+  if(S.me.role!=="leader" || u.role!=="staff") return false;
+  return (u.areas||[]).some(a=>myAreas().includes(a));
+}
+function renderUsers(){
+  const leader=!isAdmin(), mine=myAreas()||[];
+  const areaList=(cfg().areas||[]).filter(a=>!leader || mine.includes(a.id));
+  if(leader && mine.length===1 && !(S.newUserAreas||[]).length) S.newUserAreas=[mine[0]];
+  let h=`<div><h2>${esc(t("users_title"))}</h2><div class="sub">${esc(leader?t("users_sub_leader",{a:mine.map(areaName).join(", ")}):t("users_sub"))}</div></div>
+  <div class="sheet"><h3>${esc(t("add_user"))}</h3><div class="row">
+    <div class="field"><label class="lbl" for="u-name">${esc(t("full_name"))}</label><input type="text" id="u-name" value="${esc((S.nu||{}).name||"")}"></div>
+    <div class="field"><label class="lbl" for="u-user">${esc(t("username"))}</label><input type="text" id="u-user" inputmode="numeric" pattern="[0-9]*" autocomplete="off" value="${esc((S.nu||{}).user||"")}"></div>
+    <div class="field"><label class="lbl" for="u-pw">${esc(t("password"))}</label><input type="text" id="u-pw" autocomplete="new-password" value="${esc((S.nu||{}).pw||"")}"></div>
+    <div class="field"><label class="lbl" for="u-role">${esc(t("role"))}</label>${leader?`<div style="padding-block:10px;font-weight:600">${esc(t("role_staff"))}</div><input type="hidden" id="u-role" value="staff">`:`<select id="u-role">${ROLES.map(r=>`<option value="${r}" ${r===((S.nu||{}).role||"staff")?"selected":""}>${esc(t("role_"+r))}</option>`).join("")}</select>`}</div>
+  </div><div><span class="lbl">${esc(t("areas"))}</span><div class="chips">${areaList.map(a=>`<button class="chip sm" data-act="nuarea" data-v="${esc(a.id)}" aria-pressed="${(S.newUserAreas||[]).includes(a.id)}">${esc(a.name)}</button>`).join("")}</div></div>
+  <div class="sub">${esc(t("pw_view_note"))}</div>
+  <div class="savebar"><button class="btn primary" data-act="adduser">${esc(t("create"))}</button></div>${S.userMsg?`<div class="msg ${S.userMsg.cls||""}">${esc(S.userMsg.t)}</div>`:""}</div>
+  <div class="sheet"><div class="ulist">`;
+  const list=S.users.filter(u=>!leader || u.uid===S.me.uid || canManageUser(u));
+  list.slice().sort((a,b)=>ROLES.indexOf(a.role)-ROLES.indexOf(b.role)||String(a.name).localeCompare(String(b.name))).forEach(u=>{
+    const me=u.uid===S.me.uid, can=!me && canManageUser(u);
+    const roleCell = isAdmin() ? `<select data-role-of="${u.uid}" aria-label="${esc(t("role"))}" ${me?"disabled":""}>${ROLES.map(r=>`<option value="${r}" ${u.role===r?"selected":""}>${esc(t("role_"+r))}</option>`).join("")}</select>` : `<span class="sub">${esc(t("role_"+u.role))}</span>`;
+    const others=(u.areas||[]).filter(a=>!areaList.some(x=>x.id===a));
+    h+=`<div class="u"><div class="who"><b>${esc(u.name)}${me?" ("+esc(t("you"))+")":""}</b><small><span style="font-family:var(--f-data)">${esc(u.username)}</span>${can?` · ${esc(t("password"))}: <b style="font-family:var(--f-data)">${S.pwShow&&S.pwShow[u.uid]!==undefined?esc(S.pwShow[u.uid]==null?t("pw_none"):S.pwShow[u.uid]):"••••••"}</b> <button class="linkbtn" data-act="pwshow" data-u="${u.uid}">${esc(t(S.pwShow&&S.pwShow[u.uid]!==undefined?"pw_hide":"pw_show"))}</button>`:""} · ${u.active?`<span style="color:var(--ok)">${esc(t("active"))}</span>`:`<span style="color:var(--ng)">${esc(t("locked"))}</span>`}</small></div>
+      <div class="rolecell">${roleCell}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${can?`<button class="btn ghost sm" data-act="toggleuser" data-u="${u.uid}">${esc(t(u.active?"lock":"unlock"))}</button><button class="btn ghost sm" data-act="resetpw" data-u="${u.uid}">${esc(t("set_pw"))}</button>`:""}${can&&isAdmin()?`<button class="btn danger sm" data-act="deluser" data-u="${u.uid}">${esc(t("del_user"))}</button>`:""}</div>
+      <div class="areacell" style="grid-column:1/-1">${u.role==="admin"||u.role==="viewer"?`<span class="sub">${esc(t("areas"))}: ${esc(t(u.role==="viewer"?"viewer_all":"all_areas"))}</span>`:`<span class="lbl" style="display:inline;margin-right:6px">${esc(t("areas"))}</span><span class="chips" style="display:inline-flex">${areaList.map(a=>`<button class="chip sm" data-act="uarea" data-u="${u.uid}" data-v="${esc(a.id)}" aria-pressed="${(u.areas||[]).includes(a.id)}" ${can?"":"disabled"}>${esc(a.name)}</button>`).join("")}</span>${others.length?` <span class="sub">${esc(t("other_areas"))}: ${esc(others.map(areaName).join(", "))}</span>`:""}${!(u.areas||[]).length?` <span class="pill p-warn">${esc(t("area_none"))}</span>`:""}`}</div></div>`;
+  });
+  return h+`</div></div>`;
+}
+
+/* ---------- Cài đặt ---------- */
+const RULES_FS = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function prof() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function active() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && prof().active == true; }
+    function isAdmin() { return active() && prof().role == 'admin'; }
+    function isLeader() { return active() && prof().role in ['admin', 'leader']; }
+    // Khu vực: quản lý thấy tất cả; người khác chỉ thấy khu vực trong hồ sơ
+    function inArea(a) { return isAdmin() || (active() && a in prof().get('areas', [])); }
+    // Người xem báo cáo: đọc mọi khu vực, không ghi gì
+    function isViewer() { return active() && prof().role == 'viewer'; }
+    function canSee(a) { return isViewer() || inArea(a); }
+    function isLeaderOnly() { return active() && prof().role == 'leader'; }
+
+    match /users/{uid} {
+      allow read: if active();
+      allow create: if isAdmin()
+        || (isLeader() && request.resource.data.role == 'staff'
+            && request.resource.data.areas.size() > 0
+            && request.resource.data.areas.hasOnly(prof().get('areas', [])))
+        || (signedIn() && request.auth.uid == uid
+            && request.auth.token.email == 'admin@${LOGIN_DOMAIN}'
+            && request.resource.data.role == 'admin');
+      allow update: if isAdmin()
+        || (isLeader() && resource.data.role == 'staff' && request.resource.data.role == 'staff'
+            && resource.data.get('areas', []).hasAny(prof().get('areas', []))
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['active', 'areas'])
+            && request.resource.data.get('areas', []).size() > 0
+            && request.resource.data.get('areas', []).toSet().difference(resource.data.get('areas', []).toSet()).hasOnly(prof().get('areas', []))
+            && resource.data.get('areas', []).toSet().difference(request.resource.data.get('areas', []).toSet()).hasOnly(prof().get('areas', [])))
+        || (active() && request.auth.uid == uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lang']));
+      allow delete: if isAdmin() && request.auth.uid != uid;
+    }
+    match /config/{doc} {
+      allow read: if active();
+      allow write: if isAdmin() || (doc == 'catalog' && isLeader());
+    }
+    match /records/{id} {
+      allow read: if canSee(resource.data.area);
+      allow create: if inArea(request.resource.data.area)
+        && (isLeader() || (request.resource.data.byUid == request.auth.uid && !('capa' in request.resource.data)));
+      allow update: if inArea(resource.data.area) && inArea(request.resource.data.area)
+        && (isLeader() || (resource.data.byUid == request.auth.uid
+                           && request.resource.data.byUid == request.auth.uid
+                           && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['capa'])));
+      allow delete: if isAdmin();
+    }
+    match /photos/{id} {
+      allow read: if canSee(resource.data.area);
+      allow create: if inArea(request.resource.data.area) && request.resource.data.data.size() < 900000;
+      allow delete: if isAdmin();
+    }
+    match /assign/{id} {
+      allow read: if active();
+      allow create: if isLeader() && inArea(request.resource.data.area);
+      allow update: if isLeader() && inArea(resource.data.area) && inArea(request.resource.data.area);
+      allow delete: if isAdmin();
+    }
+    match /approvals/{id} {
+      allow read: if active();
+      allow create: if isAdmin() || (isLeaderOnly() && inArea(request.resource.data.area) && !('l2' in request.resource.data));
+      allow update: if isAdmin();
+      allow delete: if isAdmin() || (isLeaderOnly() && inArea(resource.data.area) && !('l2' in resource.data));
+    }
+    // Mật khẩu xem được: quản lý (mọi người), tổ trưởng (nhân viên kiểm tra cùng khu)
+    match /secrets/{uid} {
+      allow read, write: if isAdmin()
+        || (isLeaderOnly()
+            && get(/databases/$(database)/documents/users/$(uid)).data.role == 'staff'
+            && get(/databases/$(database)/documents/users/$(uid)).data.get('areas', []).hasAny(prof().get('areas', [])));
+    }
+  }
+}`;
+const RULES_ST = `rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /photos/{all=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}`;
+function renderSettings(){
+  const c=cfg();
+  const ta=(id,arr)=>`<textarea id="${id}">${esc(arr.join("\n"))}</textarea>`;
+  let h=`<div><h2>${esc(t("set_title"))}</h2></div>
+  <div class="sheet"><h3>${esc(t("set_lines"))}</h3><div class="sub">${esc(t("set_one_per_line"))}</div><div class="grid2">
+    ${FORM_KEYS.map(k=>`<div class="field"><label class="lbl" for="c-l-${k}">${esc(tx(FORMS[k]))}</label>${ta("c-l-"+k,c.lines[k]||[])}</div>`).join("")}</div></div>
+  <div class="sheet"><h3>${esc(t("set_areas"))}</h3><p class="sub" style="margin:0">${esc(t("set_areas_s"))}</p>
+    <div style="display:flex;flex-direction:column;gap:8px">${(S.cfgAreas||c.areas).map((a,i)=>`<div class="row" style="align-items:center"><div class="field"><input type="text" data-area-name="${i}" value="${esc(a.name)}" aria-label="${esc(t("area_name"))}"></div><button class="btn ghost sm" data-act="delarea" data-v="${i}" ${(S.cfgAreas||c.areas).length<2?"disabled":""}>×</button></div>`).join("")}</div>
+    <div><button class="btn ghost sm" data-act="addarea">+ ${esc(t("add_area"))}</button></div>
+    <div><span class="lbl">${esc(t("line_area"))}</span><div class="tablewrap"><table><tbody>${FORM_KEYS.map(f=>(c.lines[f]||[]).map(l=>{ const k=lineKey(f,l), cur=(S.cfgLineArea&&S.cfgLineArea[k])||areaOfLine(f,l); return `<tr><td>${esc(l)} <span class="sub">${esc(tx(FORMS[f]))}</span></td><td><select data-line-area="${esc(k)}" aria-label="${esc(t("area"))}">${(S.cfgAreas||c.areas).map(a=>`<option value="${esc(a.id)}" ${a.id===cur?"selected":""}>${esc(a.name)}</option>`).join("")}</select></td></tr>`; }).join("")).join("")}</tbody></table></div></div></div>
+  <div class="sheet"><h3>${esc(t("set_contacts"))}</h3><div class="grid2">${FORM_KEYS.map(k=>`<div class="field"><label class="lbl" for="c-ct-${k}">${esc(tx(FORMS[k]))}</label><input type="text" id="c-ct-${k}" value="${esc(c.contacts[k]||"")}"></div>`).join("")}</div></div>
+  <div class="sheet"><h3>${esc(t("set_pvc"))}</h3><p class="sub" style="margin:0">${esc(t("set_pvc_s"))}</p><div class="row">
+    <div class="field"><label class="lbl" for="c-tmin">${esc(t("tmin"))}</label><input type="number" id="c-tmin" value="${c.pvc.tMin}"></div><div class="field"><label class="lbl" for="c-tmax">${esc(t("tmax"))}</label><input type="number" id="c-tmax" value="${c.pvc.tMax}"></div>
+    <div class="field"><label class="lbl" for="c-smin">${esc(t("smin"))}</label><input type="number" id="c-smin" value="${c.pvc.sMin}"></div><div class="field"><label class="lbl" for="c-smax">${esc(t("smax"))}</label><input type="number" id="c-smax" value="${c.pvc.sMax}"></div></div></div>
+  <div class="sheet"><h3>${esc(t("set_deadline"))}</h3><p class="sub" style="margin:0">${esc(t("set_deadline_s"))}</p><div class="row">
+    <div class="field"><label class="lbl" for="c-dl-sang">${esc(t("ca_sang"))}</label><input type="time" id="c-dl-sang" value="${esc(c.deadlines.sang)}"></div>
+    <div class="field"><label class="lbl" for="c-dl-chieu">${esc(t("ca_chieu"))}</label><input type="time" id="c-dl-chieu" value="${esc(c.deadlines.chieu)}"></div></div>
+    <div class="field" style="max-width:260px"><label class="lbl" for="c-start">${esc(t("start_date"))}</label><input type="date" id="c-start" value="${esc(c.startDate||"")}"><div class="sub">${esc(t("start_date_s"))}</div></div>
+    <div><span class="lbl">${esc(t("set_workdays"))}</span><div class="chips">${[1,2,3,4,5,6,0].map(d=>`<button class="chip sm" data-act="wd" data-v="${d}" aria-pressed="${(S.cfgWd||c.workdays).includes(d)}">${esc(t("wd")[d])}</button>`).join("")}</div></div></div>
+  <div class="sheet"><h3>${esc(t("set_photo"))}</h3><div class="chips">${["ng","item","off"].map(m=>`<button class="chip" data-act="pm" data-v="${m}" aria-pressed="${((S.cfgPm||c.photoMode)==="sheet_ng"?"ng":(S.cfgPm||c.photoMode))===m}">${esc(t("pm_"+m))}</button>`).join("")}</div></div>
+  <div class="savebar"><button class="btn primary" data-act="savecfg">${esc(t("save"))}</button></div>${S.cfgMsg?`<div class="msg ${S.cfgMsg.cls||""}">${esc(S.cfgMsg.t)}</div>`:""}
+  <div class="sheet"><h3>${esc(t("set_system"))}</h3>
+    <div class="sub">Mode: <b>${S.B.mode==="demo"?"Demo (localStorage + IndexedDB)":"Firebase · "+esc(FIREBASE_CONFIG.projectId)}</b> · Photo: <b>${esc(S.B.mode==="demo"?"IndexedDB":PHOTO_BACKEND)}</b> · Login: <b>@${esc(LOGIN_DOMAIN)}</b></div>
+    <div class="sub">Firestore index: <b>records</b> — area ↑ + month ↑ (Collection)</div>
+    <details><summary>Firestore Rules</summary><div class="savebar" style="margin-block:8px"><button class="btn ghost sm" data-act="copy" data-v="fs">Copy</button></div><pre class="code" id="rules-fs">${esc(RULES_FS)}</pre></details>
+    <details><summary>Storage Rules</summary><div class="savebar" style="margin-block:8px"><button class="btn ghost sm" data-act="copy" data-v="st">Copy</button></div><pre class="code" id="rules-st">${esc(RULES_ST)}</pre></details>
+    ${S.B.mode==="demo"?`<div class="savebar"><button class="btn danger" data-act="demoreset">${esc(t("demo_reset"))}</button></div>`:""}
+  </div>`;
+  return h;
+}
+
+/* =====================================================================
+   RENDER, SỰ KIỆN, KHỞI ĐỘNG
+   ===================================================================== */
+let queued=false;
+function render(){
+  if(queued) return; queued=true;
+  requestAnimationFrame(()=>{ queued=false; draw(); });
+}
+function draw(){
+  document.documentElement.lang = LANG==="ja"?"ja":"vi";
+  document.body.classList.toggle("ja", LANG==="ja");
+  if(!S.ready) return;
+  if(!S.me){ const a=document.activeElement, id=a&&a.id; renderLogin(); if(id){ const el=document.getElementById(id); if(el) el.focus(); } return; }
+  const a=document.activeElement, aid=a&&a.id, sel=(a&&a.selectionStart!=null)?[a.selectionStart,a.selectionEnd]:null;
+  if(!$("#view") || $("#app").dataset.shell!==S.me.uid+LANG+S.tab+tabsFor().join()+(navigator.onLine?"1":"0")){
+    $("#app").innerHTML=shell(); $("#app").dataset.shell=S.me.uid+LANG+S.tab+tabsFor().join()+(navigator.onLine?"1":"0");
+  }
+  refReg.clear();
+  const v={entry:renderEntry, today:renderToday, capa:renderCapa, dash:renderDash, report:renderReport, catalog:renderCatalog, assign:renderAssign, users:renderUsers, settings:renderSettings}[S.tab];
+  $("#view").innerHTML=v?v():"";
+  if(aid){ const el=document.getElementById(aid); if(el && el!==a){ el.focus({preventScroll:true}); if(sel) try{el.setSelectionRange(sel[0],sel[1]);}catch(e){} } }
+  hydrate();
+}
+function renderBg(){
+  const a=document.activeElement;
+  if(a && a.closest && a.closest("#view") && a.matches("input:not([type=checkbox]):not([type=file]),textarea")){ S.pendingRender=true; return; }
+  render();
+}
+document.addEventListener("focusout", ()=>{ if(S.pendingRender){ S.pendingRender=false; setTimeout(render,0); } });
+function hydrate(){
+  document.querySelectorAll("img[data-pref]").forEach(async img=>{
+    const ref=refReg.get(img.dataset.pref); if(!ref) return;
+    try{ const u=await S.B.photoURL(ref); if(u) img.src=u; }catch(e){}
+  });
+}
+function setTab(tb){ if(tb==="catalog"){ S.catDraft=null; S.catMsg=null; } if(tb==="assign") S.asgDraft=null; S.tab=tb; syncSubs(); render(); window.scrollTo(0,0); }
+
+/* ---------- Modal ---------- */
+function openModal(html, narrow){ $("#modal").innerHTML=`<div class="modal" data-act="closemodal-bg"><div class="box ${narrow?"narrow":""}" role="dialog" aria-modal="true">${html}</div></div>`; const f=$("#modal input,#modal button"); if(f) f.focus(); }
+function closeModal(){ $("#modal").innerHTML=""; }
+function showPhotosOf(r){
+  const ps=r.photos||[];
+  openModal(`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h3>${esc(r.line)} · ${esc(fmtDate(r.date))} ${esc(caName(r.ca))} · ${esc(r.nguoi||"")}</h3><button class="btn ghost sm" data-act="closemodal">${esc(t("close"))}</button></div>
+    <div class="gal">${ps.map(p=>`<figure><img class="full" data-mref="${regRef(p)}" alt=""><figcaption>${esc(photoLabel(r.form,p.key))}${p.size?" · "+Math.round(p.size/1024)+" KB":""}</figcaption></figure>`).join("")}</div>`);
+  document.querySelectorAll("#modal img[data-mref]").forEach(async img=>{ const ref=refReg.get(img.dataset.mref); try{ img.src=await S.B.photoURL(ref); }catch(e){} });
+}
+function showImg(src){ openModal(`<div style="display:flex;justify-content:flex-end"><button class="btn ghost sm" data-act="closemodal">${esc(t("close"))}</button></div><img class="full" src="${src}" alt="">`); }
+function myMenu(){
+  const adminPw = isAdmin() ? `
+    <div class="field"><label class="lbl" for="m-old">${esc(t("old_pw"))}</label><input type="password" id="m-old" autocomplete="current-password"></div>
+    <div class="field"><label class="lbl" for="m-new">${esc(t("new_pw"))}</label><input type="password" id="m-new" autocomplete="new-password"></div>
+    <div class="field"><label class="lbl" for="m-new2">${esc(t("password2"))}</label><input type="password" id="m-new2" autocomplete="new-password"></div>
+    <div class="msg" id="m-msg"></div>` : `<p class="sub">${esc(t("pw_forgot"))}</p>`;
+  openModal(`<h3>${esc(S.me.name)} · ${esc(S.me.username)}</h3><div class="sub">${esc(t("role_"+S.me.role))}</div>${adminPw}
+    <div class="savebar">${isAdmin()?`<button class="btn primary" data-act="chpw">${esc(t("change_pw"))}</button>`:""}<button class="btn danger" data-act="logout">${esc(t("logout"))}</button><button class="btn ghost" data-act="closemodal">${esc(t("close"))}</button></div>`, true);
+}
+
+/* ---------- Hành động ---------- */
+async function doLogin(){
+  const u=($("#l-u")||{}).value||"", p=($("#l-p")||{}).value||"";
+  if(!u||!p){ S.login.msg={t:t("login_err")}; render(); return; }
+  S.login.busy=true; S.login.msg=null; render();
+  try{
+    const prof=await S.B.login(u,p); ls.set("kcb.lastUser",u.trim().toLowerCase());
+    if(prof) onAuth(prof);
+  }catch(e){ S.login.msg={t:t(e.code==="inactive"?"login_inactive":e.code==="net"?"login_net":"login_err")}; }
+  S.login.busy=false; render();
+}
+async function doSetup(){
+  const a=$("#l-p1").value, b=$("#l-p2").value;
+  if(a.length<6){ S.login.msg={t:t("pw_short")}; render(); return; }
+  if(a!==b){ S.login.msg={t:t("pw_mismatch")}; render(); return; }
+  S.login.busy=true; render();
+  try{ await S.B.firstSetup(a); S.login.msg={cls:"ok",t:t("created_admin")}; ls.set("kcb.lastUser","admin"); }
+  catch(e){ S.login.msg={t:e.code==="exists"?t("admin_exists"):String(e.code)}; S.login.mode="login"; }
+  S.login.busy=false; render();
+}
+async function doLogout(){ closeModal(); stopListeners(); await S.B.logout(); S.me=null; S.draft=null; S.login={mode:"login",msg:null,busy:false}; $("#app").dataset.shell=""; render(); }
+function onAuth(prof, why){
+  if(!prof){ S.me=null; S.ready=true; if(why) S.login.msg={t:t(why==="inactive"?"login_inactive":why==="net"?"login_net":"login_noprofile")}; render(); return; }
+  S.me=prof; S.ready=true;
+  if(prof.lang && prof.lang!==LANG){ LANG=prof.lang; try{localStorage.setItem("kcb.lang",LANG);}catch(e){} }
+  S.tab=tabsFor()[0]; S.draft=newDraft(); S.asgDraft=null;
+  startListeners(); render();
+}
+const withTimeout=(p,ms)=>Promise.race([p, new Promise(r=>setTimeout(()=>r("__timeout"),ms))]);
+async function save(){
+  const d=S.draft, ev=evalDraft(d);
+  const fail=(k,v)=>{ S.saveMsg={cls:"err",t:t(k,v)}; render(); };
+  if(ev.missing.length) return fail("missing",{x:ev.missing.join(", ")});
+  if(ev.noReason && ev.noReason.length) return fail("need_reason",{x:ev.noReason.join(", ")});
+  if(ev.ketqua==="NG" && !d.daBao) return fail("need_confirm");
+  if(ev.missingPhotos.length) return fail("need_photo",{x:ev.missingPhotos.map(k=>photoLabel(d.form,k)).join(", ")});
+  const id=docId(d.form,d.line,d.date,d.ca);
+  const existing=recFor(d.form,d.line,d.date,d.ca) || (S.B.getRecord? await S.B.getRecord(id).catch(()=>null) : null);
+  if(existing && S.me.role==="staff" && existing.byUid && existing.byUid!==S.me.uid) return fail("not_owner",{who:existing.nguoi||""});
+  S.saving=true; S.saveMsg=null; render();
+  const month=d.date.slice(0,7);
+  const photos=[];
+  Object.entries(d.oldPhotos).forEach(([k,p])=>{ if(!d.photos[k]) photos.push(p); });
+  const news=Object.entries(d.photos);
+  try{
+    for(let i=0;i<news.length;i++){
+      S.prog=t("uploading",{i:i+1,n:news.length}); render();
+      const [k,p]=news[i];
+      const ref=await S.B.putPhoto(p.blob,{recId:id,month,key:k,area:areaOfLine(d.form,d.line)});
+      photos.push(Object.assign({key:k, size:p.size, w:p.w, h:p.h, takenAt:p.takenAt}, ref));
+    }
+  }catch(e){ S.saving=false; S.prog=""; return fail("photo_fail",{c:e.code||e.message||"err"}); }
+  const byUid = existing && existing.byUid && S.me.role!=="staff" && S.overwrite ? existing.byUid : S.me.uid;
+  const lyDo={}; ev.ng.forEach(k=>{ const v=String((d.lyDo||{})[k]||"").trim(); if(v) lyDo[k]=v; });
+  const rec={id, form:d.form, line:d.line, maHang:d.maHang.trim(), lyDo, area:areaOfLine(d.form,d.line), date:d.date, month, ca:d.ca, gio:d.gio, byUid, nguoi: byUid===S.me.uid?S.me.name:(existing.nguoi||userName(byUid)),
+    ketqua:ev.ketqua, ngItems:ev.ng, ghiChu:d.ghiChu.trim(), daBao:ev.ketqua==="NG"?!!d.daBao:false, nguon:"app", ghiLuc:(existing&&existing.ghiLuc&&S.overwrite&&byUid!==S.me.uid)?existing.ghiLuc:new Date().toISOString(), suaBoi: (existing?S.me.uid:null), photos};
+  if(d.form==="kim") rec.items=JSON.parse(JSON.stringify(d.items));
+  if(d.form==="caosu") rec.items=Object.assign({},d.items);
+  { const ct={}; let tong=0; Object.entries(d.loi||{}).forEach(([k,v])=>{ v=+v||0; if(v>0){ ct[k]=v; tong+=v; } }); if(tong || d.form==="caosu") rec.loi={tong, loai:Object.keys(ct), chiTiet:ct}; }
+  if(existing && existing.capa) rec.capa=existing.capa;
+  if(d.form==="pvc"){ rec.nhietDo=parseFloat(d.nhietDo); rec.tocDo=parseFloat(d.tocDo); }
+  try{
+    S.prog=t("saving"); render();
+    const res=await withTimeout(S.B.saveRecord(rec), 8000);
+    if(res==="__timeout"){ S.records.set(id,rec); }
+    ls.set("kcb.lastForm",d.form); ls.set("kcb.lastLine_"+d.form,d.line); { const code=d.maHang.trim(), key="kcb.codes_"+d.form; ls.set(key,[code,...(ls.get(key,[])||[]).filter(x=>x!==code)].slice(0,8)); }
+    Object.values(d.photos).forEach(p=>{ try{URL.revokeObjectURL(p.url);}catch(e){} });
+    toast(ev.ketqua==="NG"?t("saved_ng"):t("saved_toast",{f:tx(FORMS[d.form]),l:d.line}));
+    const ml=myLines(d.form), nx=ml[(ml.indexOf(d.line)+1)%Math.max(1,ml.length)]||d.line; S.draft=newDraft(d.form,nx,d.date,d.ca); S.overwrite=false;
+    S.saveMsg={cls:"ok",t:t("saved_at",{t:hhmm()})};
+  }catch(e){ S.saveMsg={cls:"err",t: e.code==="permission-denied"?t("perm_err"):t("save_fail",{c:e.code||"err"})}; }
+  S.saving=false; S.prog=""; render();
+}
+async function onPhoto(input){
+  const k=input.dataset.photo, file=input.files&&input.files[0]; input.value="";
+  if(!file) return;
+  const d=S.draft; d.processing++; render();
+  try{
+    const now=new Date();
+    const stamp=[d.line, caName(d.ca), pad(now.getDate())+"/"+pad(now.getMonth()+1)+"/"+now.getFullYear()+" "+hhmm(), S.me.name, photoLabel(d.form,k)].join(" · ");
+    const c=await compressPhoto(file, stamp);
+    if(d.photos[k]) try{URL.revokeObjectURL(d.photos[k].url);}catch(e){}
+    d.photos[k]={blob:c.blob, url:URL.createObjectURL(c.blob), size:c.size, w:c.w, h:c.h, takenAt:now.toISOString()};
+  }catch(e){ toast(t("photo_err")); }
+  d.processing--; S.saveMsg=null; render();
+}
+function csvFor(recs){
+  const q=v=>{ const s=String(v==null?"":v); return /[",\n;]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const head=[t("form"),t("line_machine"),t("col_day"),t("col_ca"),t("col_time"),t("col_by"),t("col_res"),...FORMS.kim.items.map(i=>tx(FORMS.kim)+" - "+tx(i)),t("col_code"),...FORMS.caosu.items.map(i=>tx(FORMS.caosu)+" - "+tx(i)),t("col_defect"),t("temp"),t("speed"),t("col_note"),t("reported"),t("col_photo"),t("col_src"),"ghiLuc"];
+  const rows=recs.map(r=>[tx(FORMS[r.form]),r.line,r.date,caName(r.ca),r.gio,r.nguoi,r.ketqua,
+    ...FORMS.kim.items.map(i=>r.form==="kim"?kimCell((r.items||{})[i.k]):""), r.maHang||"",
+    ...FORMS.caosu.items.map(i=>r.form==="caosu"?((r.items||{})[i.k]||""):""), loiText(r), r.nhietDo??"", r.tocDo??"", r.ghiChu||"", r.ketqua==="NG"?(r.daBao?"x":""):"", (r.photos||[]).length||"", r.nguon==="giay"?t("src_paper"):r.mau?t("src_sample"):t("src_app"), r.ghiLuc||""]);
+  return "﻿"+[head,...rows].map(a=>a.map(q).join(",")).join("\r\n");
+}
+function saveFile(name, content, type){
+  const blob=new Blob([content],{type}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); toast(t("downloaded",{f:name}));
+}
+async function saveCfg(){
+  const lines=id=>[...new Set(document.getElementById(id).value.split("\n").map(s=>s.trim()).filter(Boolean))];
+  const num=(id,def)=>{ const v=parseFloat(document.getElementById(id).value); return isNaN(v)?def:v; };
+  const c=cfg();
+  const next={ lines:{kim:lines("c-l-kim"), caosu:lines("c-l-caosu"), pvc:lines("c-l-pvc")},
+    contacts:{kim:$("#c-ct-kim").value.trim(), caosu:$("#c-ct-caosu").value.trim(), pvc:$("#c-ct-pvc").value.trim()},
+    pvc:{tMin:num("c-tmin",c.pvc.tMin), tMax:num("c-tmax",c.pvc.tMax), sMin:num("c-smin",c.pvc.sMin), sMax:num("c-smax",c.pvc.sMax)},
+    deadlines:{sang:$("#c-dl-sang").value||c.deadlines.sang, chieu:$("#c-dl-chieu").value||c.deadlines.chieu},
+    workdays:(S.cfgWd||c.workdays).slice().sort(), photoMode:S.cfgPm||c.photoMode,
+    areas:(S.cfgAreas||c.areas).map((a,i)=>{ const el=document.querySelector(`[data-area-name="${i}"]`); return {id:a.id, name:(el?el.value.trim():a.name)||a.name}; }),
+    lineArea:Object.assign({}, c.lineArea||{}, S.cfgLineArea||{}), startDate:($("#c-start")||{}).value||"" };
+  const ids=next.areas.map(a=>a.id); Object.keys(next.lineArea).forEach(k=>{ if(!ids.includes(next.lineArea[k])) delete next.lineArea[k]; });
+  FORM_KEYS.forEach(f=>next.lines[f].forEach(l=>{ const k=lineKey(f,l); if(!next.lineArea[k]) next.lineArea[k]= ids.includes(f)?f:ids[0]; }));
+  try{ await withTimeout(S.B.setConfig(next),8000); S.cfgWd=null; S.cfgPm=null; S.cfgAreas=null; S.cfgLineArea=null; S.cfgMsg={cls:"ok",t:t("set_saved")}; toast(t("set_saved")); }
+  catch(e){ S.cfgMsg={cls:"err",t:t("perm_err")}; }
+  render();
+}
+async function addUser(){
+  const name=$("#u-name").value.trim(), un=$("#u-user").value.trim(), pw=$("#u-pw").value, role=isAdmin()?$("#u-role").value:"staff";
+  let areas=(role==="admin"||role==="viewer")?[]:(S.newUserAreas||[]).slice(); if(!isAdmin()) areas=areas.filter(a=>(myAreas()||[]).includes(a));
+  if((role==="leader"||role==="staff") && !areas.length){ S.userMsg={cls:"err",t:t("need_area")}; render(); return; }
+  if(!name){ S.userMsg={cls:"err",t:t("full_name")+"?"}; render(); return; }
+  if(!/^[0-9]{2,12}$/.test(un)){ S.userMsg={cls:"err",t:t("bad_username")}; render(); return; }
+  if(pw.length<6){ S.userMsg={cls:"err",t:t("pw_short")}; render(); return; }
+  try{ await S.B.createUser({username:un,name,role,password:pw,areas}); S.userMsg={cls:"ok",t:t("user_created",{u:un})}; S.newUserAreas=[]; S.nu={}; }
+  catch(e){ S.userMsg={cls:"err",t:e.code==="exists"?t("user_exists"):String(e.code||e.message)}; }
+  render();
+}
+async function resetPw(uid){
+  const u=S.users.find(x=>x.uid===uid); if(!u || !canManageUser(u)) return;
+  let cur=null; try{ cur=await S.B.getPassword(uid); }catch(e){}
+  openModal(`<h3>${esc(t("set_pw"))} · ${esc(u.name)} (${esc(u.username)})</h3><div class="sub">${esc(t("password"))}: <b style="font-family:var(--f-data)">${cur!=null?esc(cur):esc(t("pw_none"))}</b></div><div class="field"><label class="lbl" for="m-rp">${esc(t("new_pw"))}</label><input type="text" id="m-rp" autocomplete="off"></div><div class="msg" id="m-msg"></div>
+    <div class="savebar"><button class="btn primary" data-act="dorp" data-u="${uid}">${esc(t("save"))}</button><button class="btn ghost" data-act="closemodal">${esc(t("cancel"))}</button></div>`, true);
+}
+
+document.addEventListener("submit", e=>{ if(e.target.id==="loginform"){ e.preventDefault(); doLogin(); } });
+document.addEventListener("click", async e=>{
+  const tb=e.target.closest("[data-tab]"); if(tb){ setTab(tb.dataset.tab); return; }
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const a=b.dataset.act, d=S.draft;
+  if(a==="closemodal-bg"){ if(e.target===b) closeModal(); return; }
+  const touch=()=>{ S.saveMsg=null; S.overwrite=false; };
+  switch(a){
+    case "lang": LANG=b.dataset.v; try{localStorage.setItem("kcb.lang",LANG);}catch(x){} if(S.me){ S.me.lang=LANG; S.B.updateUser(S.me.uid,{lang:LANG}).catch(()=>{}); } break;
+    case "loginmode": S.login.mode=b.dataset.v; S.login.msg=null; break;
+    case "dosetup": await doSetup(); return;
+    case "mymenu": myMenu(); return;
+    case "closemodal": closeModal(); return;
+    case "logout": await doLogout(); return;
+    case "chpw": { const o=$("#m-old").value, n1=$("#m-new").value, n2=$("#m-new2").value, m=$("#m-msg");
+      if(n1.length<6){ m.className="msg err"; m.textContent=t("pw_short"); return; } if(n1!==n2){ m.className="msg err"; m.textContent=t("pw_mismatch"); return; }
+      try{ await S.B.changePassword(S.me.uid,o,n1); m.className="msg ok"; m.textContent=t("pw_changed"); }catch(x){ m.className="msg err"; m.textContent=x.code==="bad"?t("login_err"):String(x.code); } return; }
+    case "dorp": { const v=$("#m-rp").value; if(v.length<6){ $("#m-msg").className="msg err"; $("#m-msg").textContent=t("pw_short"); return; }
+      try{ await S.B.setPassword(b.dataset.u,v); closeModal(); toast(t("pw_changed")); S.pwShow={}; render(); }catch(x){ $("#m-msg").className="msg err"; $("#m-msg").textContent= x.code==="nosecret"?t("pw_nosecret"):t("perm_err"); } return; }
+    case "pwshow": { const uid=b.dataset.u; S.pwShow=S.pwShow||{}; if(S.pwShow[uid]!==undefined){ delete S.pwShow[uid]; render(); return; } try{ S.pwShow[uid]=await S.B.getPassword(uid); }catch(x){ S.pwShow[uid]=null; } render(); return; }
+    case "form": S.draft=newDraft(b.dataset.v,null,d.date,d.ca); touch(); break;
+    case "line": d.line=b.dataset.v; touch(); break;
+    case "code": d.maHang=b.dataset.v; S.codeQ=""; S.saveMsg=null; break;
+    case "codeclear": d.maHang=""; S.codeQ=""; break;
+    case "capaf": S.capaF=b.dataset.v; break;
+    case "capast": { const id=b.dataset.id; S.capaDraft=S.capaDraft||{}; S.capaDraft[id]=Object.assign(S.capaDraft[id]||{}, {status:b.dataset.v}); break; }
+    case "capasave": { const id=b.dataset.id, r=S.records.get(id); if(!r) return; const dr=(S.capaDraft||{})[id]||{}, c=r.capa||{};
+      const next={status:dr.status||capaStatus(r), cause:(dr.cause!=null?dr.cause:(c.cause||"")).trim(), action:(dr.action!=null?dr.action:(c.action||"")).trim(), byUid:S.me.uid, updatedAt:new Date().toISOString()};
+      if(next.status==="closed" && !next.action){ toast(t("need_action")); return; }
+      next.closedAt = next.status==="closed" ? (c.closedAt||next.updatedAt) : null;
+      next.log=(c.log||[]).concat([{s:next.status, by:S.me.uid, at:next.updatedAt}]).slice(-20);
+      try{ await withTimeout(S.B.updateRecord(id,{capa:next}),8000); delete S.capaDraft[id]; toast(t("capa_saved")); }catch(x){ toast(t("perm_err")); } render(); return; }
+    case "npf": case "ndf": { S.catNew=S.catNew||{pf:[],df:["caosu"]}; const key=a==="npf"?"pf":"df"; const arr=S.catNew[key]; const i=arr.indexOf(b.dataset.v); if(i>=0) arr.splice(i,1); else arr.push(b.dataset.v); break; }
+    case "cpf": case "cdf": { const list=S.catDraft[a==="cpf"?"products":"defects"][+b.dataset.i]; const arr=list.forms=list.forms||[]; const i=arr.indexOf(b.dataset.v); if(i>=0) arr.splice(i,1); else arr.push(b.dataset.v); S.catMsg=null; break; }
+    case "cptoggle": case "cdtoggle": { const x=S.catDraft[a==="cptoggle"?"products":"defects"][+b.dataset.i]; x.active = x.active===false; S.catMsg=null; break; }
+    case "addprod": { const code=$("#n-code").value.trim(), name=$("#n-pname").value.trim(), forms=(S.catNew||{pf:[]}).pf.slice();
+      if(!code || !forms.length){ S.catMsg={cls:"err",t:t("need_code_name")}; break; }
+      if((S.catDraft.products||[]).some(x=>x.code.toLowerCase()===code.toLowerCase())){ S.catMsg={cls:"err",t:t("code_exists")}; break; }
+      S.catDraft.products=(S.catDraft.products||[]).concat([{code,name,forms,active:true}]); Object.assign(S.catNew,{pf:[],code:"",pname:""}); S.catMsg=null; break; }
+    case "adddefcat": { const vi=$("#n-dvi").value.trim(), ja=$("#n-dja").value.trim(), forms=(S.catNew||{df:["caosu"]}).df.slice();
+      if(!vi || !forms.length){ S.catMsg={cls:"err",t:t("need_def_name")}; break; }
+      S.catDraft.defects=(S.catDraft.defects||[]).concat([{id:"d"+uid8(),vi,ja,forms,active:true}]); S.catNew=Object.assign(S.catNew||{},{dvi:"",dja:""}); S.catMsg=null; break; }
+    case "savecat": try{ await withTimeout(S.B.setCatalog(Object.assign({},S.catDraft,{updatedAt:new Date().toISOString(), byUid:S.me.uid})),8000); S.catMsg={cls:"ok",t:t("cat_saved")}; toast(t("cat_saved")); }catch(x){ S.catMsg={cls:"err",t:t("perm_err")}; } render(); return;
+    case "ca": d.ca=b.dataset.v; touch(); break;
+    case "pt": { const cur=d.items[b.dataset.k][b.dataset.p]; d.items[b.dataset.k][b.dataset.p]= cur==null?"OK" : cur==="OK"?"NG" : null; S.saveMsg=null; break; }
+    case "it": d.items[b.dataset.k]= d.items[b.dataset.k]===b.dataset.v ? null : b.dataset.v; S.saveMsg=null; break;
+    case "allok": if(d.form==="kim") FORMS.kim.items.forEach(it=>POINTS.forEach(([p])=>{ if(!d.items[it.k][p]) d.items[it.k][p]="OK"; })); else FORMS.caosu.items.forEach(it=>{ if(!d.items[it.k]) d.items[it.k]="OK"; }); break;
+    case "inc": d.loi[b.dataset.k]=(+d.loi[b.dataset.k]||0)+1; break;
+    case "dec": { const k=b.dataset.k, v=(+d.loi[k]||0)-1; if(v>0) d.loi[k]=v; else delete d.loi[k]; break; }
+    case "adddef": d.loi[b.dataset.v]=1; break;
+    case "rmdef": delete d.loi[b.dataset.k]; break;
+    case "rmphoto": { const p=d.photos[b.dataset.k]; if(p) try{URL.revokeObjectURL(p.url);}catch(x){} delete d.photos[b.dataset.k]; break; }
+    case "viewnew": showImg(d.photos[b.dataset.k].url); return;
+    case "viewref": { const ref=refReg.get(b.dataset.ref); if(ref) showImg(await S.B.photoURL(ref)); return; }
+    case "viewrec": { const r=S.records.get(b.dataset.id); if(r) showPhotosOf(r); return; }
+    case "reset": S.draft=newDraft(d.form,d.line); touch(); break;
+    case "loadexist": { const r=recFor(d.form,d.line,d.date,d.ca); if(r){ S.draft=draftFromRecord(r); S.overwrite=true; S.saveMsg={t:t("editing")}; } break; }
+    case "save": await save(); return;
+    case "openslot": { const f=b.dataset.f, l=b.dataset.l, ca=b.dataset.ca, r=recFor(f,l,S.todayDate,ca);
+      S.draft= r? draftFromRecord(r) : newDraft(f,l,S.todayDate,ca); S.overwrite=!!r; S.saveMsg= r?{t:t("editing")}:null; setTab("entry"); return; }
+    case "repform": S.rep.form=b.dataset.v; S.rep.line=null; break;
+    case "repline": S.rep.line=b.dataset.v; break;
+    case "approve": case "approve2": { const R=S.rep, id=R.form+"_"+slug(R.line||"")+"_"+R.month, cur=S.approvals.get(id);
+      const sig={byUid:S.me.uid, name:S.me.name, at:new Date().toISOString(), note:(($("#f-apnote")||{}).value||"").trim()};
+      const base={form:R.form,line:R.line,area:areaOfLine(R.form,R.line),month:R.month};
+      const doc = a==="approve" ? Object.assign(base,{l1:sig}) : Object.assign(base,{l1:(cur&&(cur.l1||(cur.byUid?{byUid:cur.byUid,name:cur.nguoiDuyet,at:cur.at,note:cur.note||""}:null)))||sig, l2:sig});
+      try{ await withTimeout(S.B.setApproval(id,doc),8000); toast(t(a==="approve"?"ap_l1":"ap_l2")); }catch(x){ toast(t("perm_err")); } return; }
+    case "unapprove": { const R=S.rep, id=R.form+"_"+slug(R.line||"")+"_"+R.month, cur=S.approvals.get(id); if(!cur) return;
+      try{ if(isAdmin() && cur.l2){ const {l2, ...rest}=cur; delete rest.id; await S.B.setApproval(id,rest); } else await S.B.setApproval(id,null); }catch(x){ toast(t("perm_err")); } return; }
+    case "csv": saveFile(`${S.rep.form}_${slug(S.rep.line||"")}_${S.rep.month}.csv`, csvFor(recsFor(S.rep.month,S.rep.form,S.rep.line)), "text/csv;charset=utf-8"); return;
+    case "csvall": saveFile(`kiemtra_${S.rep.month}.csv`, csvFor([...S.records.values()].filter(r=>r.month===S.rep.month).sort((x,y)=>(x.form+x.line+sk(x)).localeCompare(y.form+y.line+sk(y)))), "text/csv;charset=utf-8"); return;
+    case "dform": S.dash.form=b.dataset.v; break;
+    case "dpvc": S.dash.pvcLine=b.dataset.v; break;
+    case "asg": { const k=b.dataset.k, r=b.dataset.r, u=b.dataset.u; const o=S.asgDraft[k]=S.asgDraft[k]||{main:[],backup:[]}; const arr=o[r]=o[r]||[]; const i=arr.indexOf(u); if(i>=0) arr.splice(i,1); else { arr.push(u); const other=r==="main"?"backup":"main"; o[other]=(o[other]||[]).filter(x=>x!==u); } break; }
+    case "saveasg": { const ch={}, old=S.asg.map||{}, norm=v=>JSON.stringify([(v&&v.main||[]).slice().sort(),(v&&v.backup||[]).slice().sort()]);
+      FORM_KEYS.forEach(f=>visibleLines(f).forEach(l=>{ const k=lineKey(f,l), v=S.asgDraft[k]; if(v && norm(v)!==norm(old[k])) ch[k]={main:v.main||[], backup:v.backup||[], area:areaOfLine(f,l), form:f, line:l}; }));
+      if(!Object.keys(ch).length){ toast(t("asg_nochange")); return; }
+      try{ await withTimeout(S.B.setAssign({map:ch, at:new Date().toISOString(), byUid:S.me.uid}),8000); toast(t("asg_saved")); }catch(x){ toast(t("perm_err")); } return; }
+    case "adduser": await addUser(); return;
+    case "toggleuser": { const u=S.users.find(x=>x.uid===b.dataset.u); if(u && canManageUser(u)) try{ await S.B.updateUser(u.uid,{active:!u.active}); }catch(x){ toast(t("perm_err")); } return; }
+    case "resetpw": resetPw(b.dataset.u); return;
+    case "deluser": { const u=S.users.find(x=>x.uid===b.dataset.u); if(!u || !isAdmin()) return;
+      if(u.role==="admin" && S.users.filter(x=>x.role==="admin").length<2){ toast(t("cant_del_last_admin")); return; }
+      openModal(`<h3>${esc(t("del_user_q",{n:u.name+" ("+u.username+")"}))}</h3><div class="savebar"><button class="btn danger" data-act="deluser2" data-u="${u.uid}">${esc(t("del_user"))}</button><button class="btn ghost" data-act="closemodal">${esc(t("cancel"))}</button></div>`, true); return; }
+    case "deluser2": { const uid=b.dataset.u, u=S.users.find(x=>x.uid===uid); closeModal();
+      try{ await S.B.deleteUser(uid);
+        const m={}; FORM_KEYS.forEach(f=>(cfg().lines[f]||[]).forEach(l=>{ const k=lineKey(f,l), o=(S.asg.map||{})[k]; if(!o) return; const main=(o.main||[]).filter(x=>x!==uid), backup=(o.backup||[]).filter(x=>x!==uid); if(main.length!==(o.main||[]).length || backup.length!==(o.backup||[]).length) m[k]={main,backup,area:areaOfLine(f,l),form:f,line:l}; }));
+        if(Object.keys(m).length){ await S.B.setAssign({map:m, at:new Date().toISOString(), byUid:S.me.uid}); S.asgDraft=null; }
+        toast(t("user_deleted",{n:u?u.name:""})); }catch(x){ toast(t("perm_err")); } return; }
+    case "uarea": { const u=S.users.find(x=>x.uid===b.dataset.u); if(!u || !canManageUser(u) || (!isAdmin() && !(myAreas()||[]).includes(b.dataset.v))) return; const cur=(u.areas||[]).slice(); const i=cur.indexOf(b.dataset.v); if(i>=0) cur.splice(i,1); else cur.push(b.dataset.v);
+      if(!isAdmin() && !cur.length){ toast(t("need_area")); return; } try{ await S.B.updateUser(u.uid,{areas:cur}); }catch(x){ toast(t("perm_err")); } return; }
+    case "nuarea": { const cur=(S.newUserAreas||[]).slice(); const i=cur.indexOf(b.dataset.v); if(i>=0) cur.splice(i,1); else cur.push(b.dataset.v); S.newUserAreas=cur; break; }
+    case "addarea": S.cfgAreas=(S.cfgAreas||cfg().areas).map(a=>Object.assign({},a)).concat([{id:"a"+uid8(), name:t("area")+" "+((S.cfgAreas||cfg().areas).length+1)}]); break;
+    case "delarea": { const arr=(S.cfgAreas||cfg().areas).map(a=>Object.assign({},a)); arr.splice(+b.dataset.v,1); S.cfgAreas=arr; break; }
+    case "rperiod": S.rep.period=b.dataset.v; syncSubs(); break;
+    case "rq": S.rep.q=+b.dataset.v; syncSubs(); break;
+    case "pform": S.rep.pform=b.dataset.v; break;
+    case "csvperiod": { const P=S._period; if(!P) return; const q=v=>{ const s=String(v==null?"":v); return /[",\n;]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+      const rows=[[P.title],[],[t("r_by_month"),t("col_checks"),t("col_compliance"),"NG",t("col_def"),t("s_late"),t("s_miss"),t("col_approval")],...P.mRows.map(x=>[fmtMonth(x.m),x.n,x.comp,x.ng,x.def,x.late,x.miss,x.ap]),[],[t("r_by_line"),t("area"),t("col_checks"),t("col_compliance"),"NG",t("col_def"),t("s_late"),t("s_miss")],...P.lRows.map(x=>[x.o.l+" ("+tx(FORMS[x.o.f])+")",areaName(areaOfLine(x.o.f,x.o.l)),x.n,x.comp,x.ng,x.def,x.late,x.miss])];
+      const rr=repRange(); saveFile(`baocao_${rr.from}_${rr.to}.csv`, "\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n"), "text/csv;charset=utf-8"); return; }
+    case "csvperiodraw": { const P=S._period; if(!P) return; const rr=repRange(); saveFile(`kiemtra_${rr.from}_${rr.to}.csv`, csvFor(P.recs.slice().sort((x,y)=>(x.form+x.line+sk(x)).localeCompare(y.form+y.line+sk(y)))), "text/csv;charset=utf-8"); return; }
+    case "wd": { const v=+b.dataset.v; const cur=(S.cfgWd||cfg().workdays).slice(); const i=cur.indexOf(v); if(i>=0) cur.splice(i,1); else cur.push(v); S.cfgWd=cur; break; }
+    case "pm": S.cfgPm=b.dataset.v; break;
+    case "savecfg": await saveCfg(); return;
+    case "copy": { const el=$(b.dataset.v==="fs"?"#rules-fs":"#rules-st"); try{ await navigator.clipboard.writeText(el.textContent); toast("OK"); }catch(x){ const r=document.createRange(); r.selectNodeContents(el); getSelection().removeAllRanges(); getSelection().addRange(r); } return; }
+    case "demoreset": openModal(`<h3>${esc(t("demo_reset_q"))}</h3><div class="savebar"><button class="btn danger" data-act="demoreset2">${esc(t("confirm"))}</button><button class="btn ghost" data-act="closemodal">${esc(t("cancel"))}</button></div>`,true); return;
+    case "demoreset2": await S.B.resetAll(); location.reload(); return;
+  }
+  render();
+});
+document.addEventListener("input", e=>{
+  const tg=e.target, d=S.draft;
+  if(tg.dataset && tg.dataset.capa){ S.capaDraft=S.capaDraft||{}; S.capaDraft[tg.dataset.capa]=Object.assign(S.capaDraft[tg.dataset.capa]||{}, {[tg.dataset.f]:tg.value}); return; }
+  if(tg.dataset && tg.dataset.cat){ const x=S.catDraft[tg.dataset.cat][+tg.dataset.i]; if(x) x[tg.dataset.f]=tg.value; S.catMsg=null; return; }
+  if(["n-code","n-pname","n-dvi","n-dja"].includes(tg.id)){ S.catNew=S.catNew||{pf:[],df:["caosu"]}; S.catNew[tg.id.slice(2)]=tg.value; return; }
+  if(tg.id==="u-role"){ S.nu=S.nu||{}; S.nu.role=tg.value; render(); return; }
+  if(["u-name","u-user","u-pw"].includes(tg.id)){ S.nu=S.nu||{}; S.nu[tg.id.slice(2)]=tg.value; return; }
+  if(tg.id==="f-codeq"){ S.codeQ=tg.value; render(); return; }
+  if(tg.dataset && tg.dataset.areaName!=null){ const arr=(S.cfgAreas||cfg().areas).map(x=>Object.assign({},x)); arr[+tg.dataset.areaName].name=tg.value; S.cfgAreas=arr; return; }
+  if(!d) return;
+  if(tg.id==="f-mahang"){ const was=!!String(d.maHang||"").trim(); d.maHang=tg.value; if(was!==!!tg.value.trim()) render(); }
+  else if(tg.id==="f-note") d.ghiChu=tg.value;
+  else if(tg.dataset && tg.dataset.reason){ d.lyDo[tg.dataset.reason]=tg.value; }
+  else if(tg.id==="f-t" || tg.id==="f-s"){
+    if(tg.id==="f-t") d.nhietDo=tg.value; else d.tocDo=tg.value;
+    const p=cfg().pvc, isT=tg.id==="f-t", el=$(isT?"#rg-t":"#rg-s");
+    if(el) el.innerHTML = isT ? rangeBadge(parseFloat(d.nhietDo),p.tMin,p.tMax,"°C") : rangeBadge(parseFloat(d.tocDo),p.sMin,p.sMax,"");
+    const ev=evalDraft(d), rv=$("#res-val"); if(rv){ rv.textContent= ev.missing.length?"—":ev.ketqua; rv.style.color="var(--"+(ev.ketqua==="NG"?"ng":"ok")+")"; }
+  }
+});
+document.addEventListener("change", e=>{
+  const tg=e.target, d=S.draft;
+  if(tg.matches("input[data-photo]")){ onPhoto(tg); return; }
+  if(tg.matches("select[data-role-of]")){ S.B.updateUser(tg.dataset.roleOf,{role:tg.value}).catch(()=>toast(t("perm_err"))); return; }
+  if(tg.id==="f-date" && tg.value){ d.date=tg.value; S.overwrite=false; S.saveMsg=null; syncSubs(); render(); }
+  else if(tg.id==="f-gio"){ d.gio=tg.value; }
+  else if(tg.id==="f-t" || tg.id==="f-s"){ render(); }
+  else if(tg.id==="f-year"){ S.rep.y=+tg.value; syncSubs(); render(); }
+  else if(tg.matches("select[data-line-area]")){ S.cfgLineArea=Object.assign({},S.cfgLineArea||{}); S.cfgLineArea[tg.dataset.lineArea]=tg.value; }
+  else if(tg.id==="f-dabao"){ d.daBao=tg.checked; }
+  else if(tg.id==="f-today" && tg.value){ S.todayDate=tg.value; syncSubs(); render(); }
+  else if(tg.id==="f-month" && tg.value){ S.rep.month=tg.value; syncSubs(); render(); }
+  else if(tg.id==="d-from" && tg.value){ S.dash.from=tg.value; if(S.dash.to<tg.value) S.dash.to=tg.value; syncSubs(); render(); }
+  else if(tg.id==="d-to" && tg.value){ S.dash.to=tg.value; if(S.dash.from>tg.value) S.dash.from=tg.value; syncSubs(); render(); }
+});
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("#modal").innerHTML) closeModal(); });
+window.addEventListener("online", render); window.addEventListener("offline", render);
+setInterval(()=>{ if(S.me && S.tab==="today") render(); }, 60000);
+
+/* ---------- Khởi động ---------- */
+(async function boot(){
+  const useFb = !!(FIREBASE_CONFIG.apiKey && window.firebase);
+  try{ S.B = useFb ? FirebaseBackend() : DemoBackend(); }
+  catch(e){ console.error(e); S.B=DemoBackend(); }
+  await S.B.init(onAuth);
+  if(!S.ready){ S.ready=true; } render();
+})();
+})();
+</script>
+</body>
+</html>
