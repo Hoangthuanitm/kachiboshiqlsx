@@ -116,6 +116,8 @@ textarea{min-height:84px;resize:vertical}
 .stat{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
 .stat b{display:block;font:600 26px var(--f-data);font-variant-numeric:tabular-nums;line-height:1.2}
 .stat small{display:block;color:var(--muted);font-size:12px}
+.stat .delta{font-size:12px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums}
+.stat .delta .sub{font-weight:400}
 .stat.ng b{color:var(--ng)} .stat.warn b{color:var(--warn)} .stat.ok b{color:var(--ok)}
 .board{display:flex;flex-direction:column;gap:14px}
 .bgroup h3{font-size:15px;margin-bottom:6px}
@@ -198,6 +200,163 @@ details summary{cursor:pointer;font-weight:600}
 .ulist .u .who small{color:var(--muted)}
 .asg{display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,3fr);gap:10px;padding-block:12px;border-bottom:1px solid var(--line);align-items:start}
 @media (max-width:560px){.asg{grid-template-columns:1fr}.ulist .u{grid-template-columns:1fr auto}.ulist .u .rolecell{grid-column:1/-1}}
+/* Chọn ngày */
+.dpick{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;font:16px var(--f-body);color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;min-height:42px;cursor:pointer;text-align:left}
+.dpick svg{color:var(--muted);flex:0 0 auto}
+.tfield{font-family:var(--f-data)!important;letter-spacing:.04em}
+#dp{position:fixed;z-index:25;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgb(0 0 0 / .18);padding:12px;width:300px;max-width:calc(100vw - 24px)}
+#dp .dph{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-weight:700}
+#dp .dph button{width:36px;height:36px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;cursor:pointer;font-size:18px}
+#dp .dpg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+#dp .dpg.m{grid-template-columns:repeat(3,1fr)}
+#dp .dpg span{font-size:11px;color:var(--muted);font-weight:600;padding-block:4px}
+#dp .dpg button{border:1px solid transparent;background:none;color:var(--ink);border-radius:8px;min-height:36px;cursor:pointer;font:500 14px var(--f-body)}
+#dp .dpg button:hover{background:var(--pen-soft)}
+#dp .dpg button.today{border-color:var(--pen)}
+#dp .dpg button.sel{background:var(--pen);color:var(--on-pen)}
+#dp .dpg button.off{color:var(--muted)}
+#dp .dpf{display:flex;justify-content:space-between;margin-top:8px}
+/* Tooltip & tương tác dashboard */
+#tip{position:fixed;z-index:30;pointer-events:none;background:var(--ink);color:var(--bg);font:500 12px/1.4 var(--f-body);padding:6px 9px;border-radius:6px;max-width:260px;box-shadow:0 4px 14px rgb(0 0 0 / .2);white-space:pre-line}
+button.hbar{width:100%;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:3px 4px;border-radius:6px}
+button.hbar:hover{background:var(--pen-soft)}
+button.hbar[aria-pressed="true"]{background:var(--pen-soft);outline:1.5px solid var(--pen)}
+.hbars.dim button.hbar:not([aria-pressed="true"]){opacity:.45}
+svg .hit{cursor:pointer}
+svg .hit:hover rect.bar{opacity:.8}
+svg .hit.sel rect.bar{stroke:var(--ink);stroke-width:1.5}
+.selbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-radius:var(--r);background:var(--pen-soft);color:var(--pen);font-weight:600}
+.drill tr{cursor:pointer}
+.drill tr:hover td{background:var(--pen-soft)}
+.hcbtn{border:0;background:none;padding:0;cursor:pointer}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ===== Giao diện công nhân: chữ to, nút to, ít chữ ===== */
+body.wkmode{font-size:18px}
+.wk{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+.wk-top{display:flex;align-items:center;gap:12px;padding-block:14px;border-bottom:1px solid var(--line)}
+.wk-ava{width:48px;height:48px;border-radius:50%;background:var(--pen);color:var(--on-pen);display:grid;place-items:center;font:700 20px var(--f-body);flex:0 0 auto}
+.wk-who{flex:1;min-width:0}
+.wk-who b{display:block;font-size:20px;line-height:1.2}
+.wk-who span{color:var(--muted);font-size:15px}
+.wk-out{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;min-height:48px;padding:0 14px;font:600 16px var(--f-body);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.wk-h{font:700 26px/1.2 var(--f-body);margin:18px 0 4px}
+.wk-sub{color:var(--muted);font-size:16px;margin:0 0 14px}
+.wk-list{display:flex;flex-direction:column;gap:12px}
+.wk-task{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;width:100%;text-align:left;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:18px;padding:14px;cursor:pointer;font:inherit;min-height:96px}
+.wk-task .ic{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;background:var(--pen-soft);color:var(--pen)}
+.wk-task .ic svg{width:38px;height:38px}
+.wk-task .nm{font-size:21px;font-weight:700;line-height:1.2}
+.wk-task .ca{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:16px;margin-top:2px}
+.wk-task .ca svg{width:20px;height:20px}
+.wk-task .st{font-weight:700;font-size:15px;margin-top:6px}
+.wk-task .go{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--pen);color:var(--on-pen)}
+.wk-task .go svg{width:24px;height:24px}
+.wk-task.todo{border-color:var(--pen)}
+.wk-task.todo .st{color:var(--pen)}
+.wk-task.late{border-color:var(--warn);background:var(--warn-soft)}
+.wk-task.late .ic{background:var(--paper);color:var(--warn)} .wk-task.late .st{color:var(--warn)} .wk-task.late .go{background:var(--warn);color:#fff}
+.wk-task.ok{background:var(--ok-soft);border-color:transparent}
+.wk-task.ok .ic{background:var(--paper);color:var(--ok)} .wk-task.ok .st{color:var(--ok)} .wk-task.ok .go{background:var(--ok);color:#fff}
+.wk-task.ng{background:var(--ng-soft);border-color:transparent}
+.wk-task.ng .ic{background:var(--paper);color:var(--ng)} .wk-task.ng .st{color:var(--ng)} .wk-task.ng .go{background:var(--ng);color:#fff}
+.wk-task.after{opacity:.8}
+.wk-task.after .go{background:var(--idle);color:#fff}
+.wk-grp{font-size:15px;font-weight:700;color:var(--muted);margin:18px 0 8px}
+.wk-empty{padding:28px 18px;text-align:center;border:2px dashed var(--line);border-radius:18px;color:var(--muted);font-size:18px}
+/* Bước kiểm */
+.wz-bar{display:flex;align-items:center;gap:10px;padding-block:12px}
+.wz-ib{width:52px;height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:0 0 auto}
+.wz-ib svg{width:26px;height:26px}
+.wz-prog{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.wz-prog small{color:var(--muted);font-size:14px;font-weight:600}
+.wz-dots{display:flex;gap:4px}
+.wz-dots i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.wz-dots i.done{background:var(--pen)} .wz-dots i.cur{background:var(--pen);opacity:.45}
+.wz-ctx{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:16px;margin-bottom:14px}
+.wz-ctx svg{width:26px;height:26px;color:var(--pen);flex:0 0 auto}
+.wz-ctx b{font-size:17px}
+.wz-q{font:700 27px/1.25 var(--f-body);margin:6px 0 6px;text-wrap:balance}
+.wz-hint{color:var(--muted);font-size:17px;margin:0 0 16px}
+.wz-yn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-block:10px}
+.wz-big{border:2.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:20px;min-height:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font:700 24px var(--f-body);cursor:pointer;padding:12px}
+.wz-big svg{width:52px;height:52px}
+.wz-big.pass{color:var(--ok);border-color:var(--ok)} .wz-big.fail{color:var(--ng);border-color:var(--ng)}
+.wz-big.pass.on{background:var(--ok);color:#fff} .wz-big.fail.on{background:var(--ng);color:#fff}
+.wz-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.wz-tile{border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:16px;min-height:76px;padding:10px 12px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.wz-tile b{font:700 21px var(--f-data);letter-spacing:.01em}
+.wz-tile span{font-size:14px;color:var(--muted)}
+.wz-tile.on{border-color:var(--pen);background:var(--pen-soft)}
+.wz-pts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.wz-pt{border:2.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:16px;min-height:84px;font:700 20px var(--f-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.wz-pt svg{width:28px;height:28px}
+.wz-pt.ok{border-color:var(--ok);color:var(--ok)} .wz-pt.ng{border-color:var(--ng);background:var(--ng);color:#fff}
+.wz-sec{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.wz-lbl{font-weight:700;font-size:18px;margin-bottom:8px;display:block}
+.wz-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.wz-chip{border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;min-height:52px;padding:6px 18px;font:600 17px var(--f-body);cursor:pointer}
+.wz-chip.on{border-color:var(--ng);background:var(--ng-soft);color:var(--ng)}
+.wz-in{width:100%;font:18px var(--f-body);color:var(--ink);background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 14px;min-height:56px}
+.wz-cam{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:72px;border:2.5px dashed var(--pen);border-radius:16px;color:var(--pen);background:var(--pen-soft);font:700 20px var(--f-body);cursor:pointer}
+.wz-cam svg{width:32px;height:32px}
+.wz-cam.done{border-style:solid;background:var(--paper)}
+.wz-shot{display:flex;gap:12px;align-items:center}
+.wz-shot img{width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.wz-need{color:var(--muted);font-weight:600;font-size:16px;margin-top:10px;display:flex;align-items:center;gap:6px}
+.wz-need::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warn);flex:0 0 auto}
+.wz-need.err{color:var(--ng)}
+.wz-next{width:100%;min-height:72px;border:0;border-radius:18px;background:var(--pen);color:var(--on-pen);font:700 24px var(--f-body);cursor:pointer;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px}
+.wz-next svg{width:28px;height:28px}
+.wz-next:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+.wz-next.save{background:var(--ok);color:#fff}
+.wz-ghost{width:100%;min-height:64px;border:2px solid var(--line);border-radius:18px;background:var(--paper);color:var(--ink);font:700 20px var(--f-body);cursor:pointer;margin-top:10px}
+/* Bàn phím số */
+.kp-disp{display:flex;align-items:baseline;justify-content:center;gap:8px;border:2.5px solid var(--line);border-radius:18px;padding:8px 16px;min-height:80px;margin-bottom:8px;background:var(--paper)}
+.kp-disp b{font:600 56px/1 var(--f-data);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.kp-disp span{font-size:22px;color:var(--muted)}
+.kp-disp.out{border-color:var(--ng)} .kp-disp.in{border-color:var(--ok)}
+.kp-state{text-align:center;font-weight:700;font-size:18px;min-height:28px;margin-bottom:10px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kp button{min-height:58px;border:1.5px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);font:600 30px var(--f-data);cursor:pointer}
+.kp button.fn{font:700 18px var(--f-body);background:var(--bg)}
+/* Lỗi */
+.df-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.df{position:relative;border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:16px;min-height:92px;padding:10px 12px;text-align:left;cursor:pointer;font:600 18px var(--f-body);display:flex;flex-direction:column;justify-content:space-between}
+.df b{font:700 34px/1 var(--f-data);color:var(--ng)}
+.df.has{border-color:var(--ng);background:var(--ng-soft)}
+.df-ctl{display:flex;gap:8px;margin-top:6px}
+.df-ctl button{flex:1;min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:700 18px var(--f-body);cursor:pointer}
+.df-tot{font-weight:700;font-size:20px;margin:12px 0 0}
+/* Dừng máy */
+.stopbox{background:var(--ng);color:#fff;border-radius:22px;padding:22px 18px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.stopbox svg{width:72px;height:72px}
+.stopbox h2{font:800 34px/1.1 var(--f-body);margin:0;color:#fff;text-transform:uppercase;letter-spacing:.02em}
+.wk h1.wk-h,.wk h2.wz-q,.wk .wk-done h2{text-transform:none;letter-spacing:0;font-family:var(--f-body)}
+.stopbox p{margin:0;font-size:18px}
+.stopbox .who{font:700 24px var(--f-body)}
+/* Xem lại */
+.rv{display:flex;flex-direction:column;border:1.5px solid var(--line);border-radius:18px;overflow:hidden;background:var(--paper)}
+.rv-row{display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--line);font-size:18px}
+.rv-row:last-child{border-bottom:0}
+.rv-row .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+.rv-row .ic svg{width:22px;height:22px}
+.rv-row .ic.ok{background:var(--ok-soft);color:var(--ok)} .rv-row .ic.ng{background:var(--ng-soft);color:var(--ng)} .rv-row .ic.na{background:var(--bg);color:var(--muted)}
+.rv-row .tx{flex:1;min-width:0}
+.rv-row .tx small{display:block;color:var(--muted);font-size:15px}
+.rv-row button{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:12px;min-height:44px;padding:0 14px;font:600 16px var(--f-body);cursor:pointer}
+/* Đã lưu */
+.wk-done{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding-block:28px}
+.wk-done .big{width:132px;height:132px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:#fff}
+.wk-done .big.ng{background:var(--ng)}
+.wk-done .big svg{width:80px;height:80px}
+.wk-done h2{font:800 34px var(--f-body);margin:0}
+.wk-done p{margin:0;font-size:18px;color:var(--muted)}
+@media (max-width:380px){ .wz-big{min-height:116px;font-size:21px} .wz-q{font-size:24px} .kp-disp b{font-size:46px} }
+/* Đăng nhập: ô và nút to cho công nhân */
+.login .box input{font-size:20px;min-height:58px;border-radius:12px}
+.login .box .btn.primary{min-height:60px;font-size:20px;border-radius:14px}
+.login .box .lbl{font-size:14px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -205,6 +364,8 @@ details summary{cursor:pointer;font-weight:600}
 <div id="app"></div>
 <div class="toast" id="toast" hidden role="status"></div>
 <div id="modal"></div>
+<div id="dp" hidden></div>
+<div id="tip" hidden></div>
 <script>
 /* =====================================================================
    CẤU HÌNH FIREBASE — dán cấu hình dự án của bạn vào đây.
@@ -241,7 +402,7 @@ vi:{
   create_admin:"Tạo tài khoản admin", back:"Quay lại", pw_mismatch:"Hai mật khẩu không khớp.", pw_short:"Mật khẩu tối thiểu 6 ký tự.",
   admin_exists:"Tài khoản admin đã tồn tại. Hãy đăng nhập.", created_admin:"Đã tạo admin. Đang đăng nhập…",
   change_pw:"Đổi mật khẩu", old_pw:"Mật khẩu hiện tại", new_pw:"Mật khẩu mới", save:"Lưu", cancel:"Huỷ", close:"Đóng", pw_changed:"Đã đổi mật khẩu.",
-  step_form:"1 · Chọn phiếu", step_line:"2 · Line / máy", step_machine:"2 · Máy", step_items:"4 · Nội dung kiểm tra", step_code:"3 · Mã hàng", code_first:"Nhập mã hàng trước khi kiểm tra.", req_code:"mã hàng", recent_codes:"Mã gần đây", c_codes:"Mã hàng có nhiều bất thường nhất", c_codes_s:"Số lần NG + hàng lỗi theo mã hàng",
+  step_form:"1 · Chọn phiếu", step_line:"2 · Line / máy", step_machine:"2 · Máy", step_items:"4 · Nội dung kiểm tra", step_code:"3 · Mã hàng", code_first:"Nhập mã hàng trước khi kiểm tra.", req_code:"mã hàng", recent_codes:"Mã gần đây", c_codes:"Mã hàng có nhiều bất thường nhất", c_codes_s:"Tỷ lệ lỗi theo mã hàng (chỉ tính phiếu có số lượng kiểm)",
   date:"Ngày", check_round:"Lần kiểm", time:"Giờ kiểm", inspector:"Người thực hiện",
   ca_sang:"Sáng", ca_chieu:"Chiều", ca_sang_l:"Sáng · trước giờ làm", ca_chieu_l:"Chiều · sau nghỉ trưa",
   no_lines:"Chưa có line nào. Quản lý thêm ở tab Cài đặt.", no_assigned:"Bạn chưa được phân công line nào cho phiếu này. Liên hệ quản lý.",
@@ -269,7 +430,7 @@ vi:{
   csv_one:"Tải Excel (CSV) phiếu này", csv_all:"Tải CSV cả tháng, mọi phiếu", downloaded:"Đã tải {f}",
   dash_title:"Dashboard chất lượng", dash_sub:"Tổng hợp lỗi phát sinh, mức tuân thủ kiểm tra và người phụ trách.", from:"Từ tháng", to:"Đến tháng", all:"Tất cả",
   k_compliance:"Tuân thủ kiểm tra", k_compliance_s:"{a}/{b} lần đã kiểm đúng lịch", k_ng:"Lần NG", k_ng_s:"trên {n} lần kiểm", k_defects:"Hàng lỗi loại ra", k_defects_s:"chiếc", k_late:"Nhập trễ / bỏ sót", k_late_s:"{a} trễ · {b} bỏ sót", k_photo:"Phiếu có ảnh", k_photo_s:"phiếu nhập qua app",
-  c_pareto:"Loại lỗi phát hiện nhiều nhất", c_pareto_s:"Sắp xếp giảm dần — xử lý các loại đầu danh sách trước (Pareto).", c_items:"Hạng mục kiểm tra bị NG nhiều nhất", c_lines:"Line / máy có nhiều bất thường nhất", c_lines_s:"Số lần NG + hàng lỗi mỗi 100 lần kiểm",
+  c_pareto:"Loại lỗi phát hiện nhiều nhất", c_pareto_s:"Sắp xếp giảm dần — xử lý các loại đầu danh sách trước (Pareto).", c_items:"Hạng mục kiểm tra bị NG nhiều nhất", c_lines:"Line / máy có nhiều bất thường nhất", c_lines_s:"Tỷ lệ lần kiểm bị NG · tỷ lệ lỗi hàng nếu phiếu có số lượng kiểm",
   c_trend:"Hàng lỗi theo ngày", c_heat:"Lịch tuân thủ kiểm tra", c_heat_s:"Mỗi ô: trên = sáng, dưới = chiều.", c_staff:"Theo nhân viên", c_pvc:"Nhiệt độ máy in sấy PVC", c_recent:"Bất thường gần đây",
   lg_ok:"Đạt", lg_ng:"NG", lg_miss:"Bỏ sót", lg_late:"Nhập trễ", lg_none:"Không cần / chưa tới",
   unclassified:"Chưa phân loại", pieces:"chiếc", times:"lần", per100:"/100 lần", no_data:"Chưa có dữ liệu trong khoảng này.", none_ng:"Không có bất thường nào trong khoảng này.",
@@ -285,11 +446,17 @@ vi:{
   set_pvc:"Ngưỡng tiêu chuẩn máy in sấy PVC", set_pvc_s:"Phiếu giấy chưa ghi ngưỡng. 130–140°C và 500–540 là giả định tạm, cần kỹ thuật xác nhận.",
   tmin:"Nhiệt độ min", tmax:"Nhiệt độ max", smin:"Tốc độ min", smax:"Tốc độ max",
   set_deadline:"Hạn chót mỗi lần kiểm", set_deadline_s:"Quá giờ này chưa có phiếu thì báo “Quá giờ”. Lưu sau giờ này bị đánh dấu “Nhập trễ”.",
-  set_workdays:"Ngày làm việc", set_photo:"Ảnh chứng minh", pm_item:"Mỗi hạng mục 1 ảnh", pm_sheet_ng:"1 ảnh / phiếu + ảnh cho mục NG (khuyên dùng)", pm_ng:"Chỉ khi NG (khuyên dùng)", pm_off:"Không yêu cầu",
+  set_workdays:"Ngày làm việc", sat_title:"Thứ 7", sat_all:"Làm mọi thứ 7", sat_alt:"Làm cách tuần", sat_none:"Nghỉ thứ 7", sat_anchor:"Một thứ 7 có đi làm (mốc)", sat_anchor_s:"App tính xen kẽ từ ngày này: làm – nghỉ – làm…", sat_flip:"Đổi tuần làm", sat_next:"Các thứ 7 sắp tới", sat_work:"Làm", sat_off:"Nghỉ", sat_need_anchor:"Chọn một ngày thứ 7 làm mốc.", sat_not_sat:"Ngày mốc phải là thứ 7.", extra_days:"Ngày làm bù / làm thêm", extra_days_s:"Mỗi dòng 1 ngày (dd/mm/yyyy). Ngày nghỉ nhưng vẫn đi làm (VD: thứ 7 tuần nghỉ, Chủ nhật làm bù) — tính như ngày làm việc.", wd_week:"Thứ 2 – Chủ nhật", set_photo:"Ảnh chứng minh", pm_item:"Mỗi hạng mục 1 ảnh", pm_sheet_ng:"1 ảnh / phiếu + ảnh cho mục NG (khuyên dùng)", pm_ng:"Chỉ khi NG (khuyên dùng)", pm_off:"Không yêu cầu",
   set_saved:"Đã lưu cài đặt", set_system:"Hệ thống & Firebase", demo_reset:"Xoá toàn bộ dữ liệu dùng thử", demo_reset_q:"Xoá hết dữ liệu dùng thử trên máy này?", confirm:"Xác nhận",
   sample_note:"Dữ liệu tháng 9/2026 trong chế độ dùng thử là dữ liệu mẫu để xem dashboard; dữ liệu tháng 8 và 5–8/9 lấy từ phiếu giấy.",
   wd:["CN","T2","T3","T4","T5","T6","T7"],
+  today_btn:"Hôm nay", dp_title:"Tháng {m} năm {y}", dp_year:"Năm {y}", mname:["Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6","Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"], dp_wd:["T2","T3","T4","T5","T6","T7","CN"],
+  q_month:"Tháng này", q_3m:"3 tháng gần nhất", q_ytd:"Từ đầu năm", sel_filter:"Đang lọc: {x}", sel_clear:"Bỏ lọc", drill_title:"Phiếu phù hợp ({n})", drill_more:"Hiện 50 phiếu mới nhất.", click_hint:"Bấm vào cột, thanh hoặc ô để lọc toàn bộ dashboard; bấm lại để bỏ lọc.", rec_detail:"Chi tiết phiếu", c_heat_m:"Tuân thủ theo tháng", f_line:"Line", f_day:"Ngày", f_month:"Tháng", f_code:"Mã hàng", f_def:"Lỗi", f_item:"Hạng mục",
+  holidays:"Ngày nghỉ lễ", holidays_s:"Mỗi dòng 1 ngày (dd/mm/yyyy). Không tính bỏ sót vào các ngày này.",
+  sample_title:"Dữ liệu mẫu", sample_gen:"Tạo dữ liệu mẫu 01/2026 → hôm nay", sample_clear:"Xoá dữ liệu mẫu", sample_desc:"Chỉ có ở chế độ dùng thử. Tạo tài khoản mẫu, danh mục, phân công và phiếu kiểm từ 01/01/2026 đến hôm nay để xem thử dashboard và báo cáo. Phiếu mẫu có nhãn “Mẫu” và xoá được bất cứ lúc nào.", sample_done:"Đã tạo {n} phiếu mẫu", sample_cleared:"Đã xoá dữ liệu mẫu", sample_accounts:"Tài khoản mẫu (mật khẩu 123456): tổ trưởng 1001 (kim) · 1002 (cao su) · 1003 (PVC), nhân viên 2001–2005, người xem báo cáo 9001.", sample_working:"Đang tạo dữ liệu…",
   req_line:"line / máy", req_person:"người thực hiện", req_temp:"nhiệt độ", req_speed:"tốc độ băng chuyền",
+  w_hello:"Chào {n}", w_today:"Việc hôm nay", w_tap:"Chạm vào ô để kiểm", w_none:"Bạn chưa được giao máy nào. Hãy báo tổ trưởng.", w_off:"Hôm nay là ngày nghỉ.", w_st_todo:"Cần kiểm", w_st_late:"Quá giờ – kiểm ngay", w_st_after:"Kiểm sau giờ nghỉ trưa", w_st_ok:"Đã kiểm – Đạt", w_st_ng:"Đã kiểm – Không đạt", w_left:"Còn {n} ca cần kiểm", w_all_done:"Đã kiểm xong hôm nay", w_logout:"Thoát", w_step:"Bước {i} / {n}", w_back:"Quay lại", w_quit_q:"Bỏ phiếu đang làm dở?", w_quit_yes:"Bỏ phiếu", w_quit_no:"Làm tiếp",
+  w_q_code:"Đang chạy mã hàng nào?", w_find:"Tìm mã", w_pass:"Đạt", w_fail:"Không đạt", w_kim_hint:"Thả kim thử ở 3 chỗ: trái, giữa, phải băng chuyền", w_which:"Chỗ nào không đạt?", w_why:"Vì sao không đạt?", w_why_other:"Hoặc ghi lý do", w_photo:"Chụp ảnh", w_photo_again:"Chụp lại", w_next:"Tiếp", w_q_nhietDo:"Nhiệt độ máy là bao nhiêu?", w_q_tocDo:"Tốc độ băng chuyền là bao nhiêu?", w_std:"Chuẩn: {a} – {b}", w_out:"Ngoài chuẩn", w_in:"Trong chuẩn", w_q_qty:"Đã kiểm bao nhiêu chiếc?", w_q_def:"Có hàng lỗi không?", w_no_def:"Không có hàng lỗi", w_def_tap:"Chạm vào loại lỗi để đếm thêm 1", w_def_total:"Tổng: {n} chiếc", w_stop:"Dừng máy", w_stop_call:"Báo ngay cho", w_stop_done:"Tôi đã dừng máy và đã báo", w_review:"Xem lại, đúng thì bấm Lưu", w_save:"Lưu", w_saving:"Đang lưu…", w_saved:"Đã lưu", w_saved_ng:"Đã lưu. Tổ trưởng sẽ xử lý.", w_next_task:"Kiểm tiếp", w_home:"Về danh sách", w_kp_del:"Xoá", w_change:"Đổi", w_code:"Mã hàng", w_qty:"Số lượng kiểm", w_defs:"Hàng lỗi", w_need_pts:"Chạm vào chỗ không đạt", w_need_why:"Chọn hoặc ghi lý do", w_need_photo:"Chụp ảnh chỗ không đạt", w_pcs:"chiếc", w_auto:"Ngày giờ tự ghi", w_nothing:"Không có",
   tab_capa:"Xử lý NG", tab_catalog:"Danh mục",
   capa_title:"Theo dõi xử lý bất thường", capa_sub:"Mỗi lần NG cần tìm nguyên nhân, có biện pháp khắc phục và khép lại. Tổ trưởng cập nhật tại đây.",
   st_open:"Chưa xử lý", st_doing:"Đang xử lý", st_closed:"Đã khắc phục", f_todo:"Cần xử lý", cause:"Nguyên nhân", action:"Biện pháp khắc phục", capa_save:"Cập nhật",
@@ -301,7 +468,7 @@ vi:{
   need_code_name:"Nhập mã hàng và chọn ít nhất 1 phiếu.", need_def_name:"Nhập tên lỗi và chọn ít nhất 1 phiếu.",
   pick_code:"Tìm mã hàng", no_products:"Chưa có mã hàng nào trong danh mục cho phiếu này. Liên hệ tổ trưởng / quản lý.", change:"Đổi mã", add_defect:"Chạm vào lỗi phát hiện để thêm", no_match:"Không tìm thấy mã phù hợp.",
   manage_catalog:"Mở danh mục",
-  offline:"Đang mất mạng: phiếu vẫn lưu và tự gửi khi có mạng (ảnh cần có mạng).", perm_err:"Không đủ quyền thực hiện thao tác này.",
+  sl_kiem:"Số lượng đã kiểm (chiếc)", need_qty:"Nhập số lượng đã kiểm.", qty_lt_def:"Số hàng lỗi ({d}) lớn hơn số lượng đã kiểm ({q}).", k_rate:"Tỷ lệ lỗi", k_rate_s:"{d} lỗi / {q} chiếc kiểm", k_rate_na:"Chưa có phiếu ghi số lượng kiểm", vs_prev:"so với {p}", vs_prev_na:"Kỳ trước chưa có dữ liệu", pts:"điểm", same_days:"cùng kỳ đến {d}", col_qty:"SL kiểm", col_rate:"Tỷ lệ lỗi", ng_rate:"tỷ lệ NG", rate_word:"tỷ lệ", offline:"Đang mất mạng: phiếu vẫn lưu và tự gửi khi có mạng (ảnh cần có mạng).", perm_err:"Không đủ quyền thực hiện thao tác này.",
   del_user:"Xoá", del_user_q:"Xoá tài khoản {n}? Người này sẽ không đăng nhập được nữa. Các phiếu đã nhập vẫn giữ tên người nhập.", user_deleted:"Đã xoá {n}", cant_del_last_admin:"Không thể xoá quản lý cuối cùng.",
   area:"Khu vực", areas:"Khu vực phụ trách", all_areas:"Tất cả khu vực", set_areas:"Khu vực & line", set_areas_s:"Mỗi line thuộc 1 khu vực. Tổ trưởng và nhân viên chỉ xem và thao tác được các line trong khu vực của mình.",
   add_area:"Thêm khu vực", area_name:"Tên khu vực", no_area:"Tài khoản chưa được gán khu vực nào. Liên hệ quản lý.", area_none:"(chưa gán)", line_area:"Line thuộc khu vực",
@@ -323,7 +490,7 @@ ja:{
   create_admin:"管理者を作成", back:"戻る", pw_mismatch:"パスワードが一致しません。", pw_short:"パスワードは6文字以上です。",
   admin_exists:"管理者アカウントは既に存在します。ログインしてください。", created_admin:"管理者を作成しました。ログイン中…",
   change_pw:"パスワード変更", old_pw:"現在のパスワード", new_pw:"新しいパスワード", save:"保存", cancel:"キャンセル", close:"閉じる", pw_changed:"パスワードを変更しました。",
-  step_form:"1 · チェック表を選択", step_line:"2 · ライン／機械", step_machine:"2 · 機械", step_items:"4 · チェック内容", step_code:"3 · 品番", code_first:"チェック前に品番を入力してください。", req_code:"品番", recent_codes:"最近の品番", c_codes:"異常が多い品番", c_codes_s:"品番別のNG回数＋不良数",
+  step_form:"1 · チェック表を選択", step_line:"2 · ライン／機械", step_machine:"2 · 機械", step_items:"4 · チェック内容", step_code:"3 · 品番", code_first:"チェック前に品番を入力してください。", req_code:"品番", recent_codes:"最近の品番", c_codes:"異常が多い品番", c_codes_s:"品番別の不良率（検査数の記録がある分のみ）",
   date:"日付", check_round:"回", time:"時間", inspector:"実施者",
   ca_sang:"朝", ca_chieu:"午後", ca_sang_l:"朝 · 作業開始前", ca_chieu_l:"午後 · 昼休み明け",
   no_lines:"ラインが未登録です。設定で追加してください。", no_assigned:"このチェック表の担当ラインがありません。管理者に連絡してください。",
@@ -351,7 +518,7 @@ ja:{
   csv_one:"このチェック表をExcel(CSV)で出力", csv_all:"今月の全チェック表をCSV出力", downloaded:"{f} を出力しました",
   dash_title:"品質ダッシュボード", dash_sub:"不良の発生状況、チェック遵守率、担当者を集計します。", from:"開始月", to:"終了月", all:"すべて",
   k_compliance:"チェック遵守率", k_compliance_s:"{b}回中 {a}回 期限内実施", k_ng:"NG回数", k_ng_s:"{n}回のチェック中", k_defects:"不良品", k_defects_s:"個", k_late:"遅れ／漏れ", k_late_s:"遅れ{a} · 漏れ{b}", k_photo:"写真付き記録", k_photo_s:"アプリ入力分",
-  c_pareto:"不良内容（多い順）", c_pareto_s:"降順（パレート）— 上位から対策してください。", c_items:"NGが多いチェック項目", c_lines:"異常が多いライン／機械", c_lines_s:"チェック100回あたりのNG＋不良数",
+  c_pareto:"不良内容（多い順）", c_pareto_s:"降順（パレート）— 上位から対策してください。", c_items:"NGが多いチェック項目", c_lines:"異常が多いライン／機械", c_lines_s:"チェックのNG率・検査数がある場合は不良率",
   c_trend:"日別不良数", c_heat:"チェック実施カレンダー", c_heat_s:"各枠：上＝朝、下＝午後。", c_staff:"担当者別", c_pvc:"PVC加工機の温度", c_recent:"最近の異常",
   lg_ok:"合格", lg_ng:"NG", lg_miss:"漏れ", lg_late:"遅れ入力", lg_none:"対象外／未到来",
   unclassified:"未分類", pieces:"個", times:"回", per100:"/100回", no_data:"この期間のデータはありません。", none_ng:"この期間の異常はありません。",
@@ -367,11 +534,17 @@ ja:{
   set_pvc:"PVC加工機の基準値", set_pvc_s:"紙の記録表に基準値の記載がありません。130–140°C、500–540は仮の値です。技術担当に確認してください。",
   tmin:"温度 下限", tmax:"温度 上限", smin:"スピード 下限", smax:"スピード 上限",
   set_deadline:"各回の期限", set_deadline_s:"期限を過ぎて未記録なら「時間超過」、期限後の保存は「遅れ入力」になります。",
-  set_workdays:"稼働日", set_photo:"証拠写真", pm_item:"各項目に1枚", pm_sheet_ng:"記録ごと1枚＋NG項目（推奨）", pm_ng:"NGのみ（推奨）", pm_off:"不要",
+  set_workdays:"稼働日", sat_title:"土曜日", sat_all:"毎週出勤", sat_alt:"隔週出勤", sat_none:"土曜休み", sat_anchor:"出勤する土曜日（基準日）", sat_anchor_s:"この日から交互に計算します：出勤 – 休み – 出勤…", sat_flip:"出勤週を入れ替え", sat_next:"今後の土曜日", sat_work:"出勤", sat_off:"休み", sat_need_anchor:"基準となる土曜日を選んでください。", sat_not_sat:"基準日は土曜日にしてください。", extra_days:"振替出勤日・臨時出勤日", extra_days_s:"1行に1日（yyyy/mm/dd）。休日でも出勤する日（例：休みの土曜、振替の日曜）は稼働日として数えます。", wd_week:"月〜日", set_photo:"証拠写真", pm_item:"各項目に1枚", pm_sheet_ng:"記録ごと1枚＋NG項目（推奨）", pm_ng:"NGのみ（推奨）", pm_off:"不要",
   set_saved:"設定を保存しました", set_system:"システム・Firebase", demo_reset:"試用データを全て削除", demo_reset_q:"この端末の試用データを全て削除しますか？", confirm:"確認",
   sample_note:"試用モードの2026年9月のデータはダッシュボード確認用のサンプルです。8月と9/5–9/8は紙の記録から入力しました。",
   wd:["日","月","火","水","木","金","土"],
+  today_btn:"今日", dp_title:"{y}年{m}月", dp_year:"{y}年", mname:["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"], dp_wd:["月","火","水","木","金","土","日"],
+  q_month:"今月", q_3m:"直近3か月", q_ytd:"年初から", sel_filter:"絞り込み中：{x}", sel_clear:"解除", drill_title:"該当する記録（{n}件）", drill_more:"最新50件を表示。", click_hint:"棒・バー・セルをクリックするとダッシュボード全体を絞り込めます。もう一度クリックで解除。", rec_detail:"記録の詳細", c_heat_m:"月別遵守率", f_line:"ライン", f_day:"日付", f_month:"月", f_code:"品番", f_def:"不良", f_item:"項目",
+  holidays:"祝日・休業日", holidays_s:"1行に1日（yyyy/mm/dd）。この日は漏れに数えません。",
+  sample_title:"サンプルデータ", sample_gen:"サンプル作成（2026年1月〜今日）", sample_clear:"サンプル削除", sample_desc:"試用モードのみ。サンプルのアカウント・マスタ・担当割当と、2026年1月1日から今日までのチェック記録を作成し、ダッシュボードと報告を試せます。サンプルには「サンプル」表示があり、いつでも削除できます。", sample_done:"サンプル記録を{n}件作成しました", sample_cleared:"サンプルデータを削除しました", sample_accounts:"サンプルアカウント（パスワード123456）：リーダー 1001（検針）· 1002（ゴム）· 1003（PVC）、検査員 2001–2005、閲覧者 9001。", sample_working:"作成中…",
   req_line:"ライン／機械", req_person:"実施者", req_temp:"温度", req_speed:"コンベアのスピード",
+  w_hello:"{n}さん、こんにちは", w_today:"今日の作業", w_tap:"チェックする枠をタップ", w_none:"担当の機械がありません。リーダーに連絡してください。", w_off:"今日は休日です。", w_st_todo:"チェックが必要", w_st_late:"時間超過 – すぐチェック", w_st_after:"昼休み明けにチェック", w_st_ok:"チェック済 – 合格", w_st_ng:"チェック済 – 不合格", w_left:"あと{n}回", w_all_done:"今日のチェックは完了", w_logout:"ログアウト", w_step:"ステップ {i} / {n}", w_back:"戻る", w_quit_q:"入力中の記録を破棄しますか？", w_quit_yes:"破棄", w_quit_no:"続ける",
+  w_q_code:"今の品番は？", w_find:"品番を検索", w_pass:"合格", w_fail:"不合格", w_kim_hint:"テストピースを左・中・右の3か所で通す", w_which:"どこが不合格？", w_why:"不合格の理由は？", w_why_other:"または理由を入力", w_photo:"写真を撮る", w_photo_again:"撮り直す", w_next:"次へ", w_q_nhietDo:"温度はいくつ？", w_q_tocDo:"コンベアのスピードはいくつ？", w_std:"基準：{a} – {b}", w_out:"基準外", w_in:"基準内", w_q_qty:"何個チェックした？", w_q_def:"不良品はある？", w_no_def:"不良品なし", w_def_tap:"不良の種類をタップして1つ数える", w_def_total:"合計：{n}個", w_stop:"機械を止める", w_stop_call:"すぐ報告", w_stop_done:"機械を止めて報告しました", w_review:"確認して保存", w_save:"保存", w_saving:"保存中…", w_saved:"保存しました", w_saved_ng:"保存しました。リーダーが対応します。", w_next_task:"次のチェック", w_home:"一覧に戻る", w_kp_del:"削除", w_change:"変更", w_code:"品番", w_qty:"検査数", w_defs:"不良品", w_need_pts:"不合格の場所をタップ", w_need_why:"理由を選ぶか入力", w_need_photo:"不合格箇所の写真を撮る", w_pcs:"個", w_auto:"日時は自動記録", w_nothing:"なし",
   tab_capa:"NG処置", tab_catalog:"マスタ",
   capa_title:"異常処置の管理", capa_sub:"NGごとに原因と対策を記録し、完了まで管理します。リーダーがここで更新します。",
   st_open:"未対応", st_doing:"対応中", st_closed:"対策完了", f_todo:"要対応", cause:"原因", action:"対策", capa_save:"更新",
@@ -383,7 +556,7 @@ ja:{
   need_code_name:"品番を入力し、対象チェック表を1つ以上選んでください。", need_def_name:"不良名を入力し、対象チェック表を1つ以上選んでください。",
   pick_code:"品番を検索", no_products:"このチェック表の品番が未登録です。リーダー／管理者に連絡してください。", change:"品番を変更", add_defect:"発見した不良をタップして追加", no_match:"該当する品番がありません。",
   manage_catalog:"マスタを開く",
-  offline:"オフライン：記録は保存され、接続時に自動送信されます（写真は接続が必要）。", perm_err:"この操作の権限がありません。",
+  sl_kiem:"検査数（個）", need_qty:"検査数を入力してください。", qty_lt_def:"不良数（{d}）が検査数（{q}）を超えています。", k_rate:"不良率", k_rate_s:"{q}個中 不良{d}個", k_rate_na:"検査数の記録がありません", vs_prev:"{p}比", vs_prev_na:"前期間のデータなし", pts:"pt", same_days:"同期間（〜{d}）", col_qty:"検査数", col_rate:"不良率", ng_rate:"NG率", rate_word:"比率", offline:"オフライン：記録は保存され、接続時に自動送信されます（写真は接続が必要）。", perm_err:"この操作の権限がありません。",
   del_user:"削除", del_user_q:"{n} のアカウントを削除しますか？ログインできなくなります。入力済みの記録は実施者名とともに残ります。", user_deleted:"{n} を削除しました", cant_del_last_admin:"最後の管理者は削除できません。",
   area:"エリア", areas:"担当エリア", all_areas:"全エリア", set_areas:"エリアとライン", set_areas_s:"各ラインは1つのエリアに属します。リーダーと検査員は自分のエリアのラインのみ閲覧・操作できます。",
   add_area:"エリア追加", area_name:"エリア名", no_area:"エリアが割り当てられていません。管理者に連絡してください。", area_none:"（未割当）", line_area:"ラインの所属エリア",
@@ -432,7 +605,9 @@ const DEFAULT_CFG = {
   photoMode:"ng",
   areas:[{id:"kim",name:"Khu kiểm kim"},{id:"caosu",name:"Khu cao su"},{id:"pvc",name:"Khu in sấy PVC"}],
   lineArea:{},
-  startDate:""
+  startDate:"",
+  holidays:[],
+  satMode:"alt", satAnchor:"2026-01-10", extraDays:[]
 };
 const CAMERA_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>';
 
@@ -447,8 +622,39 @@ const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/
 const docId = (form,line,date,ca) => form+"_"+slug(line)+"_"+date+"_"+ca;
 const lineKey = (form,line) => form+"_"+slug(line);
 const parseD = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
-const fmtDate = d => { if(!d) return ""; const x=parseD(d); return t("wd")[x.getDay()]+" "+pad(x.getDate())+"/"+pad(x.getMonth()+1); };
-const fmtMonth = m => m ? m.slice(5)+"/"+m.slice(0,4) : "";
+/* Ngày tháng theo ngôn ngữ: Tiếng Việt dd/mm/yyyy, Tiếng Nhật yyyy年m月d日 */
+const WD_LONG = {vi:["Chủ nhật","Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy"], ja:["日","月","火","水","木","金","土"]};
+/* Ngày làm việc — một hàm duy nhất cho lịch kiểm, thống kê, ô chọn ngày, dữ liệu mẫu.
+   Thứ tự ưu tiên: ngày lễ (nghỉ) > ngày làm bù (làm) > thứ 7 theo chế độ > ngày trong tuần. */
+function satModeOf(c){ return c.satMode || ((c.workdays||[]).includes(6) ? "all" : "none"); }
+function isSatWorking(c, date){
+  const m=satModeOf(c); if(m==="all") return true; if(m==="none") return false;
+  const a=c.satAnchor; if(!a) return true;
+  const diff=Math.round((Date.UTC(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10))-Date.UTC(+a.slice(0,4),+a.slice(5,7)-1,+a.slice(8,10)))/864e5);
+  return ((Math.round(diff/7)%2)+2)%2===0;
+}
+function workdayOf(c, date){
+  if((c.holidays||[]).includes(date)) return false;
+  if((c.extraDays||[]).includes(date)) return true;
+  const dow=new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10)).getDay();
+  if(dow===6) return isSatWorking(c,date);
+  return (c.workdays||[1,2,3,4,5,6]).includes(dow);
+}
+const fmtDate = d => { if(!d) return ""; const x=parseD(d); return LANG==="ja" ? (x.getMonth()+1)+"/"+x.getDate()+"("+t("wd")[x.getDay()]+")" : t("wd")[x.getDay()]+" "+pad(x.getDate())+"/"+pad(x.getMonth()+1); };
+const fmtDateLong = d => { if(!d) return ""; const x=parseD(d); return LANG==="ja" ? x.getFullYear()+"年"+(x.getMonth()+1)+"月"+x.getDate()+"日（"+WD_LONG.ja[x.getDay()]+"）" : WD_LONG.vi[x.getDay()]+", "+pad(x.getDate())+"/"+pad(x.getMonth()+1)+"/"+x.getFullYear(); };
+const fmtDateNum = d => { if(!d) return ""; const [y,m,dd]=d.split("-"); return LANG==="ja" ? y+"/"+m+"/"+dd : dd+"/"+m+"/"+y; };
+const fmtMonth = m => { if(!m) return ""; const [y,mm]=m.split("-"); return LANG==="ja" ? y+"年"+(+mm)+"月" : mm+"/"+y; };
+const fmtMonthLabel = m => m ? (LANG==="ja" ? fmtMonth(m) : "Tháng "+fmtMonth(m)) : "";
+const fmtMonthShort = m => { const mm=+m.slice(5); return LANG==="ja" ? mm+"月" : "T"+mm; };
+const fmtDT = iso => { if(!iso) return ""; const g=new Date(iso), hm=pad(g.getHours())+":"+pad(g.getMinutes()); return LANG==="ja" ? g.getFullYear()+"/"+pad(g.getMonth()+1)+"/"+pad(g.getDate())+" "+hm : pad(g.getDate())+"/"+pad(g.getMonth()+1)+"/"+g.getFullYear()+" "+hm; };
+const fmtDTShort = iso => { if(!iso) return ""; const g=new Date(iso), hm=pad(g.getHours())+":"+pad(g.getMinutes()); return LANG==="ja" ? (g.getMonth()+1)+"/"+g.getDate()+" "+hm : pad(g.getDate())+"/"+pad(g.getMonth()+1)+" "+hm; };
+/* Ô chọn ngày / tháng / giờ riêng của app (thay ô của trình duyệt, vốn theo ngôn ngữ máy) */
+const CAL_SVG='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+function dateField(id, val, kind){
+  const label = !val ? "—" : kind==="month" ? fmtMonthLabel(val) : fmtDateLong(val);
+  return `<input type="hidden" id="${id}" value="${esc(val||"")}"><button type="button" class="dpick" id="${id}-btn" data-act="dp-open" data-for="${id}" data-kind="${kind}" aria-haspopup="dialog"><span>${esc(label)}</span>${CAL_SVG}</button>`;
+}
+function timeField(id, val){ return `<input type="text" class="tfield" id="${id}" value="${esc(val||"")}" data-prev="${esc(val||"")}" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="HH:MM">`; }
 const caName = c => t(c==="sang"?"ca_sang":"ca_chieu");
 const sk = r => r.date+(r.ca==="sang"?"1":"2")+(r.gio||"");
 const ls = { get(k,def){ try{ const v=localStorage.getItem(k); return v==null?def:JSON.parse(v);}catch(e){return def;} }, set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }, del(k){ try{localStorage.removeItem(k);}catch(e){} } };
@@ -530,6 +736,84 @@ function DemoBackend(){
     async changePassword(uid,oldPw,newPw){ const u=db.users.find(x=>x.uid===uid); if(!u || u.pw!==await sha(oldPw)) throw {code:"bad"}; u.pw=await sha(newPw); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); if(sc[uid]!=null){ sc[uid]=newPw; ls.set(K.sec,sc); } },
     async createUser(o){ if(db.users.some(x=>x.username===o.username)) throw {code:"exists"}; const u={uid:"u_"+uid8(), username:o.username, name:o.name, role:o.role, areas:o.areas||[], active:true, pw:await sha(o.password)}; db.users.push(u); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); sc[u.uid]=o.password; ls.set(K.sec,sc); bus.emit("users"); return u.uid; },
     async deleteUser(uid){ db.users=db.users.filter(x=>x.uid!==uid); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); delete sc[uid]; ls.set(K.sec,sc); bus.emit("users"); },
+    /* ---------- Dữ liệu MẪU 01/2026 → hôm nay (chỉ chế độ dùng thử) ---------- */
+    async seedSample(){
+      const pw=await sha("123456"), today=todayStr(), nowHM=hhmm();
+      const U=[["u_s1001","1001","Ngô Lập Quốc","leader",["kim"]],["u_s1002","1002","Phạm Bảo Chính","leader",["caosu"]],["u_s1003","1003","Trần Xuân Mỹ","leader",["pvc"]],
+        ["u_s2001","2001","Phúc","staff",["kim"]],["u_s2002","2002","Hồng","staff",["caosu"]],["u_s2003","2003","Lan (mẫu)","staff",["caosu"]],["u_s2004","2004","Can","staff",["pvc"]],["u_s2005","2005","Tuấn (mẫu)","staff",["pvc","kim"]],["u_s9001","9001","Người xem (mẫu)","viewer",[]]];
+      const sc=ls.get(K.sec,{});
+      U.forEach(([uid,code,name,role,areas])=>{ if(db.users.some(x=>x.username===code)) return; db.users.push({uid,username:code,name,role,areas,active:true,pw,sample:true}); sc[uid]="123456"; });
+      ls.set(K.users,db.users); ls.set(K.sec,sc);
+      const uidOf=code=>(db.users.find(x=>x.username===code)||{}).uid;
+      // Danh mục
+      const cat=db.cat||{products:[],defects:[]}; cat.products=cat.products||[]; cat.defects=cat.defects||[];
+      [["poly Touden","Găng poly Touden"],["GT-102","Găng GT-102"],["GT-205","Găng GT-205"],["GT-310","Găng GT-310 (ra mắt 06/2026)"]].forEach(([code,name])=>{ if(!cat.products.some(p=>p.code===code)) cat.products.push({code,name,forms:["kim","caosu","pvc"],active:true,sample:true}); });
+      [["do","Dơ","汚れ"],["rach","Rách","破れ"],["thung","Thủng","穴あき"],["dinh","Dính / bọt","付着・気泡"],["mong","Lớp cao su mỏng","ゴム層が薄い"],["khac","Khác","その他"]].forEach(([id,vi,ja])=>{ if(!cat.defects.some(d=>d.id===id)) cat.defects.push({id,vi,ja,forms:["caosu"],active:true,sample:true}); });
+      db.cat=cat; ls.set(K.cat,cat);
+      // Cấu hình: ngày bắt đầu + ngày lễ
+      const HOL=["2026-01-01","2026-02-14","2026-02-15","2026-02-16","2026-02-17","2026-02-18","2026-02-19","2026-02-20","2026-02-21","2026-02-22","2026-04-27","2026-04-30","2026-05-01","2026-09-01","2026-09-02"];
+      const c0=Object.assign({},DEFAULT_CFG,db.cfg||{}); c0.startDate=(!c0.startDate||c0.startDate>"2026-01-01")?"2026-01-01":c0.startDate; c0.holidays=[...new Set([...(c0.holidays||[]),...HOL])].sort();
+      db.cfg=c0; ls.set(K.cfg,c0);
+      const LINES=[["kim","Máy kiểm kim 1","2001","2005"],["caosu","Cao su 1","2002","2003"],["caosu","Cao su 2","2003","2002"],["pvc","PVC 1","2004","2005"],["pvc","PVC 2","2004","2005"]];
+      const map=(db.asg&&db.asg.map)||{}; LINES.forEach(([f,l,m,bk])=>{ map[lineKey(f,l)]={main:[uidOf(m)],backup:[uidOf(bk)],area:f,form:f,line:l}; }); db.asg={map}; ls.set(K.asg,db.asg);
+      // Phiếu
+      let s=20260101; const rnd=()=>{ s|=0; s=s+0x6D2B79F5|0; let q=Math.imul(s^s>>>15,1|s); q=q+Math.imul(q^q>>>7,61|q)^q; return ((q^q>>>14)>>>0)/4294967296; };
+      const pois=l=>{ if(l>30){ return Math.max(0,Math.round(l+Math.sqrt(l)*(rnd()+rnd()+rnd()-1.5)*2)); } let L=Math.exp(-l),k=0,p=1; do{k++;p*=rnd();}while(p>L); return k-1; };
+      const pick=w=>{ let x=rnd()*w.reduce((a,b)=>a+b[1],0); for(const [k,p] of w){ x-=p; if(x<=0) return k; } return w[0][0]; };
+      const gauss=()=>(rnd()+rnd()+rnd()+rnd()-2)*1.2;
+      const RS={camBien:"Máy không báo khi thả kim thử ở điểm giữa",amBao:"Âm báo nhỏ, thời gian báo ngắn",tocDo:"Băng chuyền chạy không đều",kichThuoc:"Cổ tay ngắn hơn chuẩn",deoThu:"Đeo vào bị bó ngón",lopCaoSu:"Lớp cao su không đều, có bọt khí",nhietDo:"Nhiệt độ lệch chuẩn"};
+      const CAPA={kim:["Cảm biến bám bụi","Vệ sinh đầu dò, hiệu chỉnh độ nhạy, kiểm lại 100% hàng từ lần kiểm trước"],caosu:["Nồng độ dung dịch nhúng thấp","Điều chỉnh nồng độ, cách ly lô, kiểm lại 100%"],pvc:["Cảm biến nhiệt lệch","Hiệu chỉnh bộ điều nhiệt, theo dõi 3 ngày"]};
+      const recs=db.rec||{}; let n=0;
+      if(!c0.satMode){ c0.satMode="alt"; c0.satAnchor="2026-01-10"; } c0.workdays=(c0.workdays||[1,2,3,4,5]).filter(x=>x!==6); db.cfg=c0; ls.set(K.cfg,c0);
+      const isWd=d=>workdayOf(c0,d);
+      for(let dd=new Date(2026,0,1); dstr(dd)<=today; dd.setDate(dd.getDate()+1)){
+        const date=dstr(dd); if(!isWd(date)) continue;
+        const mi=dd.getMonth(), f0=Math.max(0.35,1-mi*0.075);
+        LINES.forEach(([f,l,mainC,bkC])=>CAS.forEach(ca=>{
+          const dl=c0.deadlines[ca]||"23:59";
+          if(date===today && nowHM<=dl) return;
+          const id=docId(f,l,date,ca); if(recs[id]) return;
+          if(rnd()<0.06*f0+0.008) return;
+          const who=rnd()<0.12?bkC:mainC, uid=uidOf(who), u=db.users.find(x=>x.uid===uid)||{};
+          const gio= ca==="sang" ? (f==="kim"?"07:30":f==="caosu"?"08:10":"07:45") : (f==="caosu"?"13:20":"13:00");
+          const late=rnd()<0.13*f0+0.015;
+          const lh=late?(+dl.slice(0,2)+1+Math.floor(rnd()*3))+":"+pad(Math.floor(rnd()*60)):gio;
+          const code = f==="caosu" && mi>=5 && rnd()<0.35 ? "GT-310" : pick([["poly Touden",5],["GT-102",3],["GT-205",2]]);
+          const r={id, form:f, line:l, area:f, date, month:date.slice(0,7), ca, gio, nguoi:u.name||"", byUid:uid, ketqua:"OK", ngItems:[], lyDo:{}, ghiChu:"", daBao:false, nguon:"app", mau:true, maHang:code, ghiLuc:new Date(date+"T"+lh.padStart(5,"0")+":00").toISOString(), photos:[]};
+          if(f==="kim"){ r.items={}; FORMS.kim.items.forEach(it=>{ r.items[it.k]={trai:"OK",giua:"OK",phai:"OK"}; }); if(rnd()<0.035*f0){ const k=rnd()<0.7?"camBien":"amBao"; r.items[k][pick([["trai",1],["giua",2],["phai",1]])]="NG"; r.ngItems=[k]; } }
+          if(f==="caosu"){ r.items={}; FORMS.caosu.items.forEach(it=>r.items[it.k]="OK");
+            const q=150+Math.floor(rnd()*26)*10; r.slKiem=q;
+            let rate=(l==="Cao su 2"?0.016:0.008)*f0; if(code==="GT-310") rate*= mi===5?2.4 : mi===6?1.5 : 1.05;
+            const nd=pois(q*rate), ct={}; for(let i=0;i<nd;i++){ const k=pick([["do",40],["rach",22],["thung",12],["dinh",14],["mong",code==="GT-310"&&mi===5?30:7],["khac",5]]); ct[k]=(ct[k]||0)+1; }
+            r.loi={tong:nd, loai:Object.keys(ct), chiTiet:ct};
+            if(rnd()<0.045*f0*(l==="Cao su 2"?1.6:1)*(code==="GT-310"&&mi===5?2:1)){ const k=pick([["lopCaoSu",3],["deoThu",2],["kichThuoc",1]]); r.items[k]="NG"; r.ngItems=[k]; } }
+          if(f==="pvc"){ let mean=135; if(l==="PVC 1" && mi===2) mean=138.6; let tmp=Math.round((mean+gauss()*1.4)*10)/10; r.nhietDo=tmp; r.tocDo=rnd()<0.008*f0?560:520;
+            if(tmp<130||tmp>140) r.ngItems.push("nhietDo"); if(r.tocDo>540) r.ngItems.push("tocDo"); }
+          if(r.ngItems.length){ r.ketqua="NG"; r.daBao=true; r.ngItems.forEach(k=>r.lyDo[k]=RS[k]||"Bất thường");
+            const age=(parseD(today)-parseD(date))/864e5, cp=CAPA[f];
+            r.capa = age>7 && rnd()<0.95 ? {status:"closed", cause:cp[0], action:cp[1], byUid:uidOf(f==="kim"?"1001":f==="caosu"?"1002":"1003"), updatedAt:new Date(date+"T16:30:00").toISOString(), closedAt:new Date(date+"T16:30:00").toISOString()} : {status:"doing", cause:age>2?cp[0]:"", action:"", byUid:uidOf(f==="kim"?"1001":f==="caosu"?"1002":"1003"), updatedAt:new Date(date+"T15:00:00").toISOString()}; }
+          recs[id]=r; n++;
+        }));
+      }
+      db.rec=recs; ls.set(K.rec,recs);
+      // Duyệt tháng 2 cấp cho các tháng đã qua
+      const tm=today.slice(0,7);
+      for(let m="2026-01"; m<tm; m=monthAdd(m,1)){ const nx=monthAdd(m,1);
+        LINES.forEach(([f,l])=>{ const id=f+"_"+slug(l)+"_"+m; if(db.ap[id]) return; const lead=uidOf(f==="kim"?"1001":f==="caosu"?"1002":"1003");
+          db.ap[id]={form:f,line:l,area:f,month:m,sample:true,l1:{byUid:lead,name:"",at:new Date(nx+"-03T09:00:00").toISOString(),note:""},l2:{byUid:"u_admin",name:"",at:new Date(nx+"-05T10:00:00").toISOString(),note:""}}; }); }
+      ls.set(K.ap,db.ap);
+      ["users","config","assign","catalog","rec","ap"].forEach(bus.emit);
+      return n;
+    },
+    async clearSample(){
+      Object.keys(db.rec).forEach(k=>{ if(db.rec[k].mau) delete db.rec[k]; }); ls.set(K.rec,db.rec);
+      Object.keys(db.ap).forEach(k=>{ if(db.ap[k].sample) delete db.ap[k]; }); ls.set(K.ap,db.ap);
+      const gone=db.users.filter(u=>u.sample).map(u=>u.uid); db.users=db.users.filter(u=>!u.sample); ls.set(K.users,db.users);
+      const sc=ls.get(K.sec,{}); gone.forEach(u=>delete sc[u]); ls.set(K.sec,sc);
+      const map=(db.asg&&db.asg.map)||{}; Object.values(map).forEach(o=>{ o.main=(o.main||[]).filter(x=>!gone.includes(x)); o.backup=(o.backup||[]).filter(x=>!gone.includes(x)); }); ls.set(K.asg,db.asg);
+      if(db.cat){ db.cat.products=(db.cat.products||[]).filter(p=>!p.sample); db.cat.defects=(db.cat.defects||[]).filter(d=>!d.sample); ls.set(K.cat,db.cat); }
+      ["users","assign","catalog","rec","ap"].forEach(bus.emit);
+    },
     async getPassword(uid){ const sc=ls.get(K.sec,{}); return sc[uid]!=null?sc[uid]:null; },
     async setPassword(uid,newPw){ const u=db.users.find(x=>x.uid===uid); if(!u) throw {code:"err"}; u.pw=await sha(newPw); ls.set(K.users,db.users); const sc=ls.get(K.sec,{}); sc[uid]=newPw; ls.set(K.sec,sc); },
     async updateUser(uid,patch){ const u=db.users.find(x=>x.uid===uid); if(!u) return; if(patch.password){ u.pw=await sha(patch.password); delete patch.password; } Object.assign(u,patch); ls.set(K.users,db.users); bus.emit("users"); },
@@ -682,7 +966,7 @@ function tabsFor(){
   if(S.me.role==="admin") return ["entry","today","capa","dash","report","catalog","assign","users","settings"];
   if(S.me.role==="leader") return ["entry","today","capa","dash","report","assign","users","catalog"];
   if(S.me.role==="viewer") return ["today","capa","dash","report"];
-  return ["entry","today"];
+  return ["work"];
 }
 const catalog = () => S.catalog || DEFAULT_CATALOG;
 function defName(id){ const d=(catalog().defects||[]).find(x=>x.id===id); if(d) return tx(d); const o=DEFECTS.find(x=>x[0]===id); return o?tx(o[1]):id; }
@@ -713,14 +997,14 @@ function newDraft(form,line,date,ca){
   const lines=myLines(f); const last=ls.get("kcb.lastLine_"+f,"");
   const h=new Date().getHours();
   const d={form:f, line: line || (lines.includes(last)?last:lines[0]||""), date:date||todayStr(), ca:ca||(h<11?"sang":"chieu"), gio:hhmm(),
-    nguoiUid:S.me?S.me.uid:null, items:{}, lyDo:{}, maHang:"", loi:{}, nhietDo:"", tocDo:"", ghiChu:"", daBao:false, photos:{}, oldPhotos:{}, processing:0};
+    nguoiUid:S.me?S.me.uid:null, items:{}, lyDo:{}, maHang:"", slKiem:"", loi:{}, nhietDo:"", tocDo:"", ghiChu:"", daBao:false, photos:{}, oldPhotos:{}, processing:0};
   if(f==="kim") FORMS.kim.items.forEach(it=>d.items[it.k]={trai:null,giua:null,phai:null});
   if(f==="caosu") FORMS.caosu.items.forEach(it=>d.items[it.k]=null);
   return d;
 }
 function draftFromRecord(r){
   const d=newDraft(r.form,r.line,r.date,r.ca);
-  d.gio=r.gio||d.gio; d.maHang=r.maHang||""; d.lyDo=Object.assign({},r.lyDo||{}); d.ghiChu=r.ghiChu||""; d.daBao=!!r.daBao; d.nguoiUid=r.byUid||null; d.nguoiName=r.nguoi||"";
+  d.gio=r.gio||d.gio; d.maHang=r.maHang||""; d.slKiem=r.slKiem||""; d.lyDo=Object.assign({},r.lyDo||{}); d.ghiChu=r.ghiChu||""; d.daBao=!!r.daBao; d.nguoiUid=r.byUid||null; d.nguoiName=r.nguoi||"";
   if(r.form==="kim" && r.items) FORMS.kim.items.forEach(it=>{ const v=r.items[it.k]||{}; d.items[it.k]={trai:v.trai||null,giua:v.giua||null,phai:v.phai||null}; });
   if(r.form==="caosu"){ if(r.items) FORMS.caosu.items.forEach(it=>d.items[it.k]=r.items[it.k]||null); }
   d.loi=Object.assign({},(r.loi&&r.loi.chiTiet)||{});
@@ -755,6 +1039,7 @@ function evalDraft(d){
   }
   out.ng=ngKeysOf(d.form,d.items,d.nhietDo,d.tocDo);
   if(!String(d.maHang||"").trim()) out.missing.unshift(t("req_code"));
+  if(activeDefects(d.form).length && !(parseInt(d.slKiem,10)>0)) out.missing.push(t("sl_kiem"));
   out.noReason=out.ng.filter(k=>!String((d.lyDo||{})[k]||"").trim()).map(k=>tx(FORMS[d.form].items.find(i=>i.k===k)||{vi:k}));
   if(out.flags.length) out.ketqua="NG";
   out.needPhotos=requiredPhotos(d,out.ng);
@@ -765,7 +1050,7 @@ const photoLabel = (form,k) => k==="sheet" ? t("photo_sheet") : tx((FORMS[form].
 
 /* ---------- Đăng ký nghe dữ liệu ---------- */
 function neededRange(){
-  const rr=repRange(); const ms=[S.todayDate.slice(0,7), rr.from, rr.to, S.dash.from, S.dash.to, monthAdd(todayStr().slice(0,7),-2)];
+  const rr=repRange(); const ms=[S.todayDate.slice(0,7), rr.from, rr.to, S.dash.from, S.dash.to, monthAdd(todayStr().slice(0,7),-2), prevRange(S.dash.from,S.dash.to).from, prevRange(rr.from,rr.to).from];
   if(S.draft) ms.push(S.draft.date.slice(0,7));
   ms.sort(); return {from:ms[0], to:ms[ms.length-1]};
 }
@@ -783,7 +1068,7 @@ function syncSubs(){
 function startListeners(){
   stopListeners();
   S.unsubs.push(S.B.listenUsers(list=>{ S.users=list; const me=list.find(u=>u.uid===S.me.uid); if(me){ if(!me.active){ doLogout(); return; } S.me=Object.assign({},S.me,me); syncSubs(); } else if(S.me){ doLogout(); return; } renderBg(); }));
-  S.unsubs.push(S.B.listenDoc("config",c=>{ if(isAdmin() && (!c || !c.startDate) && !S._autoStart){ S._autoStart=true; S.B.setConfig(Object.assign({}, c||DEFAULT_CFG, {startDate:todayStr()})).catch(()=>{}); } if(c) S.cfg={ lines:Object.assign({},DEFAULT_CFG.lines,c.lines||{}), contacts:Object.assign({},DEFAULT_CFG.contacts,c.contacts||{}), pvc:Object.assign({},DEFAULT_CFG.pvc,c.pvc||{}), deadlines:Object.assign({},DEFAULT_CFG.deadlines,c.deadlines||{}), workdays:c.workdays||DEFAULT_CFG.workdays, photoMode:c.photoMode||DEFAULT_CFG.photoMode, areas:(c.areas&&c.areas.length)?c.areas:DEFAULT_CFG.areas, lineArea:c.lineArea||{}, startDate:c.startDate||"" }; S.records=new Map([...S.records].filter(([k,r])=>recVisible(r))); const d=S.draft; if(d && !myLines(d.form).includes(d.line)) d.line=myLines(d.form)[0]||""; renderBg(); }));
+  S.unsubs.push(S.B.listenDoc("config",c=>{ if(isAdmin() && (!c || !c.startDate) && !S._autoStart){ S._autoStart=true; S.B.setConfig(Object.assign({}, c||DEFAULT_CFG, {startDate:todayStr()})).catch(()=>{}); } if(c) S.cfg={ lines:Object.assign({},DEFAULT_CFG.lines,c.lines||{}), contacts:Object.assign({},DEFAULT_CFG.contacts,c.contacts||{}), pvc:Object.assign({},DEFAULT_CFG.pvc,c.pvc||{}), deadlines:Object.assign({},DEFAULT_CFG.deadlines,c.deadlines||{}), workdays:c.workdays||DEFAULT_CFG.workdays, photoMode:c.photoMode||DEFAULT_CFG.photoMode, areas:(c.areas&&c.areas.length)?c.areas:DEFAULT_CFG.areas, lineArea:c.lineArea||{}, startDate:c.startDate||"", holidays:c.holidays||[], satMode:satModeOf(c), satAnchor:c.satAnchor||"", extraDays:c.extraDays||[] }; S.records=new Map([...S.records].filter(([k,r])=>recVisible(r))); const d=S.draft; if(d && !myLines(d.form).includes(d.line)) d.line=myLines(d.form)[0]||""; renderBg(); }));
   S.unsubs.push(S.B.listenDoc("catalog",c=>{ S.catalog=c?{products:c.products||[], defects:c.defects||[]}:null; renderBg(); }));
   S.unsubs.push(S.B.listenDoc("assign",a=>{ S.asg=a||{map:{}}; const d=S.draft; if(d && !S.saving){ if(!myForms().includes(d.form)) S.draft=newDraft(); else if(!myLines(d.form).includes(d.line)) d.line=myLines(d.form)[0]||""; } renderBg(); }));
   S.unsubs.push(S.B.listenApprovals(list=>{ S.approvals=new Map(list.map(x=>[x.id,x])); renderBg(); }));
@@ -815,19 +1100,46 @@ function slotInfo(form,line,date,ca){
   if(!r){ if(!isWorkday(date)) return {state:"none", off:true}; if(!slotDue(date,ca)) return {state:"none", wait:true}; return {state:"miss"}; }
   return {state: r.ketqua==="NG"?"ng":(isLate(r)?"late":"ok"), r, late:isLate(r)};
 }
+/* Kỳ trước: cùng độ dài, ngay trước kỳ đang xem. Nếu kỳ đang xem chưa kết thúc (có hôm nay) thì kỳ trước chỉ tính đến cùng số ngày. */
+function prevRange(from,to){
+  const [fy,fm]=from.split("-").map(Number), [ty,tm]=to.split("-").map(Number), n=(ty-fy)*12+(tm-fm)+1;
+  const pf=monthAdd(from,-n), pt=monthAdd(to,-n), td=todayStr(); let until=null;
+  if(lastDay(to)>=td && from<=td.slice(0,7)){ const off=Math.round((parseD(td)-parseD(from+"-01"))/864e5); const u=parseD(pf+"-01"); u.setDate(u.getDate()+off); until=dstr(u); if(until>lastDay(pt)) until=lastDay(pt); }
+  const label=(n===1?fmtMonth(pf):fmtMonth(pf)+"–"+fmtMonth(pt))+(until?" · "+t("same_days",{d:until.slice(8)+"/"+until.slice(5,7)}):"");
+  return {from:pf,to:pt,until,label};
+}
+function fmtNum(v){ const a=Math.abs(v); return (a<1&&a>0? a.toFixed(2) : a<10? a.toFixed(1) : Math.round(a).toString()).replace(/\.0+$/,"").replace(".", LANG==="ja"?".":","); }
+function fmtPct(v){ if(v==null) return "—"; const a=Math.abs(v); return (a>0&&a<1? a.toFixed(2) : a.toFixed(1)).replace(/\.0+$/,"").replace(".", LANG==="ja"?".":",")+"%"; }
+/* Chỉ số tổng hợp cho 1 kỳ — dùng chung Dashboard và báo cáo quý/năm */
+function kpiStats(D){
+  const {recs, slots}=dashData(D), SS=slotSummary(slots);
+  const qRecs=recs.filter(r=>+r.slKiem>0), qty=qRecs.reduce((s,r)=>s+(+r.slKiem),0), defQ=qRecs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0);
+  const ng=recs.filter(r=>r.ketqua==="NG").length, app=recs.filter(r=>r.nguon==="app"&&!r.mau), ph=app.filter(r=>(r.photos||[]).length).length;
+  return { recs, slots, SS, checks:recs.length, ng, ngRate:recs.length?ng/recs.length*100:null,
+    def:recs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), qty, defQ, rate:qty?defQ/qty*100:null,
+    comp:SS.due?SS.onTime/SS.due*100:null, lmRate:SS.due?(recs.filter(isLate).length+SS.miss)/SS.due*100:null, late:recs.filter(isLate).length, miss:SS.miss, photo:app.length?ph/app.length*100:null, hasData:recs.length>0||SS.due>0 };
+}
+function deltaHTML(cur, prev, kind, betterUp, label, pre){
+  if(cur==null || prev==null || !prev.hasData) return `<div class="delta sub">${esc(t("vs_prev_na"))}</div>`;
+  const c=cur, p=prev.v; if(c==null || p==null) return `<div class="delta sub">${esc(t("vs_prev_na"))}</div>`;
+  const d=c-p; if(Math.abs(d)<1e-9 || /^0([.,]0+)?$/.test(fmtNum(d))) return `<div class="delta sub">= ${esc(t("vs_prev",{p:label}))}</div>`;
+  const good=(d>0)===betterUp;
+  return `<div class="delta" style="color:var(--${good?"ok":"ng"})">${d>0?"▲":"▼"} ${pre?esc(pre)+" ":""}${fmtNum(d)}${kind==="pp"?" "+esc(t("pts")):""} <span class="sub">${esc(t("vs_prev",{p:label}))}</span></div>`;
+}
 function slotSummary(slots){
   const due=slots.filter(s=>s.state!=="none");
   const done=due.filter(s=>s.r).length, onTime=due.filter(s=>s.r && !s.late).length, miss=due.filter(s=>s.state==="miss").length, late=due.filter(s=>s.late).length;
   return {due:due.length, done, onTime, miss, late};
 }
 const visForms = () => FORM_KEYS.filter(f=>visibleLines(f).length);
-function isWorkday(date){ return (cfg().workdays||[1,2,3,4,5,6]).includes(parseD(date).getDay()); }
+function isWorkday(date){ return workdayOf(cfg(), date); }
 
 /* =====================================================================
    GIAO DIỆN
    ===================================================================== */
 function langSwitch(){ return `<span class="langsw" role="group" aria-label="${esc(t("lang"))}"><button data-act="lang" data-v="vi" aria-pressed="${LANG==="vi"}">VI</button><button data-act="lang" data-v="ja" aria-pressed="${LANG==="ja"}">日本語</button></span>`; }
 function shell(){
+  if(S.me && S.me.role==="staff") return workerShell();
   const tabs=tabsFor();
   if(!tabs.includes(S.tab)) S.tab=tabs[0];
   return `<div class="wrap"><header class="top"><div class="brand"><h1>${esc(t("app"))}</h1><span class="jp">${esc(t("appSub"))}</span>
@@ -878,9 +1190,9 @@ function renderEntry(){
   const itemPhoto = k => (pm==="item" || need.has(k)) ? photoSlot(d,k,need.has(k)) : "";
   let h=`<div><span class="lbl">${esc(t("step_form"))}</span><div class="forms">`+forms.map(k=>`<button class="formcard" data-act="form" data-v="${k}" aria-pressed="${d.form===k}"><b>${esc(tx(FORMS[k]))}</b><span class="jp-s">${esc(LANG==="ja"?FORMS[k].vi:FORMS[k].sheetJa)}</span></button>`).join("")+`</div></div>`;
   h+=`<div class="sheet"><div><span class="lbl">${esc(t(d.form==="pvc"?"step_machine":"step_line"))}</span><div class="chips">`+(lines.length?lines.map(l=>`<button class="chip" data-act="line" data-v="${esc(l)}" aria-pressed="${d.line===l}">${esc(l)}</button>`).join(""):`<span class="sub">${esc(t(S.me.role==="staff"?"no_assigned":"no_lines"))}</span>`)+`</div></div>
-    <div class="row"><div class="field"><label class="lbl" for="f-date">${esc(t("date"))}</label><input type="date" id="f-date" value="${esc(d.date)}"></div>
+    <div class="row"><div class="field"><label class="lbl" for="f-date-btn">${esc(t("date"))}</label>${dateField("f-date",d.date,"date")}</div>
       <div class="field"><span class="lbl">${esc(t("check_round"))}</span><div class="chips">${CAS.map(k=>`<button class="chip" data-act="ca" data-v="${k}" aria-pressed="${d.ca===k}">${esc(t("ca_"+k+"_l"))}</button>`).join("")}</div></div>
-      <div class="field" style="flex:0 1 140px"><label class="lbl" for="f-gio">${esc(t("time"))}</label><input type="time" id="f-gio" value="${esc(d.gio)}"></div></div>
+      <div class="field" style="flex:0 1 140px"><label class="lbl" for="f-gio">${esc(t("time"))}</label>${timeField("f-gio",d.gio)}</div></div>
     <div class="sub">${esc(t("inspector"))}: <b style="color:var(--ink)">${esc(d.nguoiName||S.me.name)}</b></div></div>`;
   const hasCode=!!String(d.maHang||"").trim();
   const prods=activeProducts(d.form);
@@ -928,7 +1240,8 @@ function renderEntry(){
   const defs=activeDefects(d.form);
   if(defs.length || Object.keys(d.loi||{}).length){
     const sel=Object.keys(d.loi||{}).filter(k=>d.loi[k]>0), tong=sel.reduce((s,k)=>s+(+d.loi[k]||0),0);
-    h+=`<div><span class="lbl">${esc(t("defects_title",{n:tong}))}</span>
+    h+=`<div class="field" style="max-width:280px"><label class="lbl" for="f-qty">${esc(t("sl_kiem"))} *</label><input class="big" type="number" inputmode="numeric" min="1" step="1" id="f-qty" value="${esc(d.slKiem||"")}" autocomplete="off"></div>
+      <div><span class="lbl">${esc(t("defects_title",{n:tong}))}</span>
       ${sel.length?`<div class="defects" style="margin-bottom:10px">${sel.map(k=>`<div class="stepper"><span>${esc(defName(k))}</span><button data-act="dec" data-k="${esc(k)}" aria-label="−">−</button><output>${d.loi[k]}</output><button data-act="inc" data-k="${esc(k)}" aria-label="+">+</button><button data-act="rmdef" data-k="${esc(k)}" aria-label="${esc(t("remove_def"))}" title="${esc(t("remove_def"))}" style="color:var(--ng);border-color:var(--ng)">×</button></div>`).join("")}</div>`:""}
       <div class="sub" style="margin-bottom:6px">${esc(t("add_defect"))}</div><div class="chips">${defs.filter(x=>!(d.loi[x.id]>0)).map(x=>`<button class="chip sm" data-act="adddef" data-v="${esc(x.id)}">+ ${esc(tx(x))}</button>`).join("")}</div></div>`;
   }
@@ -974,8 +1287,8 @@ function renderToday(){
     });
     rows+=`</div>`;
   });
-  return `<div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;justify-content:space-between"><div><h2>${esc(t("today_title",{d:fmtDate(date)}))}</h2><div class="sub">${esc(t("today_hint"))}</div></div>
-    <div class="field" style="width:180px"><label class="lbl" for="f-today">${esc(t("date"))}</label><input type="date" id="f-today" value="${esc(date)}"></div></div>
+  return `<div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;justify-content:space-between"><div><h2>${esc(t("today_title",{d:fmtDateLong(date)}))}</h2><div class="sub">${esc(t("today_hint"))}</div></div>
+    <div class="field" style="width:260px"><label class="lbl" for="f-today-btn">${esc(t("date"))}</label>${dateField("f-today",date,"date")}</div></div>
     <div class="stats"><div class="stat ok"><span class="lbl">${esc(t("st_ok"))}</span><b>${n.ok}</b></div><div class="stat ng"><span class="lbl">NG</span><b>${n.ng}</b></div><div class="stat warn"><span class="lbl">${esc(t("st_overdue_n"))}</span><b>${n.over}</b></div><div class="stat"><span class="lbl">${esc(t("st_wait_n"))}</span><b>${n.wait}</b></div></div>
     <div class="board"><div class="bhead"><span>${esc(t("line_machine"))}</span><span>${esc(t("ca_sang"))}</span><span>${esc(t("ca_chieu"))}</span></div>${rows||`<div class="empty">${esc(t("no_lines"))}</div>`}</div>`;
 }
@@ -987,7 +1300,7 @@ function thumbs(r){ const ps=r.photos||[]; if(!ps.length) return ""; return `<di
 function periodBar(){
   const R=S.rep, y0=new Date().getFullYear(), years=[y0-2,y0-1,y0,y0+1];
   let h=`<div class="sheet"><div class="row"><div class="field"><span class="lbl">${esc(t("period"))}</span><div class="chips">${["month","quarter","year"].map(k=>`<button class="chip" data-act="rperiod" data-v="${k}" aria-pressed="${R.period===k}">${esc(t("p_"+k))}</button>`).join("")}</div></div>`;
-  if(R.period==="month") h+=`<div class="field" style="flex:0 1 190px"><label class="lbl" for="f-month">${esc(t("month"))}</label><input type="month" id="f-month" value="${esc(R.month)}"></div>`;
+  if(R.period==="month") h+=`<div class="field" style="flex:0 1 230px"><label class="lbl" for="f-month-btn">${esc(t("month"))}</label>${dateField("f-month",R.month,"month")}</div>`;
   else { h+=`<div class="field" style="flex:0 1 120px"><label class="lbl" for="f-year">${esc(t("year"))}</label><select id="f-year">${years.map(y=>`<option ${y===R.y?"selected":""}>${y}</option>`).join("")}</select></div>`;
     if(R.period==="quarter") h+=`<div class="field" style="flex:0 1 220px"><span class="lbl">${esc(t("quarter"))}</span><div class="chips">${[1,2,3,4].map(q=>`<button class="chip sm" data-act="rq" data-v="${q}" aria-pressed="${R.q===q}">Q${q}</button>`).join("")}</div></div>`; }
   return h+`</div></div>`;
@@ -1005,13 +1318,18 @@ function renderReport(){
   const mslots=[]; { const td=todayStr(), end=lastDay(R.month)<td?lastDay(R.month):td; for(let dd=parseD(R.month+"-01"); dstr(dd)<=end; dd.setDate(dd.getDate()+1)){ const ds=dstr(dd); CAS.forEach(ca=>mslots.push(slotInfo(R.form,R.line,ds,ca))); } }
   const SS=slotSummary(mslots);
   const late=recs.filter(isLate).length;
+  /* So với tháng trước (cùng số ngày nếu tháng này chưa hết) — chỉ số của đúng line đang xem */
+  const lineStats=(from,to,until)=>{ const st=kpiStats({from,to,until,form:R.form}); const rs=st.recs.filter(r=>r.line===R.line), sl=st.slots.filter(s=>s.line===R.line), ss=slotSummary(sl);
+    const q=rs.filter(r=>+r.slKiem>0), qty=q.reduce((s,r)=>s+(+r.slKiem),0), defQ=q.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), ngc=rs.filter(r=>r.ketqua==="NG").length;
+    return {checks:rs.length, ngRate:rs.length?ngc/rs.length*100:null, comp:ss.due?ss.onTime/ss.due*100:null, miss:ss.miss, late:rs.filter(isLate).length, qty, defQ, rate:qty?defQ/qty*100:null, hasData:rs.length>0||ss.due>0}; };
+  const MK=lineStats(R.month,R.month,null), PRm=prevRange(R.month,R.month), MP=lineStats(PRm.from,PRm.to,PRm.until), pv=v=>({v,hasData:MP.hasData}), PL=PRm.label;
   const apId=R.form+"_"+slug(R.line||"")+"_"+R.month, ap=S.approvals.get(apId);
   if(S.dbErr) return `<div class="banner">${esc(S.dbErr)}</div>`;
   let h=`<div><h2>${esc(t("rep_title"))}</h2><div class="sub">${esc(t("rep_sub"))}</div></div>${periodBar()}
   <div class="sheet"><div class="row">
     <div class="field"><span class="lbl">${esc(t("form"))}</span><div class="chips">${vf.map(k=>`<button class="chip" data-act="repform" data-v="${k}" aria-pressed="${R.form===k}">${esc(tx(FORMS[k]))}</button>`).join("")}</div></div></div>
     <div><span class="lbl">${esc(t("line_machine"))}</span><div class="chips">${used.map(l=>`<button class="chip" data-act="repline" data-v="${esc(l)}" aria-pressed="${R.line===l}">${esc(l)}</button>`).join("")}</div></div></div>
-  <div class="stats"><div class="stat"><span class="lbl">${esc(t("n_checks"))}</span><b>${recs.length}</b></div><div class="stat"><span class="lbl">${esc(t("n_days"))}</span><b>${days.length}</b></div><div class="stat ng"><span class="lbl">${esc(t("n_ng"))}</span><b>${ng}</b></div><div class="stat ${SS.due&&SS.onTime/SS.due<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${SS.due?Math.round(SS.onTime/SS.due*100)+"%":"—"}</b><small>${esc(t("k_compliance_s",{a:SS.onTime,b:SS.due}))}</small></div><div class="stat warn"><span class="lbl">${esc(t("col_miss"))}</span><b>${SS.miss}</b></div><div class="stat warn"><span class="lbl">${esc(t("n_late"))}</span><b>${late}</b></div></div>`;
+  <div class="stats"><div class="stat"><span class="lbl">${esc(t("n_checks"))}</span><b>${recs.length}</b>${deltaHTML(MK.checks,pv(MP.checks),"n",true,PL)}</div><div class="stat"><span class="lbl">${esc(t("n_days"))}</span><b>${days.length}</b></div><div class="stat ng"><span class="lbl">${esc(t("n_ng"))}</span><b>${ng}</b>${deltaHTML(MK.ngRate,pv(MP.ngRate),"pp",false,PL,t("ng_rate"))}</div><div class="stat ${SS.due&&SS.onTime/SS.due<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${SS.due?Math.round(SS.onTime/SS.due*100)+"%":"—"}</b><small>${esc(t("k_compliance_s",{a:SS.onTime,b:SS.due}))}</small>${deltaHTML(MK.comp,pv(MP.comp),"pp",true,PL)}</div><div class="stat warn"><span class="lbl">${esc(t("col_miss"))}</span><b>${SS.miss}</b>${deltaHTML(MK.miss,pv(MP.miss),"n",false,PL)}</div><div class="stat warn"><span class="lbl">${esc(t("n_late"))}</span><b>${late}</b>${deltaHTML(MK.late,pv(MP.late),"n",false,PL)}</div>${MK.qty||MP.qty||activeDefects(R.form).length?`<div class="stat"><span class="lbl">${esc(t("k_rate"))}</span><b>${fmtPct(MK.rate)}</b><small>${MK.qty?esc(t("k_rate_s",{d:MK.defQ,q:MK.qty})):esc(t("k_rate_na"))}</small>${deltaHTML(MK.rate,pv(MP.rate),"pp",false,PL)}</div>`:""}</div>`;
   if(!recs.length) h+=`<div class="empty">${esc(t("no_recs",{l:R.line||"",m:fmtMonth(R.month)}))}</div>`;
   else {
     if(R.form==="pvc") h+=`<div class="card"><h3>${esc(t("c_pvc"))} · ${esc(R.line)}</h3>${pvcChart(recs)}</div>`;
@@ -1022,6 +1340,8 @@ function renderReport(){
     if(R.form==="pvc") th+=`<th class="num">${esc(t("temp"))}</th><th class="num">${esc(t("speed"))}</th>`;
     const showDef = R.form!=="caosu" && recs.some(r=>r.loi&&r.loi.tong);
     if(showDef) th+=`<th>${esc(t("col_defect"))}</th>`;
+    const showQty = recs.some(r=>+r.slKiem>0);
+    if(showQty) th+=`<th class="num">${esc(t("col_qty"))}</th><th class="num">${esc(t("col_rate"))}</th>`;
     th+=`<th>${esc(t("col_res"))}</th><th>${esc(t("col_by"))}</th>${showNote?`<th>${esc(t("col_note"))}</th>`:""}<th>${esc(t("col_photo"))}</th><th>${esc(t("col_src"))}</th>`;
     recs.forEach(r=>{
       let tds=`<td>${esc(fmtDate(r.date))}</td><td>${esc(caName(r.ca))}</td><td class="mono">${esc(r.gio||"")}</td><td>${esc(r.maHang||"")}</td>`;
@@ -1029,15 +1349,16 @@ function renderReport(){
       if(R.form==="caosu") tds+=FORMS.caosu.items.map(it=>{ const v=(r.items||{})[it.k]; return `<td class="mono">${v==="OK"?esc(t("pass")):esc(v||"—")}</td>`; }).join("")+`<td>${esc(loiText(r))}</td>`;
       if(R.form==="pvc") tds+=`<td class="mono num">${esc(r.nhietDo??"")}</td><td class="mono num">${esc(r.tocDo??"")}</td>`;
       if(showDef) tds+=`<td>${esc(loiText(r))}</td>`;
+      if(showQty) tds+=+r.slKiem>0?`<td class="num mono">${r.slKiem}</td><td class="num mono">${fmtPct(((r.loi&&r.loi.tong)||0)/r.slKiem*100)}</td>`:`<td></td><td></td>`;
       tds+=`<td><span class="pill ${r.ketqua==="NG"?"p-ng":"p-ok"}">${esc(r.ketqua)}</span> ${capaPill(r)}${isLate(r)?` <span class="pill p-warn">${esc(t("st_late"))}</span>`:""}</td><td>${esc(r.nguoi||"")}</td>
         ${showNote?`<td class="wrapc">${r.lyDo&&Object.keys(r.lyDo).length?`<span style="color:var(--ng)">${esc(Object.entries(r.lyDo).map(([k,v])=>tx(FORMS[r.form].items.find(i=>i.k===k)||{vi:k})+": "+v).join("; "))}</span> `:""}${esc(r.ghiChu||"")}${r.ketqua==="NG"?(r.daBao?" · "+esc(t("reported")):" · <b>"+esc(t("not_reported"))+"</b>"):""}</td>`:""}<td>${thumbs(r)}</td>
-        <td class="src">${r.nguon==="giay"?esc(t("src_paper")):r.mau?esc(t("src_sample")):esc(t("src_app"))+(r.ghiLuc?" · "+esc(new Date(r.ghiLuc).toLocaleString(LANG==="ja"?"ja-JP":"vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})):"")}</td>`;
+        <td class="src">${r.nguon==="giay"?esc(t("src_paper")):r.mau?esc(t("src_sample")):esc(t("src_app"))+(r.ghiLuc?" · "+esc(fmtDTShort(r.ghiLuc)):"")}</td>`;
       body+=`<tr class="${r.ketqua==="NG"?"ngrow":""}">${tds}</tr>`;
     });
     h+=`<div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table></div>`;
   }
   { const l1=ap&&(ap.l1||(ap.byUid?{byUid:ap.byUid,name:ap.nguoiDuyet,at:ap.at,note:ap.note}:null)), l2=ap&&ap.l2;
-    const who=x=>esc(userName(x.byUid)||x.name||"")+" · "+esc(new Date(x.at).toLocaleString(LANG==="ja"?"ja-JP":"vi-VN"))+(x.note?` · “${esc(x.note)}”`:"");
+    const who=x=>esc(userName(x.byUid)||x.name||"")+" · "+esc(fmtDT(x.at))+(x.note?` · “${esc(x.note)}”`:"");
     h+=`<div class="approve" style="flex-direction:column;align-items:stretch">`;
     h+=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${l1?`<span class="pill p-ok">${esc(t("ap_l1"))}</span><span class="sub">${who(l1)}</span>`:`<span class="pill p-idle">${esc(t("ap_wait_l1"))}</span>`}</div>`;
     h+=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${l2?`<span class="pill p-ok">${esc(t("ap_l2"))}</span><span class="sub">${who(l2)}</span>`:`<span class="pill p-idle">${esc(t("ap_wait_l2"))}</span>`}</div>`;
@@ -1060,81 +1381,125 @@ function pvcChart(recs){
   for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step) grid+=`<line x1="${L}" x2="${W-Rm}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
   const band=`<rect x="${L}" y="${y(p.tMax)}" width="${W-L-Rm}" height="${y(p.tMin)-y(p.tMax)}" fill="var(--ok-soft)"/><text x="${W-Rm-4}" y="${y(p.tMax)+13}" text-anchor="end" font-size="11" fill="var(--ok)">${esc(t("std",{a:p.tMin,b:p.tMax,u:"°C"}))}</text>`;
   const path=pts.map((o,k)=>(k?"L":"M")+x(o.i).toFixed(1)+" "+y(o.v).toFixed(1)).join(" ");
-  const dots=pts.map(o=>{const bad=o.v<p.tMin||o.v>p.tMax;return `<circle cx="${x(o.i)}" cy="${y(o.v)}" r="${bad?5.5:4}" fill="${bad?"var(--ng)":"var(--pen)"}" stroke="var(--paper)" stroke-width="2"><title>${esc(fmtDate(o.r.date)+" "+caName(o.r.ca)+": "+o.v+"°C")}</title></circle>`;}).join("");
-  const every=Math.max(1,Math.ceil(n/12));
-  const labels=recs.map((r,i)=> (i%every===0)?`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${esc(r.date.slice(8)+"/"+r.date.slice(5,7))}</text>`:"").join("");
-  return `<div class="chart chartwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("c_pvc"))}">${band}${grid}<path d="${path}" fill="none" stroke="var(--pen)" stroke-width="2"/>${dots}${labels}</svg></div>`;
+  const dense=n>60;
+  const dots=pts.filter(o=>!dense || o.v<p.tMin || o.v>p.tMax).map(o=>{const bad=o.v<p.tMin||o.v>p.tMax;return `<circle cx="${x(o.i)}" cy="${y(o.v)}" r="${bad?5.5:4}" fill="${bad?"var(--ng)":"var(--pen)"}" stroke="var(--paper)" stroke-width="2" data-act="openrec" data-id="${esc(o.r.id)}" data-tip="${esc(fmtDate(o.r.date)+" "+caName(o.r.ca)+": "+o.v+"°C")}" style="cursor:pointer"></circle>`;}).join("");
+  const every=Math.max(1,Math.ceil(n/12)); let lastM="";
+  const labels = dense
+    ? recs.map((r,i)=>{ const m=r.date.slice(0,7); if(m===lastM) return ""; lastM=m; return `<line x1="${x(i)}" x2="${x(i)}" y1="${T}" y2="${H-B}" stroke="var(--line)" stroke-dasharray="2 3"/><text x="${x(i)+3}" y="${H-10}" font-size="11" fill="var(--muted)">${esc(fmtMonthShort(m))}</text>`; }).join("")
+    : recs.map((r,i)=> (i%every===0)?`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--muted)">${esc(fmtDateNum(r.date).slice(0,5))}</text>`:"").join("");
+  const hit = dense ? pts.map(o=>`<rect x="${(x(o.i)-(W-L-Rm)/n/2).toFixed(1)}" y="${T}" width="${Math.max(1,(W-L-Rm)/n).toFixed(2)}" height="${H-T-B}" fill="transparent" data-act="openrec" data-id="${esc(o.r.id)}" data-tip="${esc(fmtDate(o.r.date)+" "+caName(o.r.ca)+": "+o.v+"°C")}" style="cursor:pointer"/>`).join("") : "";
+  return `<div class="chart chartwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("c_pvc"))}">${band}${grid}${labels}<path d="${path}" fill="none" stroke="var(--pen)" stroke-width="${dense?1.25:2}"/>${hit}${dots}</svg></div>`;
 }
 
 /* ---------- Dashboard ---------- */
+/* Thanh ngang: nếu có r.sel thì là nút bấm để lọc chéo toàn dashboard */
 function hbars(rows, opts){
   if(!rows.length) return `<div class="sub">${esc(opts&&opts.empty||t("no_data"))}</div>`;
-  const max=Math.max(1,...rows.map(r=>r.v));
-  return `<div class="hbars">`+rows.map(r=>`<div class="hbar" title="${esc(r.tip||"")}"><span class="lab">${esc(r.label)}${r.sub?` <small>${esc(r.sub)}</small>`:""}</span><span class="track"><span class="fill ${r.ng?"ng":""}" style="display:block;width:${Math.max(2,r.v/max*100).toFixed(1)}%"></span></span><span class="val">${esc(r.text!=null?r.text:r.v)}</span></div>`).join("")+`</div>`;
+  const max=Math.max(1,...rows.map(r=>r.v)), S0=S.dash&&S.dash.sel;
+  const isOn=r=>r.sel&&S0&&S0.k===r.sel.k&&S0.v===r.sel.v, anyOn=rows.some(isOn);
+  return `<div class="hbars ${anyOn?"dim":""}">`+rows.map(r=>{
+    const inner=`<span class="lab">${esc(r.label)}${r.sub?` <small>${esc(r.sub)}</small>`:""}</span><span class="track"><span class="fill ${r.ng?"ng":""}" style="display:block;width:${Math.max(2,r.v/max*100).toFixed(1)}%"></span></span><span class="val">${esc(r.text!=null?r.text:r.v)}</span>`;
+    const tip=esc(r.tip||(r.label+(r.sub?" · "+r.sub:"")+": "+(r.text!=null?r.text:r.v)));
+    return r.sel?`<button class="hbar" data-act="dsel" data-k="${r.sel.k}" data-v="${esc(r.sel.v)}" data-l="${esc(r.sel.label)}" aria-pressed="${isOn(r)}" data-tip="${tip}">${inner}</button>`:`<div class="hbar" data-tip="${tip}">${inner}</div>`;
+  }).join("")+`</div>`;
+}
+function selPred(sel){
+  const v=sel.v;
+  if(sel.k==="def") return r=>{ const l=r.loi||{}; if(v==="__unk") return l.tong>0 && !Object.keys(l.chiTiet||{}).length; return (l.chiTiet||{})[v]>0; };
+  if(sel.k==="item"){ const [f,k]=v.split("|"); return r=>r.form===f && recNgKeys(r).includes(k); }
+  if(sel.k==="line") return r=>r.form+"|"+r.line===v;
+  if(sel.k==="code") return r=>r.maHang===v;
+  if(sel.k==="day") return r=>r.date===v;
+  if(sel.k==="month") return r=>r.month===v;
+  return ()=>true;
 }
 function dashData(D){
   D=D||S.dash; const c=cfg(), today=todayStr();
   const forms = (D.form==="all"?FORM_KEYS:[D.form]).filter(f=>visForms().includes(f)); const st0=trackStart();
-  const recs=[...S.records.values()].filter(r=>r.month>=D.from && r.month<=D.to && forms.includes(r.form));
-  // lịch dự kiến
-  const start=parseD(D.from+"-01"), endS=lastDay(D.to)<today?lastDay(D.to):today, end=parseD(endS);
+  let endS=lastDay(D.to)<today?lastDay(D.to):today; if(D.until && D.until<endS) endS=D.until;
+  const allRecs=[...S.records.values()].filter(r=>r.month>=D.from && r.month<=D.to && r.date<=endS && forms.includes(r.form));
+  const start=parseD(D.from+"-01"), end=parseD(endS);
   const dates=[]; for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)) dates.push(dstr(d));
-  const slots=[];
-  forms.forEach(f=>visibleLines(f).forEach(l=>dates.forEach(date=>CAS.forEach(ca=>{ slots.push(Object.assign({form:f,line:l,date,ca}, slotInfo(f,l,date,ca))); }))));
-  return {recs, dates, slots, forms};
+  const allSlots=[];
+  forms.forEach(f=>visibleLines(f).forEach(l=>dates.forEach(date=>CAS.forEach(ca=>{ allSlots.push(Object.assign({form:f,line:l,date,ca}, slotInfo(f,l,date,ca))); }))));
+  let recs=allRecs, slots=allSlots;
+  if(D.sel){ recs=allRecs.filter(selPred(D.sel)); const v=D.sel.v;
+    if(D.sel.k==="line") slots=allSlots.filter(s=>s.form+"|"+s.line===v);
+    else if(D.sel.k==="day") slots=allSlots.filter(s=>s.date===v);
+    else if(D.sel.k==="month") slots=allSlots.filter(s=>s.date.slice(0,7)===v); }
+  return {recs, dates, slots, forms, allRecs, allSlots};
 }
+function selLabel(sel){ return t({def:"f_def",item:"f_item",line:"f_line",code:"f_code",day:"f_day",month:"f_month"}[sel.k])+": "+sel.label; }
 function renderDash(){
   const D=S.dash, c=cfg();
-  const {recs, dates, slots, forms}=dashData();
+  const {recs, dates, slots, forms, allRecs, allSlots}=dashData();
+  const own=k=>D.sel&&D.sel.k===k ? allRecs : recs;   // biểu đồ của chính loại đang lọc vẫn hiện đủ để đổi lựa chọn
+  const K=kpiStats(D), PR=prevRange(D.from,D.to), KP=kpiStats({from:PR.from,to:PR.to,until:PR.until,form:D.form,sel:D.sel&&!["day","month"].includes(D.sel.k)?D.sel:null});
+  const pv=v=>({v, hasData:KP.hasData}), PL=PR.label;
   const due=slots.filter(s=>s.state!=="none"), SS=slotSummary(slots);
   const onTime=SS.onTime, miss=SS.miss, late=recs.filter(isLate).length;
   const ngRecs=recs.filter(r=>r.ketqua==="NG");
-  const cs=recs; const defTot=cs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0);
+  const defTot=recs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0);
   const appRecs=recs.filter(r=>r.nguon==="app" && !r.mau); const withPh=appRecs.filter(r=>(r.photos||[]).length).length;
   const pct=(a,b)=>b?Math.round(a/b*100)+"%":"—";
   const openNg=capaList().filter(r=>capaStatus(r)!=="closed"); const oldest=openNg.reduce((m,r)=>Math.max(m,Math.round((parseD(todayStr())-parseD(r.date))/864e5)),0);
+  const tm=todayStr().slice(0,7);
+  const qb=(k,f,to)=>`<button class="chip sm" data-act="dquick" data-f="${f}" data-t="${to}" aria-pressed="${D.from===f&&D.to===to}">${esc(t(k))}</button>`;
   let h=`<div><h2>${esc(t("dash_title"))}</h2><div class="sub">${esc(t("dash_sub"))}${myAreas()?" · "+esc(t("area"))+": "+esc(myAreas().map(areaName).join(", ")):""}</div></div>${S.dbErr?`<div class="banner">${esc(S.dbErr)}</div>`:""}
   <div class="sheet"><div class="row">
-    <div class="field" style="flex:0 1 180px"><label class="lbl" for="d-from">${esc(t("from"))}</label><input type="month" id="d-from" value="${esc(D.from)}"></div>
-    <div class="field" style="flex:0 1 180px"><label class="lbl" for="d-to">${esc(t("to"))}</label><input type="month" id="d-to" value="${esc(D.to)}"></div>
-    <div class="field"><span class="lbl">${esc(t("form"))}</span><div class="chips"><button class="chip" data-act="dform" data-v="all" aria-pressed="${D.form==="all"}">${esc(t("all"))}</button>${visForms().map(k=>`<button class="chip" data-act="dform" data-v="${k}" aria-pressed="${D.form===k}">${esc(tx(FORMS[k]))}</button>`).join("")}</div></div>
-  </div></div>
+    <div class="field" style="flex:0 1 220px"><label class="lbl" for="d-from-btn">${esc(t("from"))}</label>${dateField("d-from",D.from,"month")}</div>
+    <div class="field" style="flex:0 1 220px"><label class="lbl" for="d-to-btn">${esc(t("to"))}</label>${dateField("d-to",D.to,"month")}</div>
+    <div class="field"><span class="lbl">&nbsp;</span><div class="quick">${qb("q_month",tm,tm)}${qb("q_3m",monthAdd(tm,-2),tm)}${qb("q_ytd",tm.slice(0,4)+"-01",tm)}</div></div>
+  </div><div><span class="lbl">${esc(t("form"))}</span><div class="chips"><button class="chip" data-act="dform" data-v="all" aria-pressed="${D.form==="all"}">${esc(t("all"))}</button>${visForms().map(k=>`<button class="chip" data-act="dform" data-v="${k}" aria-pressed="${D.form===k}">${esc(tx(FORMS[k]))}</button>`).join("")}</div></div>
+  <div class="sub">${esc(t("click_hint"))}</div></div>
+  ${D.sel?`<div class="selbar"><span>${esc(t("sel_filter",{x:selLabel(D.sel)}))}</span><button class="btn ghost sm" data-act="dclear">× ${esc(t("sel_clear"))}</button></div>`:""}
   <div class="stats">
-    <div class="stat ${due.length&&onTime/due.length<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${pct(onTime,due.length)}</b><small>${esc(t("k_compliance_s",{a:onTime,b:due.length}))}</small></div>
-    <div class="stat ng"><span class="lbl">${esc(t("k_ng"))}</span><b>${ngRecs.length}</b><small>${esc(t("k_ng_s",{n:recs.length}))}</small></div>
-    <div class="stat"><span class="lbl">${esc(t("k_defects"))}</span><b>${defTot}</b><small>${esc(t("k_defects_s"))}</small></div>
-    <div class="stat warn"><span class="lbl">${esc(t("k_late"))}</span><b>${late+miss}</b><small>${esc(t("k_late_s",{a:late,b:miss}))}</small></div>
-    <button class="stat ${openNg.length?"ng":"ok"}" data-tab="capa" style="text-align:left;font:inherit;color:inherit;cursor:pointer" title="${esc(t("k_open_all"))}"><span class="lbl">${esc(t("k_open"))} ›</span><b>${openNg.length}</b><small>${openNg.length?esc(t("k_open_s",{n:oldest})):esc(t("k_open_all"))}</small></button>
-    <div class="stat"><span class="lbl">${esc(t("k_photo"))}</span><b>${pct(withPh,appRecs.length)}</b><small>${esc(t("k_photo_s"))}</small></div>
+    <div class="stat ${due.length&&onTime/due.length<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${pct(onTime,due.length)}</b><small>${esc(t("k_compliance_s",{a:onTime,b:due.length}))}</small>${deltaHTML(K.comp,pv(KP.comp),"pp",true,PL)}</div>
+    <div class="stat ng"><span class="lbl">${esc(t("k_ng"))}</span><b>${ngRecs.length}</b><small>${esc(t("k_ng_s",{n:recs.length}))}</small>${deltaHTML(K.ngRate,pv(KP.ngRate),"pp",false,PL,t("ng_rate"))}</div>
+    <div class="stat"><span class="lbl">${esc(t("k_defects"))}</span><b>${defTot}</b><small>${esc(t("k_defects_s"))}</small>${deltaHTML(K.def,pv(KP.def),"n",false,PL)}</div>
+    <div class="stat ${K.rate!=null&&K.rate>0?"ng":""}"><span class="lbl">${esc(t("k_rate"))}</span><b>${fmtPct(K.rate)}</b><small>${K.qty?esc(t("k_rate_s",{d:K.defQ,q:K.qty})):esc(t("k_rate_na"))}</small>${deltaHTML(K.rate,pv(KP.rate),"pp",false,PL)}</div>
+    <div class="stat warn"><span class="lbl">${esc(t("k_late"))}</span><b>${late+miss}</b><small>${esc(t("k_late_s",{a:late,b:miss}))}</small>${deltaHTML(K.lmRate,pv(KP.lmRate),"pp",false,PL,t("rate_word"))}</div>
+    <button class="stat ${openNg.length?"ng":"ok"}" data-tab="capa" style="text-align:left;font:inherit;color:inherit;cursor:pointer" data-tip="${esc(t("k_open_all"))}"><span class="lbl">${esc(t("k_open"))} ›</span><b>${openNg.length}</b><small>${openNg.length?esc(t("k_open_s",{n:oldest})):esc(t("k_open_all"))}</small></button>
+    <div class="stat"><span class="lbl">${esc(t("k_photo"))}</span><b>${pct(withPh,appRecs.length)}</b><small>${esc(t("k_photo_s"))}</small>${deltaHTML(K.photo,pv(KP.photo),"pp",true,PL)}</div>
   </div>`;
-  if(!recs.length && !due.length){ return h+`<div class="empty">${esc(t("no_data"))}</div>`; }
+  if(!allRecs.length && !allSlots.some(s=>s.state!=="none")){ return h+`<div class="empty">${esc(t("no_data"))}</div>`; }
   // Pareto loại lỗi
   const tot={}; let unk=0;
-  recs.forEach(r=>{ const l=r.loi||{}; if(!l.tong) return; const ct=l.chiTiet||{}; if(Object.keys(ct).length) Object.entries(ct).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); else unk+=l.tong; });
+  own("def").forEach(r=>{ const l=r.loi||{}; if(!l.tong) return; const ct=l.chiTiet||{}; if(Object.keys(ct).length) Object.entries(ct).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); else unk+=l.tong; });
   const all=Object.values(tot).reduce((a,b)=>a+b,0)+unk;
-  let par=Object.keys(tot).map(k=>({label:defName(k), v:tot[k]})).sort((a,b)=>b.v-a.v);
-  if(unk) par.push({label:t("unclassified"), v:unk});
-  let cum=0; par=par.map(r=>{ cum+=r.v; return Object.assign(r,{text:r.v+" · "+Math.round(r.v/all*100)+"%", sub:"∑ "+Math.round(cum/all*100)+"%", tip:r.label+": "+r.v+" "+t("pieces")}); });
+  let par=Object.keys(tot).map(k=>({label:defName(k), v:tot[k], sel:{k:"def",v:k,label:defName(k)}})).sort((a,b)=>b.v-a.v);
+  if(unk) par.push({label:t("unclassified"), v:unk, sel:{k:"def",v:"__unk",label:t("unclassified")}});
+  let cum=0; par=par.map(r=>{ cum+=r.v; return Object.assign(r,{text:r.v+" · "+Math.round(r.v/all*100)+"%", sub:"∑ "+Math.round(cum/all*100)+"%", tip:r.label+": "+r.v+" "+t("pieces")+" ("+Math.round(r.v/all*100)+"%)"}); });
   // Hạng mục NG
   const itemCnt={};
-  recs.forEach(r=>recNgKeys(r).forEach(k=>{ const key=r.form+"|"+k; itemCnt[key]=(itemCnt[key]||0)+1; }));
-  const items=Object.entries(itemCnt).map(([key,v])=>{ const [f,k]=key.split("|"); const it=FORMS[f].items.find(i=>i.k===k)||{vi:k}; return {label:tx(it), sub:tx(FORMS[f]), v, ng:true, text:v+" "+t("times")}; }).sort((a,b)=>b.v-a.v).slice(0,8);
+  own("item").forEach(r=>recNgKeys(r).forEach(k=>{ const key=r.form+"|"+k; itemCnt[key]=(itemCnt[key]||0)+1; }));
+  const items=Object.entries(itemCnt).map(([key,v])=>{ const [f,k]=key.split("|"); const it=FORMS[f].items.find(i=>i.k===k)||{vi:k}; return {label:tx(it), sub:tx(FORMS[f]), v, ng:true, text:v+" "+t("times"), sel:{k:"item",v:key,label:tx(it)}}; }).sort((a,b)=>b.v-a.v).slice(0,8);
   // Line
   const byLine={};
-  recs.forEach(r=>{ const k=r.form+"|"+r.line; const o=byLine[k]=byLine[k]||{f:r.form,l:r.line,n:0,ng:0,def:0}; o.n++; if(r.ketqua==="NG") o.ng++; o.def+=(r.loi&&r.loi.tong)||0; });
-  const lines=Object.values(byLine).map(o=>{ const v=Math.round((o.ng+o.def)/o.n*1000)/10; return {label:o.l, sub:o.ng+" NG · "+o.def+" "+t("pieces")+" · "+o.n+" "+t("times"), v, text:v+t("per100"), ng:o.ng>0}; }).sort((a,b)=>b.v-a.v);
+  own("line").forEach(r=>{ const k=r.form+"|"+r.line; const o=byLine[k]=byLine[k]||{f:r.form,l:r.line,n:0,ng:0,q:0,dq:0}; o.n++; if(r.ketqua==="NG") o.ng++; if(+r.slKiem>0){ o.q+=+r.slKiem; o.dq+=(r.loi&&r.loi.tong)||0; } });
+  const lines=Object.entries(byLine).map(([key,o])=>{ const v=o.ng/o.n*100; return {label:o.l, sub:o.ng+"/"+o.n+" NG"+(o.q?" · "+t("col_rate")+" "+fmtPct(o.dq/o.q*100):""), v, text:fmtPct(v), ng:o.ng>0, sel:{k:"line",v:key,label:o.l}}; }).sort((a,b)=>b.v-a.v);
   h+=`<div class="dgrid">
     <div class="card"><h3>${esc(t("c_pareto"))}</h3><div class="sub">${esc(t("c_pareto_s"))}</div>${hbars(par)}</div>
     <div class="card"><h3>${esc(t("c_items"))}</h3>${hbars(items,{empty:t("none_ng")})}</div>
     <div class="card"><h3>${esc(t("c_lines"))}</h3><div class="sub">${esc(t("c_lines_s"))}</div>${hbars(lines)}</div>
-    <div class="card"><h3>${esc(t("c_trend"))}</h3>${trendChart(recs,dates)}</div>
-    <div class="card"><h3>${esc(t("c_codes"))}</h3><div class="sub">${esc(t("c_codes_s"))}</div>${hbars(codeRows(recs),{empty:t("none_ng")})}</div>
+    <div class="card"><h3>${esc(t(dates.length>62?"r_trend":"c_trend"))}</h3>${trendChart(own(dates.length>62?"month":"day"),dates)}</div>
+    <div class="card"><h3>${esc(t("c_codes"))}</h3><div class="sub">${esc(t("c_codes_s"))}</div>${hbars(codeRows(own("code")),{empty:t("none_ng")})}</div>
   </div>`;
+  // Danh sách phiếu theo bộ lọc
+  if(D.sel){ const list=recs.slice().sort((a,b)=>sk(b).localeCompare(sk(a)));
+    h+=`<div class="card"><h3>${esc(t("drill_title",{n:list.length}))}</h3>${list.length>50?`<div class="sub">${esc(t("drill_more"))}</div>`:""}<div class="tablewrap"><table class="drill"><thead><tr><th>${esc(t("col_day"))}</th><th>${esc(t("col_ca"))}</th><th>${esc(t("line_machine"))}</th><th>${esc(t("col_code"))}</th><th>${esc(t("col_res"))}</th><th>${esc(t("col_defect"))}</th><th>${esc(t("col_by"))}</th></tr></thead><tbody>${list.slice(0,50).map(r=>`<tr data-act="openrec" data-id="${esc(r.id)}" tabindex="0"><td>${esc(fmtDate(r.date))}</td><td>${esc(caName(r.ca))}</td><td>${esc(r.line)}</td><td class="mono">${esc(r.maHang||"")}</td><td><span class="pill ${r.ketqua==="NG"?"p-ng":"p-ok"}">${esc(r.ketqua)}</span> ${capaPill(r)}</td><td>${esc(loiText(r))}</td><td>${esc(r.nguoi||"")}</td></tr>`).join("")}</tbody></table></div></div>`; }
   // Lịch tuân thủ
   const rowsK=[]; forms.forEach(f=>visibleLines(f).forEach(l=>rowsK.push([f,l])));
-  const byKey={}; slots.forEach(s=>{ byKey[s.form+"|"+s.line+"|"+s.date+"|"+s.ca]=s.state; });
-  h+=`<div class="card"><h3>${esc(t("c_heat"))}</h3><div class="legend"><span><i style="background:var(--ok)"></i>${esc(t("lg_ok"))}</span><span><i style="background:var(--ng)"></i>${esc(t("lg_ng"))}</span><span><i style="background:var(--ok);outline:2px solid var(--warn);outline-offset:-2px"></i>${esc(t("lg_late"))}</span><span><i style="background:var(--warn)"></i>${esc(t("lg_miss"))}</span><span><i style="background:var(--idle-soft)"></i>${esc(t("lg_none"))}</span></div><div class="sub">${esc(t("c_heat_s"))}</div>
-    <div class="chartwrap"><table class="heat"><thead><tr><th></th>${dates.map(d=>`<th>${+d.slice(8)}</th>`).join("")}</tr></thead><tbody>${rowsK.map(([f,l])=>`<tr><th class="rowh">${esc(l)}</th>${dates.map(d=>`<td><span class="hc" title="${esc(l+" · "+fmtDate(d))}">${CAS.map(ca=>{ const s=byKey[f+"|"+l+"|"+d+"|"+ca]; return `<i class="${s==="none"?"":s||""}"></i>`; }).join("")}</span></td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  if(dates.length<=62){
+    const byKey={}; allSlots.forEach(s=>{ byKey[s.form+"|"+s.line+"|"+s.date+"|"+s.ca]=s; });
+    const stName=s=>!s?"":s.state==="none"?t("lg_none"):s.state==="miss"?t("lg_miss"):s.state==="ng"?"NG":s.late?t("lg_late"):t("lg_ok");
+    h+=`<div class="card"><h3>${esc(t("c_heat"))}</h3><div class="legend"><span><i style="background:var(--ok)"></i>${esc(t("lg_ok"))}</span><span><i style="background:var(--ng)"></i>${esc(t("lg_ng"))}</span><span><i style="background:var(--ok);outline:2px solid var(--warn);outline-offset:-2px"></i>${esc(t("lg_late"))}</span><span><i style="background:var(--warn)"></i>${esc(t("lg_miss"))}</span><span><i style="background:var(--idle-soft)"></i>${esc(t("lg_none"))}</span></div><div class="sub">${esc(t("c_heat_s"))}</div>
+      <div class="chartwrap"><table class="heat"><thead><tr><th></th>${dates.map(d=>`<th><button class="hcbtn" data-act="dsel" data-k="day" data-v="${d}" data-l="${esc(fmtDateLong(d))}" style="font:inherit;color:inherit" data-tip="${esc(fmtDateLong(d))}">${+d.slice(8)}</button></th>`).join("")}</tr></thead><tbody>${rowsK.map(([f,l])=>`<tr><th class="rowh"><button class="hcbtn" data-act="dsel" data-k="line" data-v="${esc(f+"|"+l)}" data-l="${esc(l)}" style="font:inherit;color:inherit;font-weight:600">${esc(l)}</button></th>${dates.map(d=>`<td><span class="hc">${CAS.map(ca=>{ const s=byKey[f+"|"+l+"|"+d+"|"+ca]; const cls=!s||s.state==="none"?"":s.state; const tip=l+" · "+fmtDateLong(d)+" · "+caName(ca)+": "+stName(s)+(s&&s.r?" ("+(s.r.gio||"")+" · "+(s.r.nguoi||"")+")":""); return s&&s.r?`<i class="${cls}" data-act="openrec" data-id="${esc(s.r.id)}" data-tip="${esc(tip)}" style="cursor:pointer"></i>`:`<i class="${cls}" data-tip="${esc(tip)}"></i>`; }).join("")}</span></td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  } else {
+    const months=[]; for(let m=D.from; m<=D.to; m=monthAdd(m,1)) months.push(m);
+    const cell=(f,l,m)=>{ const x=slotSummary(allSlots.filter(s=>s.form===f&&s.line===l&&s.date.slice(0,7)===m)); if(!x.due) return `<td class="num sub">—</td>`; const v=x.onTime/x.due*100; const bg=v>=95?"var(--ok-soft)":v>=85?"var(--warn-soft)":"var(--ng-soft)"; return `<td class="num mono" style="background:${bg}" data-tip="${esc(l+" · "+fmtMonthLabel(m)+": "+x.onTime+"/"+x.due+" · "+t("lg_miss")+" "+x.miss)}">${Math.round(v)}%</td>`; };
+    h+=`<div class="card"><h3>${esc(t("c_heat_m"))}</h3><div class="tablewrap"><table><thead><tr><th>${esc(t("line_machine"))}</th>${months.map(m=>`<th class="num"><button class="hcbtn" data-act="dsel" data-k="month" data-v="${m}" data-l="${esc(fmtMonthLabel(m))}" style="font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit">${esc(fmtMonthShort(m))}</button></th>`).join("")}</tr></thead><tbody>${rowsK.map(([f,l])=>`<tr><td><button class="hcbtn" data-act="dsel" data-k="line" data-v="${esc(f+"|"+l)}" data-l="${esc(l)}" style="font:inherit;color:inherit;font-weight:600">${esc(l)}</button></td>${months.map(m=>cell(f,l,m)).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  }
   // Theo nhân viên
   const ma=myAreas(); const staff=S.users.filter(u=>(u.role!=="admin" || recs.some(r=>r.byUid===u.uid)) && (!ma || (u.areas||[]).some(a=>ma.includes(a)) || recs.some(r=>r.byUid===u.uid)));
   const stRows=staff.map(u=>{
@@ -1146,7 +1511,7 @@ function renderDash(){
   h+=`<div class="dgrid"><div class="card"><h3>${esc(t("c_staff"))}</h3>${stRows.length?`<div class="tablewrap"><table><thead><tr><th>${esc(t("full_name"))}</th><th class="num">${esc(t("s_checks"))}</th><th class="num">${esc(t("s_rate"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th><th class="num">${esc(t("s_ng"))}</th></tr></thead><tbody>${stRows.map(x=>`<tr><td>${esc(x.u.name)}</td><td class="num mono">${x.n}</td><td class="num mono">${x.rate==null?"—":x.rate+"%"}</td><td class="num mono">${x.lt?`<span style="color:var(--warn)">${x.lt}</span>`:0}</td><td class="num mono">${x.ms?`<span style="color:var(--warn)">${x.ms}</span>`:0}</td><td class="num mono">${x.ng}</td></tr>`).join("")}</tbody></table></div>`:`<div class="sub">${esc(t("no_data"))}</div>`}</div>`;
   // Bất thường gần đây
   const recent=ngRecs.slice().sort((a,b)=>sk(b).localeCompare(sk(a))).slice(0,8);
-  h+=`<div class="card"><h3>${esc(t("c_recent"))}</h3>${recent.length?`<div class="items">${recent.map(r=>`<div class="item" style="align-items:flex-start"><div class="txt"><b>${esc(r.line)}</b> ${capaPill(r)} <span class="sub">· ${esc(fmtDate(r.date))} ${esc(caName(r.ca))} · ${esc(r.maHang||"")} · ${esc(r.nguoi||"")}</span><div style="font-size:13px">${esc(recNgKeys(r).map(k=>tx(FORMS[r.form].items.find(i=>i.k===k)||{vi:k})).join(", "))}${r.form==="pvc"?" · "+esc(r.nhietDo)+"°C":""}</div><div class="sub">${esc([...Object.values(r.lyDo||{}), r.ghiChu||""].filter(Boolean).join(" · "))}</div></div>${thumbs(r)}</div>`).join("")}</div>`:`<div class="sub">${esc(t("none_ng"))}</div>`}</div></div>`;
+  h+=`<div class="card"><h3>${esc(t("c_recent"))}</h3>${recent.length?`<div class="items">${recent.map(r=>`<div class="item" style="align-items:flex-start;cursor:pointer" data-act="openrec" data-id="${esc(r.id)}"><div class="txt"><b>${esc(r.line)}</b> ${capaPill(r)} <span class="sub">· ${esc(fmtDate(r.date))} ${esc(caName(r.ca))} · ${esc(r.maHang||"")} · ${esc(r.nguoi||"")}</span><div style="font-size:13px">${esc(recNgKeys(r).map(k=>tx(FORMS[r.form].items.find(i=>i.k===k)||{vi:k})).join(", "))}${r.form==="pvc"?" · "+esc(r.nhietDo)+"°C":""}</div><div class="sub">${esc([...Object.values(r.lyDo||{}), r.ghiChu||""].filter(Boolean).join(" · "))}</div></div>${thumbs(r)}</div>`).join("")}</div>`:`<div class="sub">${esc(t("none_ng"))}</div>`}</div></div>`;
   // PVC
   if(forms.includes("pvc")){
     const pl=visibleLines("pvc"); if(!D.pvcLine || !pl.includes(D.pvcLine)) D.pvcLine=pl[0]||null;
@@ -1156,23 +1521,31 @@ function renderDash(){
   return h;
 }
 function codeRows(recs){
-  const m={}; recs.forEach(r=>{ const c=String(r.maHang||"").trim(); if(!c) return; const o=m[c]=m[c]||{n:0,ng:0,def:0}; o.n++; if(r.ketqua==="NG") o.ng++; o.def+=(r.loi&&r.loi.tong)||0; });
-  return Object.entries(m).map(([c,o])=>({label:c, sub:o.n+" "+t("times"), v:o.ng+o.def, text:o.ng+" NG · "+o.def+" "+t("pieces"), ng:o.ng>0})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,8);
+  const m={}; recs.forEach(r=>{ const c=String(r.maHang||"").trim(); if(!c || !(+r.slKiem>0)) return; const o=m[c]=m[c]||{q:0,d:0}; o.q+=+r.slKiem; o.d+=(r.loi&&r.loi.tong)||0; });
+  return Object.entries(m).map(([c,o])=>({label:c, sub:o.d+"/"+o.q+" "+t("pieces"), v:o.d/o.q*100, text:fmtPct(o.d/o.q*100), ng:o.d>0, sel:{k:"code",v:c,label:c}})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,8);
 }
+/* Hàng lỗi + NG theo ngày (≤ 62 ngày) hoặc theo tháng; mỗi cột bấm để lọc */
 function trendChart(recs,dates){
   if(!dates.length) return `<div class="sub">${esc(t("no_data"))}</div>`;
-  const def={}, ng={};
-  recs.forEach(r=>{ def[r.date]=(def[r.date]||0)+((r.loi&&r.loi.tong)||0); if(r.ketqua==="NG") ng[r.date]=(ng[r.date]||0)+1; });
-  const W=Math.max(460,dates.length*18+60), H=200, L=34, Rm=8, T=12, B=26;
-  const max=Math.max(4,...dates.map(d=>(def[d]||0)+(ng[d]||0)));
-  const top=Math.ceil(max/4)*4, bw=(W-L-Rm)/dates.length, y=v=>T+(top-v)*(H-T-B)/top;
+  const byMonth=dates.length>62, keyOf=d=>byMonth?d.slice(0,7):d;
+  const keys=[...new Set(dates.map(keyOf))];
+  const def={}, ng={}, n={};
+  recs.forEach(r=>{ const k=byMonth?r.month:r.date; def[k]=(def[k]||0)+((r.loi&&r.loi.tong)||0); n[k]=(n[k]||0)+1; if(r.ketqua==="NG") ng[k]=(ng[k]||0)+1; });
+  const W=Math.max(460,keys.length*(byMonth?56:18)+60), H=210, L=38, Rm=8, T=12, B=26;
+  const max=Math.max(4,...keys.map(d=>(def[d]||0)+(ng[d]||0)));
+  const top=Math.ceil(max/4)*4, bw=(W-L-Rm)/keys.length, y=v=>T+(top-v)*(H-T-B)/top;
   let g=""; for(let v=0; v<=top; v+=top/4) g+=`<line x1="${L}" x2="${W-Rm}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  const S0=S.dash&&S.dash.sel, sk0=byMonth?"month":"day";
   let bars="";
-  dates.forEach((d,i)=>{
+  keys.forEach((d,i)=>{
     const x=L+i*bw+bw*0.18, w=Math.max(3,bw*0.64), a=def[d]||0, b=ng[d]||0;
-    if(a) bars+=`<rect x="${x}" y="${y(a)}" width="${w}" height="${y(0)-y(a)}" rx="2" fill="var(--pen)"><title>${esc(fmtDate(d)+": "+a+" "+t("pieces"))}</title></rect>`;
-    if(b) bars+=`<rect x="${x}" y="${y(a+b)}" width="${w}" height="${Math.max(0,y(a)-y(a+b)-2)}" rx="2" fill="var(--ng)"><title>${esc(fmtDate(d)+": "+b+" NG")}</title></rect>`;
-    if(i%Math.max(1,Math.ceil(dates.length/15))===0) bars+=`<text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${+d.slice(8)}</text>`;
+    const lab=byMonth?fmtMonthLabel(d):fmtDateLong(d), on=S0&&S0.k===sk0&&S0.v===d;
+    const tip=lab+"\n"+t("k_defects")+": "+a+" "+t("pieces")+"\nNG: "+b+"\n"+t("n_checks")+": "+(n[d]||0);
+    bars+=`<g class="hit ${on?"sel":""}" data-act="dsel" data-k="${sk0}" data-v="${d}" data-l="${esc(lab)}" data-tip="${esc(tip)}"><rect x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" fill="transparent"/>`;
+    if(a) bars+=`<rect class="bar" x="${x}" y="${y(a)}" width="${w}" height="${y(0)-y(a)}" rx="2" fill="var(--pen)" ${S0&&S0.k===sk0&&!on?'opacity=".35"':""}/>`;
+    if(b) bars+=`<rect class="bar" x="${x}" y="${y(a+b)}" width="${w}" height="${Math.max(0,y(a)-y(a+b)-2)}" rx="2" fill="var(--ng)" ${S0&&S0.k===sk0&&!on?'opacity=".35"':""}/>`;
+    bars+=`</g>`;
+    if(byMonth || i%Math.max(1,Math.ceil(keys.length/15))===0) bars+=`<text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${esc(byMonth?fmtMonthShort(d):String(+d.slice(8)))}</text>`;
   });
   return `<div class="legend"><span><i style="background:var(--pen)"></i>${esc(t("k_defects"))} (${esc(t("pieces"))})</span><span><i style="background:var(--ng)"></i>${esc(t("k_ng"))}</span></div><div class="chart chartwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("c_trend"))}">${g}${bars}</svg></div>`;
 }
@@ -1193,31 +1566,35 @@ function renderPeriodReport(){
   <div class="sheet"><span class="lbl">${esc(t("form"))}</span><div class="chips"><button class="chip" data-act="pform" data-v="all" aria-pressed="${(R.pform||"all")==="all"}">${esc(t("all"))}</button>${visForms().map(k=>`<button class="chip" data-act="pform" data-v="${k}" aria-pressed="${R.pform===k}">${esc(tx(FORMS[k]))}</button>`).join("")}</div></div>`;
   if(S.dbErr) return h+`<div class="banner">${esc(S.dbErr)}</div>`;
   const A=agg(slots), ng=recs.filter(r=>r.ketqua==="NG").length, def=recs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), late=recs.filter(isLate).length;
-  h+=`<div class="stats"><div class="stat ${A.due&&A.on/A.due<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${pct(A.on,A.due)}</b><small>${esc(t("k_compliance_s",{a:A.on,b:A.due}))}</small></div>
-    <div class="stat"><span class="lbl">${esc(t("n_checks"))}</span><b>${recs.length}</b></div><div class="stat ng"><span class="lbl">${esc(t("n_ng"))}</span><b>${ng}</b></div>
-    <div class="stat"><span class="lbl">${esc(t("k_defects"))}</span><b>${def}</b><small>${esc(t("k_defects_s"))}</small></div><div class="stat warn"><span class="lbl">${esc(t("k_late"))}</span><b>${late+A.miss}</b><small>${esc(t("k_late_s",{a:late,b:A.miss}))}</small></div></div>`;
+  const DD={from:rr.from,to:rr.to,form:R.pform||"all"}, K=kpiStats(DD), PR=prevRange(rr.from,rr.to), KP=kpiStats({from:PR.from,to:PR.to,until:PR.until,form:DD.form}), pv=v=>({v,hasData:KP.hasData}), PL=PR.label;
+  h+=`<div class="stats"><div class="stat ${A.due&&A.on/A.due<0.9?"warn":"ok"}"><span class="lbl">${esc(t("k_compliance"))}</span><b>${pct(A.on,A.due)}</b><small>${esc(t("k_compliance_s",{a:A.on,b:A.due}))}</small>${deltaHTML(K.comp,pv(KP.comp),"pp",true,PL)}</div>
+    <div class="stat"><span class="lbl">${esc(t("n_checks"))}</span><b>${recs.length}</b>${deltaHTML(K.checks,pv(KP.checks),"n",true,PL)}</div><div class="stat ng"><span class="lbl">${esc(t("n_ng"))}</span><b>${ng}</b>${deltaHTML(K.ngRate,pv(KP.ngRate),"pp",false,PL,t("ng_rate"))}</div>
+    <div class="stat"><span class="lbl">${esc(t("k_defects"))}</span><b>${def}</b><small>${esc(t("k_defects_s"))}</small>${deltaHTML(K.def,pv(KP.def),"n",false,PL)}</div>
+    <div class="stat"><span class="lbl">${esc(t("k_rate"))}</span><b>${fmtPct(K.rate)}</b><small>${K.qty?esc(t("k_rate_s",{d:K.defQ,q:K.qty})):esc(t("k_rate_na"))}</small>${deltaHTML(K.rate,pv(KP.rate),"pp",false,PL)}</div>
+    <div class="stat warn"><span class="lbl">${esc(t("k_late"))}</span><b>${late+A.miss}</b><small>${esc(t("k_late_s",{a:late,b:A.miss}))}</small>${deltaHTML(K.lmRate,pv(KP.lmRate),"pp",false,PL,t("rate_word"))}</div></div>`;
   if(!recs.length) return h+`<div class="empty">${esc(t("no_data"))}</div>`;
   // theo tháng
+  const rateOf = rs => { const q=rs.filter(r=>+r.slKiem>0); const qty=q.reduce((s,r)=>s+(+r.slKiem),0); return qty?fmtPct(q.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0)/qty*100):"—"; };
   const mRows=months.map(m=>{ const rs=recs.filter(r=>r.month===m), sl=slots.filter(s=>s.date.slice(0,7)===m), a=agg(sl);
     const lines=new Set(sl.map(s=>s.form+"|"+s.line)); const aps=[...lines].map(k=>{ const [f,l]=k.split("|"); return S.approvals.get(f+"_"+slug(l)+"_"+m); }).filter(Boolean);
     const apL1=aps.filter(x=>x.l1||x.byUid).length, apL2=aps.filter(x=>x.l2).length;
-    return {m, n:rs.length, comp:pct(a.on,a.due), ng:rs.filter(r=>r.ketqua==="NG").length, def:rs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), late:rs.filter(isLate).length, miss:a.miss, ap:lines.size?t("ap_short",{a:apL1,b:apL2,n:lines.size}):"—", has:a.due>0||rs.length>0}; });
-  h+=`<div class="card"><h3>${esc(t("r_by_month"))}</h3><div class="tablewrap"><table><thead><tr><th>${esc(t("month"))}</th><th class="num">${esc(t("col_checks"))}</th><th class="num">${esc(t("col_compliance"))}</th><th class="num">NG</th><th class="num">${esc(t("col_def"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th><th class="num">${esc(t("col_approval"))}</th></tr></thead>
-    <tbody>${mRows.map(x=>`<tr><td>${esc(fmtMonth(x.m))}</td>${x.has?`<td class="num mono">${x.n}</td><td class="num mono">${x.comp}</td><td class="num mono">${x.ng?`<span style="color:var(--ng)">${x.ng}</span>`:0}</td><td class="num mono">${x.def}</td><td class="num mono">${x.late}</td><td class="num mono">${x.miss}</td><td class="num mono">${x.ap}</td>`:`<td colspan="7" class="sub">—</td>`}</tr>`).join("")}</tbody></table></div></div>`;
+    return {m, n:rs.length, comp:pct(a.on,a.due), ng:rs.filter(r=>r.ketqua==="NG").length, def:rs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), late:rs.filter(isLate).length, miss:a.miss, rate:rateOf(rs), ap:lines.size?t("ap_short",{a:apL1,b:apL2,n:lines.size}):"—", has:a.due>0||rs.length>0}; });
+  h+=`<div class="card"><h3>${esc(t("r_by_month"))}</h3><div class="tablewrap"><table><thead><tr><th>${esc(t("month"))}</th><th class="num">${esc(t("col_checks"))}</th><th class="num">${esc(t("col_compliance"))}</th><th class="num">NG</th><th class="num">${esc(t("col_def"))}</th><th class="num">${esc(t("col_rate"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th><th class="num">${esc(t("col_approval"))}</th></tr></thead>
+    <tbody>${mRows.map(x=>`<tr><td>${esc(fmtMonth(x.m))}</td>${x.has?`<td class="num mono">${x.n}</td><td class="num mono">${x.comp}</td><td class="num mono">${x.ng?`<span style="color:var(--ng)">${x.ng}</span>`:0}</td><td class="num mono">${x.def}</td><td class="num mono">${x.rate}</td><td class="num mono">${x.late}</td><td class="num mono">${x.miss}</td><td class="num mono">${x.ap}</td>`:`<td colspan="8" class="sub">—</td>`}</tr>`).join("")}</tbody></table></div></div>`;
   // xu hướng theo tháng
   const W=Math.max(460, months.length*52+60), H=190, L=34, Rm=8, T=12, B=26, mx=Math.max(4,...mRows.map(x=>x.ng+x.def)), top=Math.ceil(mx/4)*4, bw=(W-L-Rm)/months.length, y=v=>T+(top-v)*(H-T-B)/top;
   let g=""; for(let v=0; v<=top; v+=top/4) g+=`<line x1="${L}" x2="${W-Rm}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
   mRows.forEach((x,i)=>{ const bx=L+i*bw+bw*0.22, w=bw*0.56;
-    if(x.def) g+=`<rect x="${bx}" y="${y(x.def)}" width="${w}" height="${y(0)-y(x.def)}" rx="3" fill="var(--pen)"><title>${esc(fmtMonth(x.m)+": "+x.def+" "+t("pieces"))}</title></rect>`;
-    if(x.ng) g+=`<rect x="${bx}" y="${y(x.def+x.ng)}" width="${w}" height="${Math.max(0,y(x.def)-y(x.def+x.ng)-2)}" rx="3" fill="var(--ng)"><title>${esc(fmtMonth(x.m)+": "+x.ng+" NG")}</title></rect>`;
+    if(x.def) g+=`<rect x="${bx}" y="${y(x.def)}" width="${w}" height="${y(0)-y(x.def)}" rx="3" fill="var(--pen)" data-tip="${esc(fmtMonth(x.m)+": "+x.def+" "+t("pieces"))}"></rect>`;
+    if(x.ng) g+=`<rect x="${bx}" y="${y(x.def+x.ng)}" width="${w}" height="${Math.max(0,y(x.def)-y(x.def+x.ng)-2)}" rx="3" fill="var(--ng)" data-tip="${esc(fmtMonth(x.m)+": "+x.ng+" NG")}"></rect>`;
     g+=`<text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${esc(x.m.slice(5))}</text>`; });
   h+=`<div class="card"><h3>${esc(t("r_trend"))}</h3><div class="legend"><span><i style="background:var(--pen)"></i>${esc(t("k_defects"))}</span><span><i style="background:var(--ng)"></i>NG</span></div><div class="chart chartwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("r_trend"))}">${g}</svg></div></div>`;
   // theo line
   const byLine={}; slots.forEach(s=>{ const k=s.form+"|"+s.line; const o=byLine[k]=byLine[k]||{f:s.form,l:s.line,sl:[],rs:[]}; o.sl.push(s); });
   recs.forEach(r=>{ const k=r.form+"|"+r.line; const o=byLine[k]=byLine[k]||{f:r.form,l:r.line,sl:[],rs:[]}; o.rs.push(r); });
-  const lRows=Object.values(byLine).map(o=>{ const a=agg(o.sl); return {o, n:o.rs.length, comp:pct(a.on,a.due), ng:o.rs.filter(r=>r.ketqua==="NG").length, def:o.rs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), miss:a.miss, late:o.rs.filter(isLate).length}; }).sort((a,b)=>FORM_KEYS.indexOf(a.o.f)-FORM_KEYS.indexOf(b.o.f)||a.o.l.localeCompare(b.o.l));
-  h+=`<div class="card"><h3>${esc(t("r_by_line"))}</h3><div class="tablewrap"><table><thead><tr><th>${esc(t("line_machine"))}</th><th>${esc(t("area"))}</th><th class="num">${esc(t("col_checks"))}</th><th class="num">${esc(t("col_compliance"))}</th><th class="num">NG</th><th class="num">${esc(t("col_def"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th></tr></thead>
-    <tbody>${lRows.map(x=>`<tr><td>${esc(x.o.l)} <span class="sub">${esc(tx(FORMS[x.o.f]))}</span></td><td>${esc(areaName(areaOfLine(x.o.f,x.o.l)))}</td><td class="num mono">${x.n}</td><td class="num mono">${x.comp}</td><td class="num mono">${x.ng?`<span style="color:var(--ng)">${x.ng}</span>`:0}</td><td class="num mono">${x.def}</td><td class="num mono">${x.late}</td><td class="num mono">${x.miss}</td></tr>`).join("")}</tbody></table></div></div>`;
+  const lRows=Object.values(byLine).map(o=>{ const a=agg(o.sl); return {o, n:o.rs.length, comp:pct(a.on,a.due), ng:o.rs.filter(r=>r.ketqua==="NG").length, def:o.rs.reduce((s,r)=>s+((r.loi&&r.loi.tong)||0),0), miss:a.miss, late:o.rs.filter(isLate).length, rate:rateOf(o.rs)}; }).sort((a,b)=>FORM_KEYS.indexOf(a.o.f)-FORM_KEYS.indexOf(b.o.f)||a.o.l.localeCompare(b.o.l));
+  h+=`<div class="card"><h3>${esc(t("r_by_line"))}</h3><div class="tablewrap"><table><thead><tr><th>${esc(t("line_machine"))}</th><th>${esc(t("area"))}</th><th class="num">${esc(t("col_checks"))}</th><th class="num">${esc(t("col_compliance"))}</th><th class="num">NG</th><th class="num">${esc(t("col_def"))}</th><th class="num">${esc(t("col_rate"))}</th><th class="num">${esc(t("s_late"))}</th><th class="num">${esc(t("s_miss"))}</th></tr></thead>
+    <tbody>${lRows.map(x=>`<tr><td>${esc(x.o.l)} <span class="sub">${esc(tx(FORMS[x.o.f]))}</span></td><td>${esc(areaName(areaOfLine(x.o.f,x.o.l)))}</td><td class="num mono">${x.n}</td><td class="num mono">${x.comp}</td><td class="num mono">${x.ng?`<span style="color:var(--ng)">${x.ng}</span>`:0}</td><td class="num mono">${x.def}</td><td class="num mono">${x.rate}</td><td class="num mono">${x.late}</td><td class="num mono">${x.miss}</td></tr>`).join("")}</tbody></table></div></div>`;
   // Pareto + hạng mục
   const tot={}; let unk=0; recs.forEach(r=>{ const l=r.loi||{}; if(!l.tong) return; const ct=l.chiTiet||{}; if(Object.keys(ct).length) Object.entries(ct).forEach(([k,v])=>tot[k]=(tot[k]||0)+v); else unk+=l.tong; });
   const all=Object.values(tot).reduce((a,b)=>a+b,0)+unk; let cum=0;
@@ -1255,7 +1632,7 @@ function renderCapa(){
       <div class="grid2"><div class="field"><label class="lbl" for="cc-${id}">${esc(t("cause"))}</label><textarea id="cc-${id}" data-capa="${id}" data-f="cause" ${ro?"readonly":""} style="min-height:64px">${esc(dr.cause!=null?dr.cause:(c.cause||""))}</textarea></div>
         <div class="field"><label class="lbl" for="ca-${id}">${esc(t("action"))}</label><textarea id="ca-${id}" data-capa="${id}" data-f="action" ${ro?"readonly":""} style="min-height:64px">${esc(dr.action!=null?dr.action:(c.action||""))}</textarea></div></div>
       ${ro?"":`<div class="savebar">${["doing","closed"].map(s=>`<button class="chip sm" data-act="capast" data-id="${id}" data-v="${s}" aria-pressed="${(dr.status||st)===s}">${esc(t("st_"+s))}</button>`).join("")}<button class="btn primary sm" data-act="capasave" data-id="${id}">${esc(t("capa_save"))}</button></div>`}
-      ${c.updatedAt?`<div class="src">${esc(t("handled_by",{who:userName(c.byUid)||"",t:new Date(c.updatedAt).toLocaleString(LANG==="ja"?"ja-JP":"vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})}))}</div>`:""}
+      ${c.updatedAt?`<div class="src">${esc(t("handled_by",{who:userName(c.byUid)||"",t:fmtDTShort(c.updatedAt)}))}</div>`:""}
     </div>`;
   }).join("");
   return h;
@@ -1339,6 +1716,19 @@ function renderUsers(){
 }
 
 /* ---------- Cài đặt ---------- */
+function satDraft(c){ return { mode: S.cfgSat? S.cfgSat.mode : satModeOf(c), anchor: S.cfgSat? S.cfgSat.anchor : (c.satAnchor||"") }; }
+function satSettings(c){
+  const s=satDraft(c), tmp=Object.assign({},c,{satMode:s.mode, satAnchor:s.anchor, holidays:c.holidays||[], extraDays:c.extraDays||[]});
+  let h=`<div><span class="lbl">${esc(t("sat_title"))}</span><div class="chips">${["all","alt","none"].map(m=>`<button class="chip sm" data-act="satmode" data-v="${m}" aria-pressed="${s.mode===m}">${esc(t("sat_"+m))}</button>`).join("")}</div></div>`;
+  if(s.mode==="alt"){
+    const d0=parseD(todayStr()); d0.setDate(d0.getDate()+((6-d0.getDay()+7)%7));
+    const sats=[]; for(let i=0;i<8;i++){ const x=new Date(d0); x.setDate(d0.getDate()+i*7); sats.push(dstr(x)); }
+    h+=`<div class="row" style="align-items:flex-end"><div class="field" style="max-width:280px"><label class="lbl" for="c-sat-btn">${esc(t("sat_anchor"))}</label>${dateField("c-sat",s.anchor,"date")}<div class="sub">${esc(t("sat_anchor_s"))}</div></div>
+      <div class="field"><button class="btn ghost sm" data-act="satflip">⇄ ${esc(t("sat_flip"))}</button></div></div>
+      <div><span class="lbl">${esc(t("sat_next"))}</span><div class="chips">${sats.map(d=>{ const w=workdayOf(tmp,d); return `<span class="pill ${w?"p-ok":"p-idle"}" style="font-weight:600">${esc(fmtDateNum(d).slice(0,5))} · ${esc(t(w?"sat_work":"sat_off"))}</span>`; }).join("")}</div></div>`;
+  }
+  return h;
+}
 const RULES_FS = `rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -1440,10 +1830,13 @@ function renderSettings(){
     <div class="field"><label class="lbl" for="c-tmin">${esc(t("tmin"))}</label><input type="number" id="c-tmin" value="${c.pvc.tMin}"></div><div class="field"><label class="lbl" for="c-tmax">${esc(t("tmax"))}</label><input type="number" id="c-tmax" value="${c.pvc.tMax}"></div>
     <div class="field"><label class="lbl" for="c-smin">${esc(t("smin"))}</label><input type="number" id="c-smin" value="${c.pvc.sMin}"></div><div class="field"><label class="lbl" for="c-smax">${esc(t("smax"))}</label><input type="number" id="c-smax" value="${c.pvc.sMax}"></div></div></div>
   <div class="sheet"><h3>${esc(t("set_deadline"))}</h3><p class="sub" style="margin:0">${esc(t("set_deadline_s"))}</p><div class="row">
-    <div class="field"><label class="lbl" for="c-dl-sang">${esc(t("ca_sang"))}</label><input type="time" id="c-dl-sang" value="${esc(c.deadlines.sang)}"></div>
-    <div class="field"><label class="lbl" for="c-dl-chieu">${esc(t("ca_chieu"))}</label><input type="time" id="c-dl-chieu" value="${esc(c.deadlines.chieu)}"></div></div>
-    <div class="field" style="max-width:260px"><label class="lbl" for="c-start">${esc(t("start_date"))}</label><input type="date" id="c-start" value="${esc(c.startDate||"")}"><div class="sub">${esc(t("start_date_s"))}</div></div>
-    <div><span class="lbl">${esc(t("set_workdays"))}</span><div class="chips">${[1,2,3,4,5,6,0].map(d=>`<button class="chip sm" data-act="wd" data-v="${d}" aria-pressed="${(S.cfgWd||c.workdays).includes(d)}">${esc(t("wd")[d])}</button>`).join("")}</div></div></div>
+    <div class="field"><label class="lbl" for="c-dl-sang">${esc(t("ca_sang"))}</label>${timeField("c-dl-sang",c.deadlines.sang)}</div>
+    <div class="field"><label class="lbl" for="c-dl-chieu">${esc(t("ca_chieu"))}</label>${timeField("c-dl-chieu",c.deadlines.chieu)}</div></div>
+    <div class="field" style="max-width:260px"><label class="lbl" for="c-start-btn">${esc(t("start_date"))}</label>${dateField("c-start",c.startDate||"","date")}<div class="sub">${esc(t("start_date_s"))}</div></div>
+    <div><span class="lbl">${esc(t("set_workdays"))}</span><div class="chips">${[1,2,3,4,5,0].map(d=>`<button class="chip sm" data-act="wd" data-v="${d}" aria-pressed="${(S.cfgWd||c.workdays).includes(d)}">${esc(t("wd")[d])}</button>`).join("")}</div></div>
+    ${satSettings(c)}
+    <div class="field" style="max-width:360px"><label class="lbl" for="c-hol">${esc(t("holidays"))}</label><textarea id="c-hol" style="min-height:110px;font-family:var(--f-data)">${esc((c.holidays||[]).map(fmtDateNum).join("\n"))}</textarea><div class="sub">${esc(t("holidays_s"))}</div></div>
+    <div class="field" style="max-width:360px"><label class="lbl" for="c-extra">${esc(t("extra_days"))}</label><textarea id="c-extra" style="min-height:80px;font-family:var(--f-data)">${esc((c.extraDays||[]).map(fmtDateNum).join("\n"))}</textarea><div class="sub">${esc(t("extra_days_s"))}</div></div></div>
   <div class="sheet"><h3>${esc(t("set_photo"))}</h3><div class="chips">${["ng","item","off"].map(m=>`<button class="chip" data-act="pm" data-v="${m}" aria-pressed="${((S.cfgPm||c.photoMode)==="sheet_ng"?"ng":(S.cfgPm||c.photoMode))===m}">${esc(t("pm_"+m))}</button>`).join("")}</div></div>
   <div class="savebar"><button class="btn primary" data-act="savecfg">${esc(t("save"))}</button></div>${S.cfgMsg?`<div class="msg ${S.cfgMsg.cls||""}">${esc(S.cfgMsg.t)}</div>`:""}
   <div class="sheet"><h3>${esc(t("set_system"))}</h3>
@@ -1451,10 +1844,296 @@ function renderSettings(){
     <div class="sub">Firestore index: <b>records</b> — area ↑ + month ↑ (Collection)</div>
     <details><summary>Firestore Rules</summary><div class="savebar" style="margin-block:8px"><button class="btn ghost sm" data-act="copy" data-v="fs">Copy</button></div><pre class="code" id="rules-fs">${esc(RULES_FS)}</pre></details>
     <details><summary>Storage Rules</summary><div class="savebar" style="margin-block:8px"><button class="btn ghost sm" data-act="copy" data-v="st">Copy</button></div><pre class="code" id="rules-st">${esc(RULES_ST)}</pre></details>
+    ${S.B.mode==="demo"?`<div class="sheet" style="background:var(--pen-soft);border-color:var(--pen)"><h3>${esc(t("sample_title"))}</h3><p class="sub" style="margin:0;color:var(--ink)">${esc(t("sample_desc"))}</p><p class="sub" style="margin:0">${esc(t("sample_accounts"))}</p><div class="savebar"><button class="btn primary" data-act="sample-gen">${esc(t("sample_gen"))}</button><button class="btn ghost" data-act="sample-clear">${esc(t("sample_clear"))}</button></div></div>`:""}
     ${S.B.mode==="demo"?`<div class="savebar"><button class="btn danger" data-act="demoreset">${esc(t("demo_reset"))}</button></div>`:""}
   </div>`;
   return h;
 }
+
+/* =====================================================================
+   GIAO DIỆN CÔNG NHÂN (vai trò Nhân viên kiểm tra)
+   Một màn hình = một câu hỏi. Nút to, biểu tượng, ít chữ.
+   Ngày, giờ, ca do app tự ghi. Dữ liệu lưu y hệt phiếu thường (dùng save()).
+   ===================================================================== */
+const IC = {
+  kim:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 18 6"/><path d="M15 3l6 6"/><circle cx="18.5" cy="5.5" r="1.2" fill="currentColor"/><path d="M3 14h4M3 10h2"/></svg>',
+  caosu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21v-6l-2-4V6a1.5 1.5 0 0 1 3 0v4"/><path d="M8 10V4.5a1.5 1.5 0 0 1 3 0V10"/><path d="M11 10V4a1.5 1.5 0 0 1 3 0v6"/><path d="M14 10V5.5a1.5 1.5 0 0 1 3 0V14l-2 3v4"/><path d="M7 21h8"/></svg>',
+  pvc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.5V4a2 2 0 1 1 4 0v10.5a4 4 0 1 1-4 0z"/><path d="M12 9v7"/><circle cx="12" cy="17.5" r="1.5" fill="currentColor"/></svg>',
+  sang:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="4"/><path d="M12 3v2M4.9 6.9l1.4 1.4M3 13h2M19 13h2M17.7 8.3l1.4-1.4M3 19h18"/></svg>',
+  chieu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 18a5 5 0 0 1 10 0"/><path d="M12 7v3M4.2 10.2l1.4 1.4M19.8 10.2l-1.4 1.4M3 18h18M8 21h8"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  ng:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  go:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>',
+  stop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z"/><path d="M8 12h8" stroke-width="3" stroke-linecap="round"/></svg>',
+  out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-5"/><path d="M10 8l-4 4 4 4M6 12h10"/></svg>'
+};
+const W = {}; // trạng thái bước kiểm: S.wz
+
+function workerShell(){
+  document.body.classList.add("wkmode");
+  const init=String(S.me.name||"?").trim().split(/\s+/).pop().charAt(0).toUpperCase();
+  return `<div class="wk"><header class="wk-top"><div class="wk-ava" aria-hidden="true">${esc(init)}</div>
+    <div class="wk-who"><b>${esc(S.me.name)}</b><span>${esc(fmtDateLong(todayStr()))}</span></div>
+    ${langSwitch()}<button class="wk-out" data-act="w-logout" aria-label="${esc(t("w_logout"))}">${IC.out}<span>${esc(t("w_logout"))}</span></button></header>
+    ${navigator.onLine===false?`<div class="banner">${esc(t("offline"))}</div>`:""}
+    <section id="view"></section></div>`;
+}
+
+/* ---------- Danh sách việc hôm nay ---------- */
+function workerTasks(){
+  const today=todayStr(), out=[];
+  myForms().forEach(f=>myLines(f).forEach(l=>CAS.forEach(ca=>{
+    const r=recFor(f,l,today,ca), si=slotInfo(f,l,today,ca);
+    let st;
+    if(r) st=r.ketqua==="NG"?"ng":"ok";
+    else if(!isWorkday(today)) return;
+    else if(si.state==="miss") st="late";
+    else st = (ca==="chieu" && hhmm()<"11:30") ? "after" : "todo";
+    out.push({f,l,ca,st,r});
+  })));
+  const rank={late:0,todo:1,after:2,ng:3,ok:4};
+  out.sort((a,b)=>rank[a.st]-rank[b.st] || CAS.indexOf(a.ca)-CAS.indexOf(b.ca) || FORM_KEYS.indexOf(a.f)-FORM_KEYS.indexOf(b.f) || a.l.localeCompare(b.l));
+  return out;
+}
+function taskCard(x){
+  const label={late:"w_st_late",todo:"w_st_todo",after:"w_st_after",ok:"w_st_ok",ng:"w_st_ng"}[x.st];
+  const meta = x.r ? " · "+(x.r.gio||"") : "";
+  return `<button class="wk-task ${x.st}" data-act="w-open" data-f="${x.f}" data-l="${esc(x.l)}" data-ca="${x.ca}">
+    <span class="ic">${IC[x.f]}</span>
+    <span><span class="nm">${esc(x.l)}</span><span class="ca">${IC[x.ca]}${esc(caName(x.ca))}${esc(meta)}</span><span class="st">${esc(t(label))}</span></span>
+    <span class="go">${x.r?(x.st==="ng"?IC.ng:IC.ok):IC.go}</span></button>`;
+}
+function renderTaskList(){
+  const list=workerTasks();
+  let h=`<h1 class="wk-h">${esc(t("w_hello",{n:String(S.me.name||"").trim().split(/\s+/).pop()}))}</h1>`;
+  if(!myForms().length) return h+`<div class="wk-empty">${esc(t("w_none"))}</div>`;
+  if(!list.length) return h+`<div class="wk-empty">${esc(t("w_off"))}</div>`;
+  const left=list.filter(x=>!x.r).length;
+  h+=`<p class="wk-sub">${esc(left?t("w_left",{n:left})+" · "+t("w_tap"):t("w_all_done"))}</p>`;
+  const todo=list.filter(x=>!x.r), done=list.filter(x=>x.r);
+  if(todo.length) h+=`<div class="wk-list">${todo.map(taskCard).join("")}</div>`;
+  if(done.length) h+=`<div class="wk-grp">${esc(t("w_st_ok").split(/\s[–-]\s/)[0])}</div><div class="wk-list">${done.map(taskCard).join("")}</div>`;
+  return h;
+}
+
+/* ---------- Bước kiểm ---------- */
+function wzItems(f){ return FORMS[f].items.map(i=>i.k); }
+function wzSteps(){
+  const d=S.draft, ev=evalDraft(d), st=["code", ...wzItems(d.form)];
+  if(activeDefects(d.form).length){ st.push("qty","defects"); }
+  if(ev.ketqua==="NG") st.push("stop");
+  st.push("review");
+  return st;
+}
+function wzOpen(f,l,ca){
+  const r=recFor(f,l,todayStr(),ca);
+  S.draft = r ? draftFromRecord(r) : newDraft(f,l,todayStr(),ca);
+  if(!r){ S.draft.gio=hhmm(); }
+  S.overwrite=!!r; S.saveMsg=null;
+  S.wz={key: r?"review":"code", fail:{}, other:{}, done:null, q:""};
+  if(r) wzItems(f).forEach(k=>{ if(recNgKeys(r).includes(k)) S.wz.fail[k]=true; });
+  window.scrollTo(0,0); render();
+}
+function wzGo(key){ S.wz.key=key; S.saveMsg=null; window.scrollTo(0,0); render(); }
+function wzNext(){ const st=wzSteps(), i=st.indexOf(S.wz.key); wzGo(st[Math.min(st.length-1,i+1)]); }
+function wzBack(){ const st=wzSteps(), i=st.indexOf(S.wz.key); if(i<=0){ wzQuit(); return; } wzGo(st[i-1]); }
+function wzQuit(force){
+  const d=S.draft, dirty = !S.overwrite && d && (d.maHang || Object.keys(d.photos||{}).length);
+  if(dirty && !force){
+    openModal(`<h3 style="font-size:22px">${esc(t("w_quit_q"))}</h3><div style="display:flex;flex-direction:column;gap:10px">
+      <button class="wz-next" data-act="closemodal">${esc(t("w_quit_no"))}</button><button class="wz-ghost" data-act="w-quit2">${esc(t("w_quit_yes"))}</button></div>`, true); return;
+  }
+  closeModal(); S.wz=null; S.draft=newDraft(); window.scrollTo(0,0); render();
+}
+/* Trạng thái từng hạng mục */
+function itemState(k){
+  const d=S.draft, f=d.form;
+  if(f==="kim"){ const v=d.items[k]||{}; const vals=POINTS.map(([p])=>v[p]); if(vals.some(x=>x==="NG")||S.wz.fail[k]) return "ng"; if(vals.every(x=>x==="OK")) return "ok"; return null; }
+  if(f==="caosu"){ const v=d.items[k]; return v==="NG"?"ng":v==="OK"?"ok":null; }
+  const p=cfg().pvc, v=parseFloat(k==="nhietDo"?d.nhietDo:d.tocDo); if(isNaN(v)) return null;
+  const [a,b]=k==="nhietDo"?[p.tMin,p.tMax]:[p.sMin,p.sMax]; return (v<a||v>b)?"ng":"ok";
+}
+function ngDetailOk(k){
+  const d=S.draft, ev=evalDraft(d);
+  if(d.form==="kim"){ const v=d.items[k]||{}; if(!POINTS.some(([p])=>v[p]==="NG")) return false; }
+  if(!String((d.lyDo||{})[k]||"").trim()) return false;
+  if(ev.needPhotos.includes(k) && !d.photos[k] && !d.oldPhotos[k]) return false;
+  return true;
+}
+function pastReasons(f,k){
+  const cnt={}; S.records.forEach(r=>{ if(r.form!==f) return; const v=(r.lyDo||{})[k]; if(v){ const s=String(v).trim(); if(s) cnt[s]=(cnt[s]||0)+1; } });
+  return Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,6);
+}
+function ngDetail(k){
+  const d=S.draft, ev=evalDraft(d), why=String((d.lyDo||{})[k]||"");
+  let h="";
+  if(d.form==="kim"){
+    const v=d.items[k]||{};
+    h+=`<div class="wz-sec"><span class="wz-lbl">${esc(t("w_which"))}</span><div class="wz-pts">${POINTS.map(([p,pn])=>{ const ng=v[p]==="NG"; return `<button class="wz-pt ${ng?"ng":"ok"}" data-act="w-pt" data-k="${k}" data-p="${p}" aria-pressed="${ng}">${ng?IC.ng:IC.ok}<span>${esc(tx(pn))}</span></button>`; }).join("")}</div></div>`;
+  }
+  const chips=pastReasons(d.form,k);
+  h+=`<div class="wz-sec"><span class="wz-lbl">${esc(t("w_why"))}</span>
+    ${chips.length?`<div class="wz-chips">${chips.map(c=>`<button class="wz-chip ${why===c?"on":""}" data-act="w-why" data-k="${k}" data-v="${esc(c)}">${esc(c)}</button>`).join("")}</div>`:""}
+    <label class="sub" for="w-why-${k}" style="font-size:15px">${esc(t("w_why_other"))}</label>
+    <input class="wz-in" id="w-why-${k}" data-wwhy="${k}" value="${esc(chips.includes(why)?"":why)}" autocomplete="off"></div>`;
+  if(ev.needPhotos.includes(k) || cfg().photoMode==="item"){
+    const ph=d.photos[k];
+    h+=`<div class="wz-sec">${ph?`<div class="wz-shot"><img src="${ph.url}" alt=""><label class="wz-cam done" style="flex:1">${IC.cam}<span>${esc(t("w_photo_again"))}</span><input type="file" accept="image/*" capture="environment" data-photo="${k}" hidden></label></div>`
+      :`<label class="wz-cam">${IC.cam}<span>${esc(t("w_photo"))}</span><input type="file" accept="image/*" capture="environment" data-photo="${k}" hidden></label>`}
+      ${d.processing?`<div class="sub">${esc(t("processing"))}</div>`:""}</div>`;
+  }
+  return h;
+}
+function needText(k){
+  const d=S.draft, ev=evalDraft(d);
+  if(d.form==="kim"){ const v=d.items[k]||{}; if(!POINTS.some(([p])=>v[p]==="NG")) return t("w_need_pts"); }
+  if(!String((d.lyDo||{})[k]||"").trim()) return t("w_need_why");
+  if(ev.needPhotos.includes(k) && !d.photos[k] && !d.oldPhotos[k]) return t("w_need_photo");
+  return "";
+}
+function keypad(field, unit, range){
+  const d=S.draft, v=String(d[field]||""), n=parseFloat(v);
+  const st = range && !isNaN(n) ? ((n<range[0]||n>range[1])?"out":"in") : "";
+  return `<div class="kp-disp ${st}"><b>${esc(v||"0")}</b>${unit?`<span>${esc(unit)}</span>`:""}</div>
+    <div class="kp-state" style="color:var(--${st==="out"?"ng":st==="in"?"ok":"muted"})">${st?esc(t(st==="out"?"w_out":"w_in")):range?esc(t("w_std",{a:range[0],b:range[1]})):""}</div>
+    <div class="kp">${["1","2","3","4","5","6","7","8","9", range?".":"", "0","del"].map(x=>x===""?`<span></span>`:`<button class="${x==="del"?"fn":""}" data-act="w-kp" data-f="${field}" data-v="${x}" aria-label="${x==="del"?esc(t("w_kp_del")):x}">${x==="del"?esc(t("w_kp_del")):x}</button>`).join("")}</div>`;
+}
+function renderWizard(){
+  const d=S.draft, f=d.form, st=wzSteps(), key=S.wz.key, i=Math.max(0,st.indexOf(key)), ev=evalDraft(d);
+  const ctx=`<div class="wz-ctx">${IC[f]}<span><b>${esc(d.line)}</b> · ${esc(caName(d.ca))}${d.maHang&&key!=="code"?" · "+esc(d.maHang):""}</span></div>`;
+  let h=`<div class="wz-bar"><button class="wz-ib" data-act="w-back" aria-label="${esc(t("w_back"))}">${IC.back}</button>
+    <div class="wz-prog"><small>${esc(t("w_step",{i:i+1,n:st.length}))}</small><div class="wz-dots">${st.map((s,j)=>`<i class="${j<i?"done":j===i?"cur":""}"></i>`).join("")}</div></div>
+    <button class="wz-ib" data-act="w-quit" aria-label="${esc(t("w_home"))}">${IC.close}</button></div>${ctx}`;
+  const next=(ok,label,cls)=>`<button class="wz-next ${cls||""}" data-act="${cls==="save"?"w-save":"w-next"}" ${ok?"":"disabled"}>${esc(label||t("w_next"))}${cls==="save"?"":IC.go}</button>`;
+
+  if(key==="code"){
+    const prods=activeProducts(f), recent=ls.get("kcb.codes_"+f,[])||[], q=(S.wz.q||"").trim().toLowerCase();
+    let list=prods.slice().sort((a,b)=>{ const ia=recent.indexOf(a.code), ib=recent.indexOf(b.code); return (ia<0?99:ia)-(ib<0?99:ib) || a.code.localeCompare(b.code); });
+    if(q) list=list.filter(x=>x.code.toLowerCase().includes(q)||String(x.name||"").toLowerCase().includes(q));
+    h+=`<h2 class="wz-q">${esc(t("w_q_code"))}</h2>`;
+    if(!prods.length) h+=`<div class="wk-empty">${esc(t("no_products"))}</div>`;
+    else { if(prods.length>8) h+=`<input class="wz-in" id="w-codeq" type="search" placeholder="${esc(t("w_find"))}" value="${esc(S.wz.q||"")}" style="margin-bottom:12px" autocomplete="off">`;
+      h+=`<div class="wz-tiles">${list.map(x=>`<button class="wz-tile ${d.maHang===x.code?"on":""}" data-act="w-code" data-v="${esc(x.code)}"><b>${esc(x.code)}</b>${x.name&&x.name!==x.code?`<span>${esc(x.name)}</span>`:""}</button>`).join("")||`<span class="sub">${esc(t("no_match"))}</span>`}</div>`; }
+    return h;
+  }
+  if(wzItems(f).includes(key)){
+    const it=FORMS[f].items.find(x=>x.k===key), s=itemState(key);
+    h+=`<h2 class="wz-q">${esc(tx(it))}</h2>`;
+    if(f==="pvc"){
+      const p=cfg().pvc, rg=key==="nhietDo"?[p.tMin,p.tMax]:[p.sMin,p.sMax];
+      h=h.replace(`<h2 class="wz-q">${esc(tx(it))}</h2>`,`<h2 class="wz-q">${esc(t("w_q_"+key))}</h2>`);
+      h+=keypad(key, key==="nhietDo"?"°C":"", rg);
+      if(s==="ng") h+=ngDetail(key);
+      const ok = s==="ok" || (s==="ng" && ngDetailOk(key));
+      return h+(s==="ng"&&!ok?`<div class="wz-need">${esc(needText(key))}</div>`:"")+next(ok);
+    }
+    if(f==="kim") h+=`<p class="wz-hint">${esc(t("w_kim_hint"))}</p>`;
+    h+=`<div class="wz-yn"><button class="wz-big pass ${s==="ok"?"on":""}" data-act="w-pass" data-k="${key}">${IC.ok}<span>${esc(t("w_pass"))}</span></button>
+      <button class="wz-big fail ${s==="ng"?"on":""}" data-act="w-fail" data-k="${key}">${IC.ng}<span>${esc(t("w_fail"))}</span></button></div>`;
+    if(s==="ng"){ h+=ngDetail(key); const ok=ngDetailOk(key); h+=(!ok?`<div class="wz-need">${esc(needText(key))}</div>`:"")+next(ok); }
+    else if(s==="ok") h+=next(true);
+    return h;
+  }
+  if(key==="qty"){
+    h+=`<h2 class="wz-q">${esc(t("w_q_qty"))}</h2>`+keypad("slKiem", t("w_pcs"), null);
+    return h+next(parseInt(d.slKiem,10)>0);
+  }
+  if(key==="defects"){
+    const defs=activeDefects(f), tot=Object.values(d.loi||{}).reduce((s,v)=>s+(+v||0),0), q=parseInt(d.slKiem,10)||0;
+    h+=`<h2 class="wz-q">${esc(t("w_q_def"))}</h2>`;
+    if(!tot) h+=`<button class="wz-next save" data-act="w-nodef" style="margin:0 0 16px">${IC.ok}<span>${esc(t("w_no_def"))}</span></button>`;
+    h+=`<p class="wz-hint">${esc(t("w_def_tap"))}</p><div class="df-grid">${defs.map(x=>{ const n=+d.loi[x.id]||0; return `<div class="df ${n?"has":""}"><button data-act="w-def" data-v="${esc(x.id)}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px"><span>${esc(tx(x))}</span><b>${n||""}</b></button>${n?`<div class="df-ctl"><button data-act="w-defm" data-v="${esc(x.id)}" aria-label="−">−</button><button data-act="w-def0" data-v="${esc(x.id)}" aria-label="${esc(t("remove_def"))}">${IC.close.replace('<svg ','<svg width="18" height="18" ')}</button></div>`:""}</div>`; }).join("")}</div>`;
+    if(tot) h+=`<div class="df-tot">${esc(t("w_def_total",{n:tot}))}</div>`;
+    const over = q>0 && tot>q;
+    if(over) h+=`<div class="wz-need">${esc(t("qty_lt_def",{d:tot,q}))}</div>`;
+    return h+(tot?next(!over):"");
+  }
+  if(key==="stop"){
+    const who=cfg().contacts[f]||"";
+    h+=`<div class="stopbox">${IC.stop}<h2>${esc(t("w_stop"))}</h2><p>${esc(t("w_stop_call"))}</p><div class="who">${esc(who)}</div></div>
+      <button class="wz-next ${d.daBao?"save":""}" data-act="w-called" style="margin-top:16px">${d.daBao?IC.ok:""}<span>${esc(t("w_stop_done"))}</span></button>`;
+    return h;
+  }
+  if(key==="review"){
+    h+=`<h2 class="wz-q">${esc(t("w_review"))}</h2><p class="wz-hint">${esc(t("w_auto"))}: ${esc(fmtDateLong(d.date))} · ${esc(d.gio)}</p><div class="rv">`;
+    const row=(state,title,sub,step)=>`<div class="rv-row"><span class="ic ${state}">${state==="ok"?IC.ok:state==="ng"?IC.ng:""}</span><span class="tx">${esc(title)}${sub?`<small>${esc(sub)}</small>`:""}</span>${step?`<button data-act="w-goto" data-v="${step}">${esc(t("w_change"))}</button>`:""}</div>`;
+    h+=row("ok", t("w_code")+": "+d.maHang, "", "code");
+    wzItems(f).forEach(k=>{ const it=FORMS[f].items.find(x=>x.k===k), s=itemState(k)||"na";
+      let sub=""; if(f==="pvc") sub=(k==="nhietDo"?d.nhietDo+" °C":String(d.tocDo)); if(s==="ng") sub=[sub, f==="kim"?POINTS.filter(([p])=>(d.items[k]||{})[p]==="NG").map(([p,pn])=>tx(pn)).join(", "):"", (d.lyDo||{})[k]||""].filter(Boolean).join(" · ");
+      h+=row(s, tx(it), sub, k); });
+    if(activeDefects(f).length){
+      h+=row("ok", t("w_qty")+": "+(d.slKiem||"—")+" "+t("w_pcs"), "", "qty");
+      const tot=Object.values(d.loi||{}).reduce((s,v)=>s+(+v||0),0);
+      h+=row(tot?"ng":"ok", t("w_defs")+": "+(tot?tot+" "+t("w_pcs"):t("w_nothing")), tot?Object.entries(d.loi).filter(([k,v])=>v>0).map(([k,v])=>defName(k)+" "+v).join(", "):"", "defects");
+    }
+    h+=`</div>`;
+    const okAll = !ev.missing.length && !(ev.noReason||[]).length && !ev.missingPhotos.length && (ev.ketqua!=="NG"||d.daBao);
+    if(S.saveMsg && S.saveMsg.cls==="err") h+=`<div class="wz-need err">${esc(S.saveMsg.t)}</div>`;
+    h+=`<button class="wz-next save" data-act="w-save" ${okAll&&!S.saving?"":"disabled"}>${IC.ok}<span>${esc(S.saving?(S.prog||t("w_saving")):t("w_save"))}</span></button>`;
+    return h;
+  }
+  return h;
+}
+function renderDone(){
+  const x=S.wz.done, nx=workerTasks().find(o=>!o.r && (o.st==="todo"||o.st==="late"));
+  return `<div class="wk-done"><div class="big ${x.ng?"ng":""}">${IC.ok}</div><h2>${esc(t("w_saved"))}</h2>
+    <p>${esc(x.line)} · ${esc(caName(x.ca))} · ${esc(x.gio)}</p>${x.ng?`<p style="color:var(--ng);font-weight:700">${esc(t("w_saved_ng"))}</p>`:""}</div>
+    ${nx?`<button class="wz-next" data-act="w-open" data-f="${nx.f}" data-l="${esc(nx.l)}" data-ca="${nx.ca}">${esc(t("w_next_task"))}: ${esc(nx.l)} · ${esc(caName(nx.ca))}${IC.go}</button>`:""}
+    <button class="wz-ghost" data-act="w-home">${esc(t("w_home"))}</button>`;
+}
+function renderWork(){
+  if(S.wz && S.wz.done) return renderDone();
+  if(S.wz) return renderWizard();
+  return renderTaskList();
+}
+
+/* ---------- Sự kiện ---------- */
+async function workerClick(a,b){
+  const d=S.draft;
+  switch(a){
+    case "w-logout": await doLogout(); document.body.classList.remove("wkmode"); return true;
+    case "w-open": wzOpen(b.dataset.f,b.dataset.l,b.dataset.ca); return true;
+    case "w-home": S.wz=null; S.draft=newDraft(); render(); return true;
+    case "w-back": wzBack(); return true;
+    case "w-quit": wzQuit(false); return true;
+    case "w-quit2": wzQuit(true); return true;
+    case "w-goto": wzGo(b.dataset.v); return true;
+    case "w-next": wzNext(); return true;
+    case "w-code": d.maHang=b.dataset.v; S.wz.q=""; wzNext(); return true;
+    case "w-pass": { const k=b.dataset.k; if(d.form==="kim") d.items[k]={trai:"OK",giua:"OK",phai:"OK"}; else d.items[k]="OK"; delete S.wz.fail[k]; delete d.lyDo[k]; if(d.photos[k]){ try{URL.revokeObjectURL(d.photos[k].url);}catch(e){} delete d.photos[k]; } wzNext(); return true; }
+    case "w-fail": { const k=b.dataset.k; S.wz.fail[k]=true; if(d.form==="kim"){ const v=d.items[k]||{}; if(!POINTS.some(([p])=>v[p]==="NG")) d.items[k]={trai:"OK",giua:"OK",phai:"OK"}; } else d.items[k]="NG"; render(); return true; }
+    case "w-pt": { const k=b.dataset.k, p=b.dataset.p, v=d.items[k]; v[p]= v[p]==="NG"?"OK":"NG"; render(); return true; }
+    case "w-why": { const k=b.dataset.k; d.lyDo[k]= d.lyDo[k]===b.dataset.v ? "" : b.dataset.v; render(); return true; }
+    case "w-kp": { const f=b.dataset.f, v=b.dataset.v; let s=String(d[f]||"");
+      if(v==="del") s=s.slice(0,-1); else if(v==="."){ if(!s.includes(".")) s=(s||"0")+"."; } else if(s.replace(".","").length<7) s=(s==="0"?"":s)+v;
+      d[f]=s; render(); return true; }
+    case "w-def": d.loi[b.dataset.v]=(+d.loi[b.dataset.v]||0)+1; render(); return true;
+    case "w-defm": { const k=b.dataset.v, v=(+d.loi[k]||0)-1; if(v>0) d.loi[k]=v; else delete d.loi[k]; render(); return true; }
+    case "w-def0": delete d.loi[b.dataset.v]; render(); return true;
+    case "w-nodef": d.loi={}; wzNext(); return true;
+    case "w-called": d.daBao=!d.daBao; if(d.daBao) wzNext(); else render(); return true;
+    case "w-save": { const snap={line:d.line, ca:d.ca, gio:d.gio, ng:evalDraft(d).ketqua==="NG"}; S.quietToast=true; await save(); S.quietToast=false;
+      if(S.saveMsg && S.saveMsg.cls==="ok"){ S.wz={done:snap}; S.saveMsg=null; window.scrollTo(0,0); } render(); return true; }
+  }
+  return false;
+}
+function workerInput(tg){
+  const d=S.draft; if(!d || !S.wz) return false;
+  if(tg.dataset && tg.dataset.wwhy){ d.lyDo[tg.dataset.wwhy]=tg.value; const nx=document.querySelector(".wz-next"); const k=tg.dataset.wwhy;
+    if(nx){ nx.disabled=!ngDetailOk(k); } const nd=document.querySelector(".wz-need"); if(nd) nd.textContent=needText(k); return true; }
+  if(tg.id==="w-codeq"){ S.wz.q=tg.value; render(); return true; }
+  return false;
+}
+document.addEventListener("keydown", e=>{
+  if(!S.wz || S.wz.done || !S.me || S.me.role!=="staff") return;
+  const ae=document.activeElement; if(ae && /INPUT|TEXTAREA/.test(ae.tagName)) return;
+  const btn=document.querySelector('[data-act="w-kp"]'); if(!btn) return;
+  const f=btn.dataset.f, map={Backspace:"del",".":".",",":"."}; const v=/^[0-9]$/.test(e.key)?e.key:map[e.key]; if(!v) return;
+  const b=document.querySelector(`[data-act="w-kp"][data-v="${v}"]`); if(b){ e.preventDefault(); workerClick("w-kp",b); }
+});
 
 /* =====================================================================
    RENDER, SỰ KIỆN, KHỞI ĐỘNG
@@ -1465,17 +2144,22 @@ function render(){
   requestAnimationFrame(()=>{ queued=false; draw(); });
 }
 function draw(){
+  { const tp=document.getElementById("tip"); if(tp) tp.hidden=true; }
   document.documentElement.lang = LANG==="ja"?"ja":"vi";
   document.body.classList.toggle("ja", LANG==="ja");
   if(!S.ready) return;
+  if(!S.me || S.me.role!=="staff") document.body.classList.remove("wkmode");
   if(!S.me){ const a=document.activeElement, id=a&&a.id; renderLogin(); if(id){ const el=document.getElementById(id); if(el) el.focus(); } return; }
   const a=document.activeElement, aid=a&&a.id, sel=(a&&a.selectionStart!=null)?[a.selectionStart,a.selectionEnd]:null;
   if(!$("#view") || $("#app").dataset.shell!==S.me.uid+LANG+S.tab+tabsFor().join()+(navigator.onLine?"1":"0")){
     $("#app").innerHTML=shell(); $("#app").dataset.shell=S.me.uid+LANG+S.tab+tabsFor().join()+(navigator.onLine?"1":"0");
   }
   refReg.clear();
-  const v={entry:renderEntry, today:renderToday, capa:renderCapa, dash:renderDash, report:renderReport, catalog:renderCatalog, assign:renderAssign, users:renderUsers, settings:renderSettings}[S.tab];
+  /* Cài đặt: giữ các ô đang sửa dở khi màn hình vẽ lại (bấm chip, chọn ngày…) */
+  const keep = (S.tab==="settings" && S.setDirty && S.setDirty.size) ? [...S.setDirty].map(id=>{ const e=document.getElementById(id); return e?[id,e.value]:null; }).filter(Boolean) : null;
+  const v={work:renderWork, entry:renderEntry, today:renderToday, capa:renderCapa, dash:renderDash, report:renderReport, catalog:renderCatalog, assign:renderAssign, users:renderUsers, settings:renderSettings}[S.tab];
   $("#view").innerHTML=v?v():"";
+  if(keep) keep.forEach(([id,val])=>{ const e=document.getElementById(id); if(e && e.value!==val){ e.value=val; const btn=document.getElementById(id+"-btn"); if(btn && val){ const sp=btn.querySelector("span"); if(sp) sp.textContent=btn.dataset.kind==="month"?fmtMonthLabel(val):fmtDateLong(val); } } });
   if(aid){ const el=document.getElementById(aid); if(el && el!==a){ el.focus({preventScroll:true}); if(sel) try{el.setSelectionRange(sel[0],sel[1]);}catch(e){} } }
   hydrate();
 }
@@ -1491,7 +2175,7 @@ function hydrate(){
     try{ const u=await S.B.photoURL(ref); if(u) img.src=u; }catch(e){}
   });
 }
-function setTab(tb){ if(tb==="catalog"){ S.catDraft=null; S.catMsg=null; } if(tb==="assign") S.asgDraft=null; S.tab=tb; syncSubs(); render(); window.scrollTo(0,0); }
+function setTab(tb){ if(tb!==S.tab){ S.setDirty=new Set(); S.cfgSat=null; S.cfgWd=null; } if(tb==="catalog"){ S.catDraft=null; S.catMsg=null; } if(tb==="assign") S.asgDraft=null; S.tab=tb; syncSubs(); render(); window.scrollTo(0,0); }
 
 /* ---------- Modal ---------- */
 function openModal(html, narrow){ $("#modal").innerHTML=`<div class="modal" data-act="closemodal-bg"><div class="box ${narrow?"narrow":""}" role="dialog" aria-modal="true">${html}</div></div>`; const f=$("#modal input,#modal button"); if(f) f.focus(); }
@@ -1533,12 +2217,12 @@ async function doSetup(){
   catch(e){ S.login.msg={t:e.code==="exists"?t("admin_exists"):String(e.code)}; S.login.mode="login"; }
   S.login.busy=false; render();
 }
-async function doLogout(){ closeModal(); stopListeners(); await S.B.logout(); S.me=null; S.draft=null; S.login={mode:"login",msg:null,busy:false}; $("#app").dataset.shell=""; render(); }
+async function doLogout(){ S.wz=null; closeModal(); stopListeners(); await S.B.logout(); S.me=null; S.draft=null; S.login={mode:"login",msg:null,busy:false}; $("#app").dataset.shell=""; render(); }
 function onAuth(prof, why){
   if(!prof){ S.me=null; S.ready=true; if(why) S.login.msg={t:t(why==="inactive"?"login_inactive":why==="net"?"login_net":"login_noprofile")}; render(); return; }
   S.me=prof; S.ready=true;
   if(prof.lang && prof.lang!==LANG){ LANG=prof.lang; try{localStorage.setItem("kcb.lang",LANG);}catch(e){} }
-  S.tab=tabsFor()[0]; S.draft=newDraft(); S.asgDraft=null;
+  S.tab=tabsFor()[0]; S.wz=null; S.draft=newDraft(); S.asgDraft=null;
   startListeners(); render();
 }
 const withTimeout=(p,ms)=>Promise.race([p, new Promise(r=>setTimeout(()=>r("__timeout"),ms))]);
@@ -1549,6 +2233,7 @@ async function save(){
   if(ev.noReason && ev.noReason.length) return fail("need_reason",{x:ev.noReason.join(", ")});
   if(ev.ketqua==="NG" && !d.daBao) return fail("need_confirm");
   if(ev.missingPhotos.length) return fail("need_photo",{x:ev.missingPhotos.map(k=>photoLabel(d.form,k)).join(", ")});
+  { const q=parseInt(d.slKiem,10)||0, dt=Object.values(d.loi||{}).reduce((s,v)=>s+(+v||0),0); if(q>0 && dt>q) return fail("qty_lt_def",{d:dt,q}); }
   const id=docId(d.form,d.line,d.date,d.ca);
   const existing=recFor(d.form,d.line,d.date,d.ca) || (S.B.getRecord? await S.B.getRecord(id).catch(()=>null) : null);
   if(existing && S.me.role==="staff" && existing.byUid && existing.byUid!==S.me.uid) return fail("not_owner",{who:existing.nguoi||""});
@@ -1571,6 +2256,7 @@ async function save(){
     ketqua:ev.ketqua, ngItems:ev.ng, ghiChu:d.ghiChu.trim(), daBao:ev.ketqua==="NG"?!!d.daBao:false, nguon:"app", ghiLuc:(existing&&existing.ghiLuc&&S.overwrite&&byUid!==S.me.uid)?existing.ghiLuc:new Date().toISOString(), suaBoi: (existing?S.me.uid:null), photos};
   if(d.form==="kim") rec.items=JSON.parse(JSON.stringify(d.items));
   if(d.form==="caosu") rec.items=Object.assign({},d.items);
+  if(parseInt(d.slKiem,10)>0) rec.slKiem=parseInt(d.slKiem,10);
   { const ct={}; let tong=0; Object.entries(d.loi||{}).forEach(([k,v])=>{ v=+v||0; if(v>0){ ct[k]=v; tong+=v; } }); if(tong || d.form==="caosu") rec.loi={tong, loai:Object.keys(ct), chiTiet:ct}; }
   if(existing && existing.capa) rec.capa=existing.capa;
   if(d.form==="pvc"){ rec.nhietDo=parseFloat(d.nhietDo); rec.tocDo=parseFloat(d.tocDo); }
@@ -1580,7 +2266,7 @@ async function save(){
     if(res==="__timeout"){ S.records.set(id,rec); }
     ls.set("kcb.lastForm",d.form); ls.set("kcb.lastLine_"+d.form,d.line); { const code=d.maHang.trim(), key="kcb.codes_"+d.form; ls.set(key,[code,...(ls.get(key,[])||[]).filter(x=>x!==code)].slice(0,8)); }
     Object.values(d.photos).forEach(p=>{ try{URL.revokeObjectURL(p.url);}catch(e){} });
-    toast(ev.ketqua==="NG"?t("saved_ng"):t("saved_toast",{f:tx(FORMS[d.form]),l:d.line}));
+    if(!S.quietToast) toast(ev.ketqua==="NG"?t("saved_ng"):t("saved_toast",{f:tx(FORMS[d.form]),l:d.line}));
     const ml=myLines(d.form), nx=ml[(ml.indexOf(d.line)+1)%Math.max(1,ml.length)]||d.line; S.draft=newDraft(d.form,nx,d.date,d.ca); S.overwrite=false;
     S.saveMsg={cls:"ok",t:t("saved_at",{t:hhmm()})};
   }catch(e){ S.saveMsg={cls:"err",t: e.code==="permission-denied"?t("perm_err"):t("save_fail",{c:e.code||"err"})}; }
@@ -1601,15 +2287,21 @@ async function onPhoto(input){
 }
 function csvFor(recs){
   const q=v=>{ const s=String(v==null?"":v); return /[",\n;]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
-  const head=[t("form"),t("line_machine"),t("col_day"),t("col_ca"),t("col_time"),t("col_by"),t("col_res"),...FORMS.kim.items.map(i=>tx(FORMS.kim)+" - "+tx(i)),t("col_code"),...FORMS.caosu.items.map(i=>tx(FORMS.caosu)+" - "+tx(i)),t("col_defect"),t("temp"),t("speed"),t("col_note"),t("reported"),t("col_photo"),t("col_src"),"ghiLuc"];
+  const head=[t("form"),t("line_machine"),t("col_day"),t("col_ca"),t("col_time"),t("col_by"),t("col_res"),...FORMS.kim.items.map(i=>tx(FORMS.kim)+" - "+tx(i)),t("col_code"),...FORMS.caosu.items.map(i=>tx(FORMS.caosu)+" - "+tx(i)),t("col_defect"),t("col_qty"),t("col_rate"),t("temp"),t("speed"),t("col_note"),t("reported"),t("col_photo"),t("col_src"),"ghiLuc"];
   const rows=recs.map(r=>[tx(FORMS[r.form]),r.line,r.date,caName(r.ca),r.gio,r.nguoi,r.ketqua,
     ...FORMS.kim.items.map(i=>r.form==="kim"?kimCell((r.items||{})[i.k]):""), r.maHang||"",
-    ...FORMS.caosu.items.map(i=>r.form==="caosu"?((r.items||{})[i.k]||""):""), loiText(r), r.nhietDo??"", r.tocDo??"", r.ghiChu||"", r.ketqua==="NG"?(r.daBao?"x":""):"", (r.photos||[]).length||"", r.nguon==="giay"?t("src_paper"):r.mau?t("src_sample"):t("src_app"), r.ghiLuc||""]);
+    ...FORMS.caosu.items.map(i=>r.form==="caosu"?((r.items||{})[i.k]||""):""), loiText(r), +r.slKiem>0?r.slKiem:"", +r.slKiem>0?fmtPct(((r.loi&&r.loi.tong)||0)/r.slKiem*100):"", r.nhietDo??"", r.tocDo??"", r.ghiChu||"", r.ketqua==="NG"?(r.daBao?"x":""):"", (r.photos||[]).length||"", r.nguon==="giay"?t("src_paper"):r.mau?t("src_sample"):t("src_app"), r.ghiLuc||""]);
   return "﻿"+[head,...rows].map(a=>a.map(q).join(",")).join("\r\n");
 }
 function saveFile(name, content, type){
   const blob=new Blob([content],{type}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
   document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); toast(t("downloaded",{f:name}));
+}
+function parseHolidays(txt){
+  const out=[]; txt.split(/[\n,;]+/).map(s=>s.trim()).filter(Boolean).forEach(s=>{ let m;
+    if((m=s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/))) out.push(m[1]+"-"+pad(+m[2])+"-"+pad(+m[3]));
+    else if((m=s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/))) out.push(m[3]+"-"+pad(+m[2])+"-"+pad(+m[1])); });
+  return [...new Set(out)].sort();
 }
 async function saveCfg(){
   const lines=id=>[...new Set(document.getElementById(id).value.split("\n").map(s=>s.trim()).filter(Boolean))];
@@ -1621,10 +2313,13 @@ async function saveCfg(){
     deadlines:{sang:$("#c-dl-sang").value||c.deadlines.sang, chieu:$("#c-dl-chieu").value||c.deadlines.chieu},
     workdays:(S.cfgWd||c.workdays).slice().sort(), photoMode:S.cfgPm||c.photoMode,
     areas:(S.cfgAreas||c.areas).map((a,i)=>{ const el=document.querySelector(`[data-area-name="${i}"]`); return {id:a.id, name:(el?el.value.trim():a.name)||a.name}; }),
-    lineArea:Object.assign({}, c.lineArea||{}, S.cfgLineArea||{}), startDate:($("#c-start")||{}).value||"" };
+    lineArea:Object.assign({}, c.lineArea||{}, S.cfgLineArea||{}), startDate:($("#c-start")||{}).value||"", holidays:parseHolidays(($("#c-hol")||{}).value||""),
+    satMode:satDraft(c).mode, satAnchor:satDraft(c).anchor, extraDays:parseHolidays(($("#c-extra")||{}).value||"") };
+  next.workdays=next.workdays.filter(x=>x!==6);
+  if(next.satMode==="alt"){ if(!next.satAnchor){ S.cfgMsg={cls:"err",t:t("sat_need_anchor")}; render(); return; } if(parseD(next.satAnchor).getDay()!==6){ S.cfgMsg={cls:"err",t:t("sat_not_sat")}; render(); return; } }
   const ids=next.areas.map(a=>a.id); Object.keys(next.lineArea).forEach(k=>{ if(!ids.includes(next.lineArea[k])) delete next.lineArea[k]; });
   FORM_KEYS.forEach(f=>next.lines[f].forEach(l=>{ const k=lineKey(f,l); if(!next.lineArea[k]) next.lineArea[k]= ids.includes(f)?f:ids[0]; }));
-  try{ await withTimeout(S.B.setConfig(next),8000); S.cfgWd=null; S.cfgPm=null; S.cfgAreas=null; S.cfgLineArea=null; S.cfgMsg={cls:"ok",t:t("set_saved")}; toast(t("set_saved")); }
+  try{ await withTimeout(S.B.setConfig(next),8000); S.cfgWd=null; S.cfgPm=null; S.cfgAreas=null; S.cfgLineArea=null; S.cfgSat=null; S.setDirty=new Set(); S.cfgMsg={cls:"ok",t:t("set_saved")}; toast(t("set_saved")); }
   catch(e){ S.cfgMsg={cls:"err",t:t("perm_err")}; }
   render();
 }
@@ -1646,11 +2341,71 @@ async function resetPw(uid){
     <div class="savebar"><button class="btn primary" data-act="dorp" data-u="${uid}">${esc(t("save"))}</button><button class="btn ghost" data-act="closemodal">${esc(t("cancel"))}</button></div>`, true);
 }
 
+/* ---------- Chọn ngày / tháng (theo ngôn ngữ app) ---------- */
+function applyField(id, value){
+  const el=document.getElementById(id); if(el) el.value=value;
+  const btn=document.getElementById(id+"-btn"); if(btn){ const sp=btn.querySelector("span"); if(sp) sp.textContent = btn.dataset.kind==="month"?fmtMonthLabel(value):fmtDateLong(value); }
+  const d=S.draft;
+  if(id==="f-date" && d){ d.date=value; S.overwrite=false; S.saveMsg=null; syncSubs(); render(); }
+  else if(id==="f-today"){ S.todayDate=value; syncSubs(); render(); }
+  else if(id==="f-month"){ S.rep.month=value; syncSubs(); render(); }
+  else if(id==="d-from"){ S.dash.from=value; if(S.dash.to<value) S.dash.to=value; S.dash.sel=null; syncSubs(); render(); }
+  else if(id==="c-sat"){ const s=satDraft(cfg()); s.anchor=value; S.cfgSat=s; render(); }
+  else if(id==="d-to"){ S.dash.to=value; if(S.dash.from>value) S.dash.from=value; S.dash.sel=null; syncSubs(); render(); }
+}
+window.kcbSetField=applyField;
+function closeDP(){ S.dp=null; const el=$("#dp"); if(el){ el.hidden=true; el.innerHTML=""; } }
+function openDP(id,kind){ const cur=($("#"+id)||{}).value || (kind==="month"?todayStr().slice(0,7):todayStr()); const [y,m]=cur.split("-").map(Number); S.dp={id,kind,y,m:m||1,cur}; drawDP(); }
+function drawDP(){
+  const P=S.dp, el=$("#dp"); if(!P) return;
+  let h="";
+  if(P.kind==="month"){
+    h=`<div class="dph"><button type="button" data-act="dp-nav" data-v="-12" aria-label="‹">‹</button><span>${esc(t("dp_year",{y:P.y}))}</span><button type="button" data-act="dp-nav" data-v="12" aria-label="›">›</button></div><div class="dpg m">`+t("mname").map((nm,i)=>{ const v=P.y+"-"+pad(i+1); return `<button type="button" data-act="dp-pick" data-v="${v}" class="${v===P.cur?"sel":""} ${v===todayStr().slice(0,7)?"today":""}">${esc(nm)}</button>`; }).join("")+`</div><div class="dpf"><span></span><button type="button" class="btn ghost sm" data-act="dp-close">${esc(t("close"))}</button></div>`;
+  } else {
+    const first=new Date(P.y,P.m-1,1), off=(first.getDay()+6)%7, days=new Date(P.y,P.m,0).getDate();
+    let cells=t("dp_wd").map(w=>`<span>${esc(w)}</span>`).join(""); for(let i=0;i<off;i++) cells+=`<span></span>`;
+    for(let dd=1; dd<=days; dd++){ const v=P.y+"-"+pad(P.m)+"-"+pad(dd); cells+=`<button type="button" data-act="dp-pick" data-v="${v}" class="${v===P.cur?"sel":""} ${v===todayStr()?"today":""} ${!isWorkday(v)?"off":""}">${dd}</button>`; }
+    h=`<div class="dph"><button type="button" data-act="dp-nav" data-v="-1" aria-label="‹">‹</button><span>${esc(t("dp_title",{m:P.m,y:P.y}))}</span><button type="button" data-act="dp-nav" data-v="1" aria-label="›">›</button></div><div class="dpg">${cells}</div><div class="dpf"><button type="button" class="btn ghost sm" data-act="dp-pick" data-v="${todayStr()}">${esc(t("today_btn"))}</button><button type="button" class="btn ghost sm" data-act="dp-close">${esc(t("close"))}</button></div>`;
+  }
+  el.innerHTML=h; el.hidden=false;
+  const btn=document.getElementById(P.id+"-btn"); const r=btn?btn.getBoundingClientRect():{left:16,bottom:80,top:60};
+  const w=el.offsetWidth, hh=el.offsetHeight; let left=Math.max(12,Math.min(r.left, window.innerWidth-w-12));
+  let top=r.bottom+6; if(top+hh>window.innerHeight-12) top=Math.max(12, r.top-hh-6);
+  el.style.left=left+"px"; el.style.top=top+"px";
+}
+window.addEventListener("scroll", ()=>{ if(S.dp) closeDP(); }, {passive:true});
+window.addEventListener("resize", ()=>{ if(S.dp) closeDP(); });
+
+/* ---------- Hộp thông tin khi rê chuột ---------- */
+function tipEl(){ return document.getElementById("tip"); }
+document.addEventListener("mouseover", e=>{ const el=e.target.closest && e.target.closest("[data-tip]"); const tp=tipEl(); if(!tp) return; if(!el){ tp.hidden=true; return; } tp.textContent=el.getAttribute("data-tip"); tp.hidden=false; });
+document.addEventListener("mousemove", e=>{ const tp=tipEl(); if(!tp || tp.hidden) return; const w=tp.offsetWidth, h=tp.offsetHeight; let x=e.clientX+14, y=e.clientY+14; if(x+w>innerWidth-8) x=e.clientX-w-14; if(y+h>innerHeight-8) y=e.clientY-h-14; tp.style.left=x+"px"; tp.style.top=y+"px"; });
+document.addEventListener("mouseout", e=>{ const rt=e.relatedTarget; if(!rt || !rt.closest || !rt.closest("[data-tip]")){ const tp=tipEl(); if(tp) tp.hidden=true; } });
+
+/* ---------- Chi tiết phiếu ---------- */
+function showRecord(r){
+  const F=FORMS[r.form]; let items="";
+  if(r.form==="kim") items=F.items.map(it=>{ const v=(r.items||{})[it.k]||{}; return `<tr><td>${esc(tx(it))}</td><td class="mono">${POINTS.map(([p,pn])=>esc(tx(pn))+": "+(v[p]==="NG"?`<b style="color:var(--ng)">NG</b>`:esc(v[p]||"—"))).join(" · ")}</td><td>${esc((r.lyDo||{})[it.k]||"")}</td></tr>`; }).join("");
+  if(r.form==="caosu") items=F.items.map(it=>{ const v=(r.items||{})[it.k]; return `<tr><td>${esc(tx(it))}</td><td class="mono">${v==="NG"?`<b style="color:var(--ng)">NG</b>`:v==="OK"?esc(t("pass")):"—"}</td><td>${esc((r.lyDo||{})[it.k]||"")}</td></tr>`; }).join("");
+  if(r.form==="pvc") items=`<tr><td>${esc(t("temp"))}</td><td class="mono">${esc(r.nhietDo)}</td><td>${esc((r.lyDo||{}).nhietDo||"")}</td></tr><tr><td>${esc(t("speed"))}</td><td class="mono">${esc(r.tocDo)}</td><td>${esc((r.lyDo||{}).tocDo||"")}</td></tr>`;
+  const c=r.capa||{};
+  openModal(`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><h3>${esc(t("rec_detail"))} · ${esc(r.line)}</h3><div class="sub">${esc(tx(F))} · ${esc(fmtDateLong(r.date))} · ${esc(caName(r.ca))} ${esc(r.gio||"")} · ${esc(r.nguoi||"")}</div></div><button class="btn ghost sm" data-act="closemodal">${esc(t("close"))}</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="pill ${r.ketqua==="NG"?"p-ng":"p-ok"}">${esc(r.ketqua)}</span>${capaPill(r)}${isLate(r)?`<span class="pill p-warn">${esc(t("st_late"))}</span>`:""}<span class="sub">${esc(t("col_code"))}: <b>${esc(r.maHang||"—")}</b>${+r.slKiem>0?" · "+esc(t("sl_kiem"))+": "+r.slKiem:""}${r.ghiLuc?" · "+esc(t("src_app"))+" "+esc(fmtDT(r.ghiLuc)):""}${r.mau?" · "+esc(t("src_sample")):""}</span></div>
+    <div class="tablewrap"><table><thead><tr><th>${esc(t("step_items").replace(/^\d+ · /,""))}</th><th>${esc(t("col_res"))}</th><th>${esc(t("reason"))}</th></tr></thead><tbody>${items}</tbody></table></div>
+    ${r.loi&&r.loi.tong?`<div><b>${esc(t("col_defect"))}:</b> ${esc(loiText(r))}</div>`:""}
+    ${r.ketqua==="NG"?`<div class="sub"><b>${esc(t("cause"))}:</b> ${esc(c.cause||"—")}<br><b>${esc(t("action"))}:</b> ${esc(c.action||"—")}</div>`:""}
+    ${(r.photos||[]).length?`<div>${thumbs(r)}</div>`:""}
+    ${!isViewer()?`<div class="savebar"><button class="btn ghost sm" data-act="editrec" data-id="${esc(r.id)}">${esc(t("open_old"))}</button></div>`:""}`);
+  hydrate();
+}
+
 document.addEventListener("submit", e=>{ if(e.target.id==="loginform"){ e.preventDefault(); doLogin(); } });
 document.addEventListener("click", async e=>{
   const tb=e.target.closest("[data-tab]"); if(tb){ setTab(tb.dataset.tab); return; }
+  if(S.dp && !e.target.closest("#dp") && !e.target.closest("[data-act=dp-open]")) closeDP();
   const b=e.target.closest("[data-act]"); if(!b) return;
   const a=b.dataset.act, d=S.draft;
+  if(a.startsWith("w-") && await workerClick(a,b)) return;
   if(a==="closemodal-bg"){ if(e.target===b) closeModal(); return; }
   const touch=()=>{ S.saveMsg=null; S.overwrite=false; };
   switch(a){
@@ -1717,7 +2472,18 @@ document.addEventListener("click", async e=>{
       try{ if(isAdmin() && cur.l2){ const {l2, ...rest}=cur; delete rest.id; await S.B.setApproval(id,rest); } else await S.B.setApproval(id,null); }catch(x){ toast(t("perm_err")); } return; }
     case "csv": saveFile(`${S.rep.form}_${slug(S.rep.line||"")}_${S.rep.month}.csv`, csvFor(recsFor(S.rep.month,S.rep.form,S.rep.line)), "text/csv;charset=utf-8"); return;
     case "csvall": saveFile(`kiemtra_${S.rep.month}.csv`, csvFor([...S.records.values()].filter(r=>r.month===S.rep.month).sort((x,y)=>(x.form+x.line+sk(x)).localeCompare(y.form+y.line+sk(y)))), "text/csv;charset=utf-8"); return;
-    case "dform": S.dash.form=b.dataset.v; break;
+    case "dform": S.dash.form=b.dataset.v; S.dash.sel=null; break;
+    case "dp-open": if(S.dp && S.dp.id===b.dataset.for){ closeDP(); return; } openDP(b.dataset.for,b.dataset.kind); return;
+    case "dp-nav": { const P=S.dp; if(!P) return; const v=+b.dataset.v; if(P.kind==="month") P.y+=v/12; else { P.m+=v; if(P.m<1){P.m=12;P.y--;} if(P.m>12){P.m=1;P.y++;} } drawDP(); return; }
+    case "dp-pick": { const id=S.dp&&S.dp.id; closeDP(); if(id) applyField(id,b.dataset.v); return; }
+    case "dp-close": closeDP(); return;
+    case "dsel": { const k=b.getAttribute("data-k"), v=b.getAttribute("data-v"), l=b.getAttribute("data-l")||v; const S0=S.dash.sel; S.dash.sel=(S0&&S0.k===k&&S0.v===v)?null:{k,v,label:l}; if(S.tab!=="dash"){ setTab("dash"); return; } break; }
+    case "dclear": S.dash.sel=null; break;
+    case "dquick": S.dash.from=b.dataset.f; S.dash.to=b.dataset.t; S.dash.sel=null; syncSubs(); break;
+    case "openrec": { const r=S.records.get(b.getAttribute("data-id")); if(r) showRecord(r); return; }
+    case "editrec": { const r=S.records.get(b.dataset.id); if(!r) return; closeModal(); S.draft=draftFromRecord(r); S.overwrite=true; S.saveMsg={t:t("editing")}; setTab("entry"); return; }
+    case "sample-gen": { S.setDirty=new Set(); S.cfgSat=null; S.cfgWd=null; b.disabled=true; b.textContent=t("sample_working"); await new Promise(r=>setTimeout(r,30)); const n=await S.B.seedSample(); const tm=todayStr().slice(0,7); S.dash.from=tm.slice(0,4)+"-01"; S.dash.to=tm; S.dash.sel=null; S.cfgWd=null; syncSubs(); toast(t("sample_done",{n})); render(); return; }
+    case "sample-clear": S.setDirty=new Set(); S.cfgSat=null; await S.B.clearSample(); toast(t("sample_cleared")); render(); return;
     case "dpvc": S.dash.pvcLine=b.dataset.v; break;
     case "asg": { const k=b.dataset.k, r=b.dataset.r, u=b.dataset.u; const o=S.asgDraft[k]=S.asgDraft[k]||{main:[],backup:[]}; const arr=o[r]=o[r]||[]; const i=arr.indexOf(u); if(i>=0) arr.splice(i,1); else { arr.push(u); const other=r==="main"?"backup":"main"; o[other]=(o[other]||[]).filter(x=>x!==u); } break; }
     case "saveasg": { const ch={}, old=S.asg.map||{}, norm=v=>JSON.stringify([(v&&v.main||[]).slice().sort(),(v&&v.backup||[]).slice().sort()]);
@@ -1744,9 +2510,11 @@ document.addEventListener("click", async e=>{
     case "rq": S.rep.q=+b.dataset.v; syncSubs(); break;
     case "pform": S.rep.pform=b.dataset.v; break;
     case "csvperiod": { const P=S._period; if(!P) return; const q=v=>{ const s=String(v==null?"":v); return /[",\n;]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
-      const rows=[[P.title],[],[t("r_by_month"),t("col_checks"),t("col_compliance"),"NG",t("col_def"),t("s_late"),t("s_miss"),t("col_approval")],...P.mRows.map(x=>[fmtMonth(x.m),x.n,x.comp,x.ng,x.def,x.late,x.miss,x.ap]),[],[t("r_by_line"),t("area"),t("col_checks"),t("col_compliance"),"NG",t("col_def"),t("s_late"),t("s_miss")],...P.lRows.map(x=>[x.o.l+" ("+tx(FORMS[x.o.f])+")",areaName(areaOfLine(x.o.f,x.o.l)),x.n,x.comp,x.ng,x.def,x.late,x.miss])];
+      const rows=[[P.title],[],[t("r_by_month"),t("col_checks"),t("col_compliance"),"NG",t("col_def"),t("col_rate"),t("s_late"),t("s_miss"),t("col_approval")],...P.mRows.map(x=>[fmtMonth(x.m),x.n,x.comp,x.ng,x.def,x.rate,x.late,x.miss,x.ap]),[],[t("r_by_line"),t("area"),t("col_checks"),t("col_compliance"),"NG",t("col_def"),t("col_rate"),t("s_late"),t("s_miss")],...P.lRows.map(x=>[x.o.l+" ("+tx(FORMS[x.o.f])+")",areaName(areaOfLine(x.o.f,x.o.l)),x.n,x.comp,x.ng,x.def,x.rate,x.late,x.miss])];
       const rr=repRange(); saveFile(`baocao_${rr.from}_${rr.to}.csv`, "\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n"), "text/csv;charset=utf-8"); return; }
     case "csvperiodraw": { const P=S._period; if(!P) return; const rr=repRange(); saveFile(`kiemtra_${rr.from}_${rr.to}.csv`, csvFor(P.recs.slice().sort((x,y)=>(x.form+x.line+sk(x)).localeCompare(y.form+y.line+sk(y)))), "text/csv;charset=utf-8"); return; }
+    case "satmode": { const s=satDraft(cfg()); s.mode=b.dataset.v; if(s.mode==="alt" && !s.anchor){ const d0=parseD(todayStr()); d0.setDate(d0.getDate()+((6-d0.getDay()+7)%7)); s.anchor=dstr(d0); } S.cfgSat=s; break; }
+    case "satflip": { const s=satDraft(cfg()); const a=parseD(s.anchor||todayStr()); a.setDate(a.getDate()+7); s.anchor=dstr(a); S.cfgSat=s; break; }
     case "wd": { const v=+b.dataset.v; const cur=(S.cfgWd||cfg().workdays).slice(); const i=cur.indexOf(v); if(i>=0) cur.splice(i,1); else cur.push(v); S.cfgWd=cur; break; }
     case "pm": S.cfgPm=b.dataset.v; break;
     case "savecfg": await saveCfg(); return;
@@ -1756,8 +2524,14 @@ document.addEventListener("click", async e=>{
   }
   render();
 });
+function markDirty(e){ const tg=e.target; if(S.tab==="settings" && tg && tg.id && tg.closest && tg.closest("#view") && tg.id!=="c-sat"){ (S.setDirty=S.setDirty||new Set()).add(tg.id); } }
+document.addEventListener("input", markDirty, true);
+document.addEventListener("change", markDirty, true);
 document.addEventListener("input", e=>{
   const tg=e.target, d=S.draft;
+  if(S.me && S.me.role==="staff" && workerInput(tg)) return;
+  if(tg.classList && tg.classList.contains("tfield")){ let v=tg.value.replace(/\D/g,"").slice(0,4); if(v.length>=3) v=v.slice(0,2)+":"+v.slice(2); if(tg.value!==v) tg.value=v; return; }
+  if(tg.id==="c-hol") return;
   if(tg.dataset && tg.dataset.capa){ S.capaDraft=S.capaDraft||{}; S.capaDraft[tg.dataset.capa]=Object.assign(S.capaDraft[tg.dataset.capa]||{}, {[tg.dataset.f]:tg.value}); return; }
   if(tg.dataset && tg.dataset.cat){ const x=S.catDraft[tg.dataset.cat][+tg.dataset.i]; if(x) x[tg.dataset.f]=tg.value; S.catMsg=null; return; }
   if(["n-code","n-pname","n-dvi","n-dja"].includes(tg.id)){ S.catNew=S.catNew||{pf:[],df:["caosu"]}; S.catNew[tg.id.slice(2)]=tg.value; return; }
@@ -1769,6 +2543,7 @@ document.addEventListener("input", e=>{
   if(tg.id==="f-mahang"){ const was=!!String(d.maHang||"").trim(); d.maHang=tg.value; if(was!==!!tg.value.trim()) render(); }
   else if(tg.id==="f-note") d.ghiChu=tg.value;
   else if(tg.dataset && tg.dataset.reason){ d.lyDo[tg.dataset.reason]=tg.value; }
+  else if(tg.id==="f-qty"){ d.slKiem=tg.value; }
   else if(tg.id==="f-t" || tg.id==="f-s"){
     if(tg.id==="f-t") d.nhietDo=tg.value; else d.tocDo=tg.value;
     const p=cfg().pvc, isT=tg.id==="f-t", el=$(isT?"#rg-t":"#rg-s");
@@ -1781,7 +2556,7 @@ document.addEventListener("change", e=>{
   if(tg.matches("input[data-photo]")){ onPhoto(tg); return; }
   if(tg.matches("select[data-role-of]")){ S.B.updateUser(tg.dataset.roleOf,{role:tg.value}).catch(()=>toast(t("perm_err"))); return; }
   if(tg.id==="f-date" && tg.value){ d.date=tg.value; S.overwrite=false; S.saveMsg=null; syncSubs(); render(); }
-  else if(tg.id==="f-gio"){ d.gio=tg.value; }
+  else if(tg.classList.contains("tfield")){ const v=tg.value.length===4&&/^\d{4}$/.test(tg.value)?tg.value.slice(0,2)+":"+tg.value.slice(2):tg.value; if(/^([01]\d|2[0-3]):[0-5]\d$/.test(v)){ tg.value=v; tg.dataset.prev=v; if(tg.id==="f-gio" && d) d.gio=v; } else { tg.value=tg.dataset.prev||""; toast("HH:MM (00:00–23:59)"); } }
   else if(tg.id==="f-t" || tg.id==="f-s"){ render(); }
   else if(tg.id==="f-year"){ S.rep.y=+tg.value; syncSubs(); render(); }
   else if(tg.matches("select[data-line-area]")){ S.cfgLineArea=Object.assign({},S.cfgLineArea||{}); S.cfgLineArea[tg.dataset.lineArea]=tg.value; }
@@ -1791,7 +2566,10 @@ document.addEventListener("change", e=>{
   else if(tg.id==="d-from" && tg.value){ S.dash.from=tg.value; if(S.dash.to<tg.value) S.dash.to=tg.value; syncSubs(); render(); }
   else if(tg.id==="d-to" && tg.value){ S.dash.to=tg.value; if(S.dash.from>tg.value) S.dash.from=tg.value; syncSubs(); render(); }
 });
-document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("#modal").innerHTML) closeModal(); });
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape"){ if(S.dp){ closeDP(); return; } if($("#modal").innerHTML) closeModal(); }
+  if(e.key==="Enter" && e.target.matches && e.target.matches("tr[data-act]")) e.target.click();
+});
 window.addEventListener("online", render); window.addEventListener("offline", render);
 setInterval(()=>{ if(S.me && S.tab==="today") render(); }, 60000);
 
